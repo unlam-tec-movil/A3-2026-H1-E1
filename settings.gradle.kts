@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ScaffoldingV2"
+rootProject.name = "GambApp"
 include(":app")

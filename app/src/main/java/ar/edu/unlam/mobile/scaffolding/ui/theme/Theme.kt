@@ -70,3 +70,16 @@ fun ScaffoldingV2Theme(
         content = content,
     )
 }
+
+@Composable
+fun GambAppTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = true,
+    content: @Composable () -> Unit,
+) {
+    ScaffoldingV2Theme(
+        darkTheme = darkTheme,
+        dynamicColor = dynamicColor,
+        content = content,
+    )
+}
