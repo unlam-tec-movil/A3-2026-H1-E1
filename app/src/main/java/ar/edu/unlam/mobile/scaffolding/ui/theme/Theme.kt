@@ -17,32 +17,41 @@ import androidx.core.view.WindowCompat
 
 private val DarkColorScheme =
     darkColorScheme(
-        primary = Purple80,
-        secondary = PurpleGrey80,
-        tertiary = Pink80,
+        primary = ElectricIndigo,
+        secondary = CyanWave,
+        tertiary = MidnightDeep,
+        background = DarkBg,
+        surface = DarkSurface,
+        outline = DarkBorder,
+        outlineVariant = DarkBorder,
+        onBackground = DarkTextPrimary,
+        onSurface = DarkTextPrimary,
+        onPrimary = LightSurface,
+        onSecondary = MidnightDeep,
+        onTertiary = DarkTextPrimary,
     )
 
 private val LightColorScheme =
     lightColorScheme(
-        primary = Purple40,
-        secondary = PurpleGrey40,
-        tertiary = Pink40,
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-     */
+        primary = ElectricIndigo,
+        secondary = CyanWave,
+        tertiary = MidnightDeep,
+        background = LightBg,
+        surface = LightSurface,
+        outline = LightBorder,
+        outlineVariant = LightBorder,
+        onBackground = LightTextPrimary,
+        onSurface = LightTextPrimary,
+        onPrimary = LightSurface,
+        onSecondary = LightSurface,
+        onTertiary = LightSurface,
     )
 
 @Composable
 fun ScaffoldingV2Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val colorScheme =
@@ -60,7 +69,7 @@ fun ScaffoldingV2Theme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 
@@ -74,7 +83,7 @@ fun ScaffoldingV2Theme(
 @Composable
 fun GambAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     ScaffoldingV2Theme(
