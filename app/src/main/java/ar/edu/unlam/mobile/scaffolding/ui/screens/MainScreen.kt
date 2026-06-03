@@ -69,7 +69,7 @@ fun MainScreen() {
             }
         },
     ) { paddingValue ->
-        NavHost(navController = controller, startDestination = HOME_SCREEN_ROUTE) {
+        NavHost(navController = controller, startDestination = "Dev3PlayGround") {
             composable("home") {
                 HomeScreen(modifier = Modifier.padding(paddingValue))
             }
@@ -78,6 +78,9 @@ fun MainScreen() {
                     modifier = Modifier.padding(paddingValue),
                     snackbarHostState = snackBarHostState,
                 )
+            }
+            composable("Dev3PlayGround") {
+                Dev3PlayGround()
             }
             composable(
                 route = "user/{id}",

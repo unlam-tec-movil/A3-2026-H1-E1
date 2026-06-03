@@ -106,8 +106,8 @@ dependencies {
     implementation("com.google.mlkit:pose-detection:18.0.0-beta3")
 
     // Play Services Location & Google Maps (Dev 3)
-    implementation("com.google.android.gms:play-services-location:21.1.0")
-    implementation("com.google.maps.android:maps-compose:4.3.3")
+    implementation(libs.play.services.location)
+    implementation(libs.maps.compose)
 
     // Health Connect Client (Dev 4)
     implementation("androidx.health.connect:connect-client:1.1.0-alpha07")
