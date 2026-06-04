@@ -24,6 +24,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.Dev3PlayGroundViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,7 +63,7 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
                         Toast
                             .makeText(
                                 context,
-                                "permission already granted, hot mommies near by and aproaching, you better run",
+                                "permission already granted, hot mommies near by and approaching, you better run",
                                 Toast.LENGTH_SHORT,
                             ).show()
                         vm.onLocationPermissionGranted()
@@ -94,3 +95,20 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
         }
     }
 }
+// "id": "a0571f4e-3773-4077-be8b-1d4032c81a02",
+// "name": "BienKinesio",
+// "category": "physical_therapy",
+// "address": "Juan José Paso 289",
+// "city": "Martínez",
+// "region": "",
+// "postcode": "B1640",
+// "phone": "+541148989030",
+// "website": "http://www.bienkinesio.com/",
+// "lat": -34.48979723,
+// "lng": -58.49666901,
+// "confidence_score": 0.557,
+// "email": "",
+// "manager_name": "",
+// "manager_title": "",
+// "source": "overture",
+// "imported_at": "2026-05-05T23:42:06.298423+00:00"

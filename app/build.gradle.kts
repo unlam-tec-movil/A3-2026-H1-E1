@@ -59,6 +59,9 @@ android {
         }
     }
 }
+configurations.all {
+    exclude(group = "com.intellij", module = "annotations")
+}
 
 dependencies {
 
@@ -92,9 +95,13 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // Room (Persistencia Local)
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    ksp("androidx.room:room-compiler:2.6.1")
+//    implementation("androidx.room:room-runtime:2.6.1")
+//    implementation("androidx.room:room-ktx:2.6.1")
+//    ksp("androidx.room:room-compiler:2.6.1")
+
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    implementation(libs.room.compiler)
 
     // DataStore (Configuración / Cache de Sesión)
     implementation("androidx.datastore:datastore-preferences:1.0.0")
