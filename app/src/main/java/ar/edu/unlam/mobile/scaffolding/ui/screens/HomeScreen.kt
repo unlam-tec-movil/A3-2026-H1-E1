@@ -8,6 +8,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.components.Greeting
+import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.HelloMessageUIState
+import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.HomeUIState
+import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.HomeViewModel
 
 const val HOME_SCREEN_ROUTE = "home"
 

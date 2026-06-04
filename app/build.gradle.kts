@@ -59,6 +59,9 @@ android {
         }
     }
 }
+configurations.all {
+    exclude(group = "com.intellij", module = "annotations")
+}
 
 dependencies {
 
@@ -92,9 +95,13 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // Room (Persistencia Local)
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    ksp("androidx.room:room-compiler:2.6.1")
+//    implementation("androidx.room:room-runtime:2.6.1")
+//    implementation("androidx.room:room-ktx:2.6.1")
+//    ksp("androidx.room:room-compiler:2.6.1")
+
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    implementation(libs.room.compiler)
 
     // DataStore (Configuración / Cache de Sesión)
     implementation("androidx.datastore:datastore-preferences:1.0.0")
@@ -106,8 +113,8 @@ dependencies {
     implementation("com.google.mlkit:pose-detection:18.0.0-beta3")
 
     // Play Services Location & Google Maps (Dev 3)
-    implementation("com.google.android.gms:play-services-location:21.1.0")
-    implementation("com.google.maps.android:maps-compose:4.3.3")
+    implementation(libs.play.services.location)
+    implementation(libs.maps.compose)
 
     // Health Connect Client (Dev 4)
     implementation("androidx.health.connect:connect-client:1.1.0-alpha07")
