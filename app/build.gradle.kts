@@ -101,7 +101,7 @@ dependencies {
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    implementation(libs.room.compiler)
+    ksp(libs.room.compiler)
 
     // DataStore (Configuración / Cache de Sesión)
     implementation("androidx.datastore:datastore-preferences:1.0.0")

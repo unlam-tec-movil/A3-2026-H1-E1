@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile.scaffolding.data.datasources.device.mlkit
+package ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.mlkit
 
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy

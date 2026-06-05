@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities
+package ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -12,7 +12,7 @@ data class UserEntity(
 )
 
 @Entity(tableName = "clinics")
-data class ClinicEntity(
+data class AppClinicEntity(
     @PrimaryKey val id: String,
     val name: String,
     val address: String,
