@@ -25,6 +25,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
+import ar.edu.unlam.mobile.scaffolding.ui.navigation.Screen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
 
 @Composable
 fun MainScreen() {
@@ -81,6 +83,9 @@ fun MainScreen() {
             }
             composable("Dev3PlayGround") {
                 Dev3PlayGround()
+            }
+            composable(Screen.RehabSession.route) {
+                RehabSessionScreen(modifier = Modifier.padding(paddingValue))
             }
             composable(
                 route = "user/{id}",
