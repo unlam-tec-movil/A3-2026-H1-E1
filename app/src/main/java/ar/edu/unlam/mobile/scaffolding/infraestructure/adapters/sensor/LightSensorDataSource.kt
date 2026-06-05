@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile.scaffolding.data.datasources.device.sensor
+package ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.sensor
 
 import android.content.Context
 import android.hardware.Sensor
@@ -17,6 +17,11 @@ class LightSensorDataSource(
 
     fun getLuxFlow(): Flow<Float> =
         callbackFlow {
+            if (lightSensor == null) {
+                close(UnsupportedOperationException("Este dispositivo no cuenta con sensor de luz ambiental."))
+                return@callbackFlow
+            }
+
             val listener =
                 object : SensorEventListener {
                     override fun onSensorChanged(event: SensorEvent?) {
@@ -26,9 +31,12 @@ class LightSensorDataSource(
                     override fun onAccuracyChanged(
                         sensor: Sensor?,
                         accuracy: Int,
-                    ) {}
+                    ) {
+                    }
                 }
+
             sensorManager.registerListener(listener, lightSensor, SensorManager.SENSOR_DELAY_UI)
+
             awaitClose { sensorManager.unregisterListener(listener) }
         }
 }
