@@ -1,7 +1,7 @@
-package ar.edu.unlam.mobile.scaffolding.data.datasources.local.db
+package ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos
 
 import androidx.room.*
-import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.*
+import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.entities.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -19,10 +19,10 @@ interface UserDao {
 @Dao
 interface ClinicDao {
     @Query("SELECT * FROM clinics")
-    fun getAllClinics(): Flow<List<ClinicEntity>>
+    fun getAllClinics(): Flow<List<AppClinicEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertClinics(clinics: List<ClinicEntity>)
+    suspend fun insertClinics(clinics: List<AppClinicEntity>)
 }
 
 @Dao

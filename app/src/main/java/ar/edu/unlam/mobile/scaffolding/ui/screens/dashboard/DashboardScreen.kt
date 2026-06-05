@@ -1,0 +1,756 @@
+package ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import ar.edu.unlam.mobile.scaffolding.domain.model.Session
+import ar.edu.unlam.mobile.scaffolding.ui.theme.AmberWarning
+import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
+import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
+import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
+import kotlinx.coroutines.delay
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+const val DASHBOARD_SCREEN_ROUTE = "dashboard"
+
+@Composable
+fun DashboardScreen(
+    modifier: Modifier = Modifier,
+    viewModel: DashboardViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    // Control staggered animation states
+    var headerVisible by remember { mutableStateOf(false) }
+    var card1Visible by remember { mutableStateOf(false) }
+    var card2Visible by remember { mutableStateOf(false) }
+    var card3Visible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState.isLoading) {
+        if (!uiState.isLoading) {
+            headerVisible = true
+            delay(100)
+            card1Visible = true
+            delay(150)
+            card2Visible = true
+            delay(150)
+            card3Visible = true
+        }
+    }
+
+    Box(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),
+    ) {
+        if (uiState.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = MaterialTheme.colorScheme.primary,
+            )
+        } else if (uiState.error != null) {
+            Text(
+                text = "Error: ${uiState.error}",
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.align(Alignment.Center),
+            )
+        } else {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+            ) {
+                // Header (Greeting & Avatar)
+                AnimatedVisibility(
+                    visible = headerVisible,
+                    enter =
+                        fadeIn(animationSpec = tween(500)) +
+                            slideInVertically(
+                                initialOffsetY = { -it / 4 },
+                                animationSpec = tween(500),
+                            ),
+                ) {
+                    DashboardHeader(userName = uiState.userName)
+                }
+
+                // Card 1: ROM Progress Ring Card
+                AnimatedVisibility(
+                    visible = card1Visible,
+                    enter =
+                        fadeIn(animationSpec = tween(600)) +
+                            slideInVertically(
+                                initialOffsetY = { it / 3 },
+                                animationSpec = tween(600),
+                            ),
+                ) {
+                    RomProgressCard(
+                        maxRom = uiState.maxRom,
+                        targetRom = uiState.targetRom,
+                    )
+                }
+
+                // Card 2: Steps Summary Card
+                AnimatedVisibility(
+                    visible = card2Visible,
+                    enter =
+                        fadeIn(animationSpec = tween(600)) +
+                            slideInVertically(
+                                initialOffsetY = { it / 3 },
+                                animationSpec = tween(600),
+                            ),
+                ) {
+                    StepsCard(
+                        currentSteps = uiState.currentSteps,
+                        targetSteps = uiState.targetSteps,
+                    )
+                }
+
+                // Card 3: Last Active Session Card
+                AnimatedVisibility(
+                    visible = card3Visible,
+                    enter =
+                        fadeIn(animationSpec = tween(600)) +
+                            slideInVertically(
+                                initialOffsetY = { it / 3 },
+                                animationSpec = tween(600),
+                            ),
+                ) {
+                    LastSessionCard(lastSession = uiState.lastSession)
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun DashboardHeader(
+    userName: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column {
+            Text(
+                text = "¡Hola, $userName! 👋",
+                style =
+                    MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                    ),
+            )
+            Text(
+                text = "Tu resumen de salud para hoy",
+                style =
+                    MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                    ),
+            )
+        }
+
+        // Profile Avatar
+        Box(
+            modifier =
+                Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(ElectricIndigo.copy(alpha = 0.15f))
+                    .border(2.dp, ElectricIndigo, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "Perfil",
+                tint = ElectricIndigo,
+                modifier = Modifier.size(24.dp),
+            )
+        }
+    }
+}
+
+@Composable
+fun RomProgressCard(
+    maxRom: Float,
+    targetRom: Float,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "Rango de Movimiento (ROM)",
+                style =
+                    MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    ),
+                modifier = Modifier.align(Alignment.Start),
+            )
+            Text(
+                text = "Progreso del ROM máximo alcanzado",
+                style =
+                    MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    ),
+                modifier = Modifier.align(Alignment.Start),
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Custom ROM Progress Ring component
+            RomProgressRing(
+                maxRom = maxRom,
+                targetRom = targetRom,
+                modifier = Modifier.size(200.dp),
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Highlight message/insight
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(ElectricIndigo.copy(alpha = 0.08f))
+                        .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "🎯",
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(end = 12.dp),
+                )
+                val missingDegrees = (targetRom - maxRom).coerceAtLeast(0f).toInt()
+                val message =
+                    if (missingDegrees > 0) {
+                        "Estás a sólo $missingDegrees° de alcanzar tu meta óptima de $targetRom°."
+                    } else {
+                        "¡Excelente! Has alcanzado tu meta óptima de $targetRom°."
+                    }
+                Text(
+                    text = message,
+                    style =
+                        MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Medium,
+                            color = ElectricIndigo,
+                        ),
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun RomProgressRing(
+    maxRom: Float,
+    targetRom: Float,
+    modifier: Modifier = Modifier,
+) {
+    // Percentage from 0.0 to 1.0
+    val percentage = if (targetRom > 0) (maxRom / targetRom).coerceIn(0f, 1f) else 0f
+
+    // Animate the progress sweep
+    val animatedProgress by animateFloatAsState(
+        targetValue = percentage,
+        animationSpec = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
+        label = "RomProgressAnimation",
+    )
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.aspectRatio(1f),
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize().padding(8.dp)) {
+            val strokeWidth = 14.dp.toPx()
+            val innerRadius = (size.minDimension - strokeWidth) / 2
+            val center = Offset(size.width / 2, size.height / 2)
+
+            // Draw background track
+            drawCircle(
+                color = Color.LightGray.copy(alpha = 0.25f),
+                radius = innerRadius,
+                center = center,
+                style = Stroke(width = strokeWidth),
+            )
+
+            // Draw progress arc (start from -90 degrees, i.e., 12 o'clock, sweep clockwise)
+            drawArc(
+                brush =
+                    Brush.linearGradient(
+                        colors = listOf(ElectricIndigo, CyanWave),
+                    ),
+                startAngle = -90f,
+                sweepAngle = animatedProgress * 360f,
+                useCenter = false,
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
+            )
+        }
+
+        // Central text inside the ring
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "${maxRom.toInt()}°",
+                style =
+                    MaterialTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 44.sp,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    ),
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = "Máximo ROM",
+                style =
+                    MaterialTheme.typography.labelMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    ),
+            )
+            Text(
+                text = "Meta: ${targetRom.toInt()}°",
+                style =
+                    MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = CyanWave,
+                    ),
+            )
+        }
+    }
+}
+
+@Composable
+fun StepsCard(
+    currentSteps: Int,
+    targetSteps: Int,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column {
+                    Text(
+                        text = "Pasos Diarios",
+                        style =
+                            MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            ),
+                    )
+                    Text(
+                        text = "Actividad física registrada hoy",
+                        style =
+                            MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            ),
+                    )
+                }
+
+                // Decorative step icon container
+                Box(
+                    modifier =
+                        Modifier
+                            .size(44.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(EmeraldIdeal.copy(alpha = 0.1f)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "🚶",
+                        fontSize = 22.sp,
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Steps text info
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom,
+            ) {
+                Text(
+                    text = String.format(Locale.getDefault(), "%,d", currentSteps),
+                    style =
+                        MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        ),
+                )
+                Text(
+                    text = String.format(Locale.getDefault(), "Meta: %,d", targetSteps),
+                    style =
+                        MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        ),
+                    modifier = Modifier.padding(bottom = 6.dp),
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Steps Progress Bar
+            val stepsProgress = if (targetSteps > 0) currentSteps.toFloat() / targetSteps else 0f
+            LinearProgressIndicator(
+                progress = { stepsProgress.coerceIn(0f, 1f) },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(10.dp)
+                        .clip(RoundedCornerShape(5.dp)),
+                color = EmeraldIdeal,
+                trackColor = Color.LightGray.copy(alpha = 0.25f),
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Steps stats details
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                StatInfoItem(emoji = "🔥", label = "Calorías", value = "324 kcal")
+                StatInfoItem(emoji = "🚶", label = "Distancia", value = "5.2 km")
+                StatInfoItem(emoji = "⏱️", label = "Tiempo activo", value = "45 min")
+            }
+        }
+    }
+}
+
+@Composable
+fun StatInfoItem(
+    emoji: String,
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = emoji,
+            fontSize = 20.sp,
+            modifier = Modifier.padding(end = 6.dp),
+        )
+        Column {
+            Text(
+                text = value,
+                style =
+                    MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    ),
+            )
+            Text(
+                text = label,
+                style =
+                    MaterialTheme.typography.labelSmall.copy(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    ),
+            )
+        }
+    }
+}
+
+@Composable
+fun LastSessionCard(
+    lastSession: Session?,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column {
+                    Text(
+                        text = "Última Sesión Activa",
+                        style =
+                            MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            ),
+                    )
+                    Text(
+                        text = "Resultados de tu último entrenamiento",
+                        style =
+                            MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            ),
+                    )
+                }
+
+                Box(
+                    modifier =
+                        Modifier
+                            .size(44.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(AmberWarning.copy(alpha = 0.1f)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "🏋️",
+                        fontSize = 22.sp,
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            if (lastSession != null) {
+                // Formatting Date
+                val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+                val sessionDate = dateFormat.format(Date(lastSession.dateTimestamp))
+
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Fecha del entrenamiento",
+                        style =
+                            MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            ),
+                    )
+                    Text(
+                        text = sessionDate,
+                        style =
+                            MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            ),
+                    )
+                }
+
+                HorizontalDivider()
+
+                Row(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Column {
+                        Text(
+                            text = "Duración",
+                            style =
+                                MaterialTheme.typography.labelSmall.copy(
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                                ),
+                        )
+                        val durationMin = lastSession.durationSeconds / 60
+                        val durationSec = lastSession.durationSeconds % 60
+                        Text(
+                            text = if (durationSec > 0) "${durationMin}m ${durationSec}s" else "$durationMin min",
+                            style =
+                                MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                ),
+                        )
+                    }
+
+                    Column {
+                        Text(
+                            text = "ROM Promedio",
+                            style =
+                                MaterialTheme.typography.labelSmall.copy(
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                                ),
+                        )
+                        Text(
+                            text = "${lastSession.averageRom.toInt()}°",
+                            style =
+                                MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = ElectricIndigo,
+                                ),
+                        )
+                    }
+
+                    Column {
+                        Text(
+                            text = "Rep. Exitosas",
+                            style =
+                                MaterialTheme.typography.labelSmall.copy(
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                                ),
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = EmeraldIdeal,
+                                modifier =
+                                    Modifier
+                                        .size(16.dp)
+                                        .padding(end = 4.dp),
+                            )
+                            Text(
+                                text = "${lastSession.successfulReps}",
+                                style =
+                                    MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                    ),
+                            )
+                        }
+                    }
+                }
+            } else {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "No hay registros de sesiones de entrenamiento aún.",
+                        style =
+                            MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            ),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun HorizontalDivider(
+    modifier: Modifier = Modifier,
+    color: Color = Color.LightGray.copy(alpha = 0.3f),
+    thickness: androidx.compose.ui.unit.Dp = 1.dp,
+) {
+    Spacer(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(thickness)
+                .background(color),
+    )
+}

@@ -20,8 +20,8 @@ fun BottomBar(controller: NavHostController) {
     val navBackStackEntry by controller.currentBackStackEntryAsState()
     NavigationBar {
         NavigationBarItem(
-            selected = navBackStackEntry?.destination?.hierarchy?.any { it.route == "home" } == true,
-            onClick = { controller.navigate("home") },
+            selected = navBackStackEntry?.destination?.hierarchy?.any { it.route == "dashboard" } == true,
+            onClick = { controller.navigate("dashboard") },
             icon = {
                 Icon(
                     imageVector = Icons.Default.Home,
