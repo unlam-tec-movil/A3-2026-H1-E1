@@ -15,27 +15,42 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
-import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.DashboardScreen
+import ar.edu.unlam.mobile.scaffolding.ui.navigation.Screen
+
+// Rutas donde el bottom bar y el floatingActionButton no deben aparecer
+private val routesWithoutChrome =
+    setOf(
+        Screen.Splash.route,
+        Screen.Onboarding.route,
+    )
 
 @Composable
 fun MainScreen() {
     val controller = rememberNavController()
     val snackBarHostState = remember { SnackbarHostState() }
+    val currentBackStack by controller.currentBackStackEntryAsState()
+    val currentRoute = currentBackStack?.destination?.route
+    val showChrome = currentRoute !in routesWithoutChrome
+
     Scaffold(
-        bottomBar = { BottomBar(controller = controller) },
+        bottomBar = { if (showChrome) BottomBar(controller = controller) },
         floatingActionButton = {
-            IconButton(onClick = { controller.navigate("dashboard") }) {
-                Icon(Icons.Filled.Home, contentDescription = "Home")
+            if (showChrome) {
+                IconButton(onClick = { controller.navigate("home") }) {
+                    Icon(Icons.Filled.Home, contentDescription = "Home")
+                }
             }
         },
         snackbarHost = {
@@ -70,10 +85,41 @@ fun MainScreen() {
             }
         },
     ) { paddingValue ->
-        NavHost(navController = controller, startDestination = "dashboard") {
-            composable("dashboard") {
-                DashboardScreen(modifier = Modifier.padding(paddingValue))
+        NavHost(navController = controller, startDestination = Screen.Splash.route) {
+            // Splash
+            composable(Screen.Splash.route) {
+                SplashScreen(
+                    onNavigateToOnboarding = {
+                        controller.navigate(Screen.Onboarding.route) {
+                            popUpTo(Screen.Splash.route) { inclusive = true }
+                        }
+                    },
+                    onNavigateToLogin = {
+                        controller.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Splash.route) { inclusive = true }
+                        }
+                    },
+                )
             }
+            // Onboarding
+            composable(Screen.Onboarding.route) {
+                OnboardingScreen(
+                    onNavigateToLogin = {
+                        controller.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Onboarding.route) { inclusive = true }
+                        }
+                    },
+                )
+            }
+            // Login todo
+            composable(Screen.Login.route) {
+                HomeScreen(modifier = Modifier.padding(paddingValue))
+            }
+            // Register todo
+            composable(Screen.Register.route) {
+                HomeScreen(modifier = Modifier.padding(paddingValue))
+            }
+
             composable("home") {
                 HomeScreen(modifier = Modifier.padding(paddingValue))
             }
