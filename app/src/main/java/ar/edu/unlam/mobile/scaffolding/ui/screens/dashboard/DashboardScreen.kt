@@ -1,5 +1,11 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -50,11 +56,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.mobile.scaffolding.domain.model.Session
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.StepCounterService
 import ar.edu.unlam.mobile.scaffolding.ui.theme.AmberWarning
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
@@ -72,6 +81,54 @@ fun DashboardScreen(
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestMultiplePermissions(),
+        ) { permissions ->
+            val activityRecognitionGranted =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    permissions[Manifest.permission.ACTIVITY_RECOGNITION] ?: false
+                } else {
+                    true
+                }
+
+            if (activityRecognitionGranted) {
+                val serviceIntent = Intent(context, StepCounterService::class.java)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(serviceIntent)
+                } else {
+                    context.startService(serviceIntent)
+                }
+            }
+        }
+
+    LaunchedEffect(Unit) {
+        val needsActivityRecognition =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION) !=
+                PackageManager.PERMISSION_GRANTED
+
+        val needsPostNotifications =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+                PackageManager.PERMISSION_GRANTED
+
+        if (needsActivityRecognition || needsPostNotifications) {
+            val list = mutableListOf<String>()
+            if (needsActivityRecognition) list.add(Manifest.permission.ACTIVITY_RECOGNITION)
+            if (needsPostNotifications) list.add(Manifest.permission.POST_NOTIFICATIONS)
+            permissionLauncher.launch(list.toTypedArray())
+        } else {
+            val serviceIntent = Intent(context, StepCounterService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent)
+            } else {
+                context.startService(serviceIntent)
+            }
+        }
+    }
 
     // Control staggered animation states
     var headerVisible by remember { mutableStateOf(false) }

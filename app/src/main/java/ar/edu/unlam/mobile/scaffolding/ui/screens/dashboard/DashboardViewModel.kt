@@ -6,6 +6,7 @@ import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.domain.model.User
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.StepCounterDataSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,6 +35,7 @@ class DashboardViewModel
     constructor(
         private val userRepository: UserRepository,
         private val rehabRepository: RehabRepository,
+        private val stepCounterDataSource: StepCounterDataSource,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(DashboardUiState())
         val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
@@ -56,7 +58,7 @@ class DashboardViewModel
                 // Observe sessions changes
                 val sessionsFlow = rehabRepository.getSessions(userId)
 
-                combine(userFlow, sessionsFlow) { user, sessions ->
+                combine(userFlow, sessionsFlow, stepCounterDataSource.getStepsFlow()) { user, sessions, steps ->
                     val userName = user?.name ?: "Imanol"
                     val maxRom = sessions.maxOfOrNull { it.averageRom } ?: 0f
                     val lastSession = sessions.maxByOrNull { it.dateTimestamp }
@@ -65,7 +67,7 @@ class DashboardViewModel
                         userName = userName,
                         maxRom = maxRom,
                         targetRom = 120f, // Target ROM is 120 degrees
-                        currentSteps = 7428, // Mocked/simulated steps
+                        currentSteps = steps,
                         targetSteps = 10000,
                         lastSession = lastSession,
                         isLoading = false,

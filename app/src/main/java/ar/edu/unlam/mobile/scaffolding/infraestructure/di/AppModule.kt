@@ -8,6 +8,7 @@ import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.camera.CameraXSessionAdapter
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.StepCounterDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.LocationDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.SessionDao
@@ -27,6 +28,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @Provides
+    @Singleton
+    fun providesStepCounterDataSource(context: Application): StepCounterDataSource =
+        StepCounterDataSource(context = context)
+
     @Provides
     @Singleton
     fun providesSessionPreferences(context: Application): SessionPreferences = SessionPreferences(context = context)
