@@ -56,7 +56,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -130,23 +132,11 @@ fun DashboardScreen(
         }
     }
 
-    // Control staggered animation states
-    var headerVisible by remember { mutableStateOf(false) }
-    var card1Visible by remember { mutableStateOf(false) }
-    var card2Visible by remember { mutableStateOf(false) }
-    var card3Visible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(uiState.isLoading) {
-        if (!uiState.isLoading) {
-            headerVisible = true
-            delay(100)
-            card1Visible = true
-            delay(150)
-            card2Visible = true
-            delay(150)
-            card3Visible = true
-        }
-    }
+    val entranceProgress by animateFloatAsState(
+        targetValue = if (uiState.isLoading) 0f else 1f,
+        animationSpec = tween(durationMillis = 850, easing = FastOutSlowInEasing),
+        label = "DashboardEntranceProgress"
+    )
 
     Box(
         modifier =
@@ -167,6 +157,9 @@ fun DashboardScreen(
                 modifier = Modifier.align(Alignment.Center),
             )
         } else {
+            val density = LocalDensity.current
+            val yOffsetPx = remember { with(density) { 32.dp.toPx() } }
+
             Column(
                 modifier =
                     Modifier
@@ -175,62 +168,50 @@ fun DashboardScreen(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
                 // Header (Greeting & Avatar)
-                AnimatedVisibility(
-                    visible = headerVisible,
-                    enter =
-                        fadeIn(animationSpec = tween(500)) +
-                            slideInVertically(
-                                initialOffsetY = { -it / 4 },
-                                animationSpec = tween(500),
-                            ),
-                ) {
-                    DashboardHeader(userName = uiState.userName)
-                }
+                DashboardHeader(
+                    userName = uiState.userName,
+                    modifier = Modifier.graphicsLayer {
+                        val progress = (entranceProgress / 0.6f).coerceIn(0f, 1f)
+                        val easedProgress = FastOutSlowInEasing.transform(progress)
+                        alpha = easedProgress
+                        translationY = -yOffsetPx * (1f - easedProgress)
+                    }
+                )
 
                 // Card 1: ROM Progress Ring Card
-                AnimatedVisibility(
-                    visible = card1Visible,
-                    enter =
-                        fadeIn(animationSpec = tween(600)) +
-                            slideInVertically(
-                                initialOffsetY = { it / 3 },
-                                animationSpec = tween(600),
-                            ),
-                ) {
-                    RomProgressCard(
-                        maxRom = uiState.maxRom,
-                        targetRom = uiState.targetRom,
-                    )
-                }
+                RomProgressCard(
+                    maxRom = uiState.maxRom,
+                    targetRom = uiState.targetRom,
+                    modifier = Modifier.graphicsLayer {
+                        val progress = ((entranceProgress - 0.15f) / 0.6f).coerceIn(0f, 1f)
+                        val easedProgress = FastOutSlowInEasing.transform(progress)
+                        alpha = easedProgress
+                        translationY = yOffsetPx * (1f - easedProgress)
+                    }
+                )
 
                 // Card 2: Steps Summary Card
-                AnimatedVisibility(
-                    visible = card2Visible,
-                    enter =
-                        fadeIn(animationSpec = tween(600)) +
-                            slideInVertically(
-                                initialOffsetY = { it / 3 },
-                                animationSpec = tween(600),
-                            ),
-                ) {
-                    StepsCard(
-                        currentSteps = uiState.currentSteps,
-                        targetSteps = uiState.targetSteps,
-                    )
-                }
+                StepsCard(
+                    currentSteps = uiState.currentSteps,
+                    targetSteps = uiState.targetSteps,
+                    modifier = Modifier.graphicsLayer {
+                        val progress = ((entranceProgress - 0.3f) / 0.6f).coerceIn(0f, 1f)
+                        val easedProgress = FastOutSlowInEasing.transform(progress)
+                        alpha = easedProgress
+                        translationY = yOffsetPx * (1f - easedProgress)
+                    }
+                )
 
                 // Card 3: Last Active Session Card
-                AnimatedVisibility(
-                    visible = card3Visible,
-                    enter =
-                        fadeIn(animationSpec = tween(600)) +
-                            slideInVertically(
-                                initialOffsetY = { it / 3 },
-                                animationSpec = tween(600),
-                            ),
-                ) {
-                    LastSessionCard(lastSession = uiState.lastSession)
-                }
+                LastSessionCard(
+                    lastSession = uiState.lastSession,
+                    modifier = Modifier.graphicsLayer {
+                        val progress = ((entranceProgress - 0.45f) / 0.55f).coerceIn(0f, 1f)
+                        val easedProgress = FastOutSlowInEasing.transform(progress)
+                        alpha = easedProgress
+                        translationY = yOffsetPx * (1f - easedProgress)
+                    }
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
             }

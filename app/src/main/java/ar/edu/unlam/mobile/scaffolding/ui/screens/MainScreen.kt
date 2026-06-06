@@ -2,11 +2,7 @@ package ar.edu.unlam.mobile.scaffolding.ui.screens
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -14,6 +10,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -31,7 +33,7 @@ import ar.edu.unlam.mobile.scaffolding.ui.navigation.Screen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.DashboardScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
 
-// Rutas donde el bottom bar y el floatingActionButton no deben aparecer
+// Rutas donde el bottom bar no debe aparecer
 private val routesWithoutChrome =
     setOf(
         Screen.Splash.route,
@@ -48,13 +50,6 @@ fun MainScreen() {
 
     Scaffold(
         bottomBar = { if (showChrome) BottomBar(controller = controller) },
-        floatingActionButton = {
-            if (showChrome) {
-                IconButton(onClick = { controller.navigate("home") }) {
-                    Icon(Icons.Filled.Home, contentDescription = "Home")
-                }
-            }
-        },
         snackbarHost = {
             SnackbarHost(snackBarHostState) { data ->
                 val isError = (data.visuals as? SnackbarVisualsWithError)?.isError ?: false
@@ -87,9 +82,39 @@ fun MainScreen() {
             }
         },
     ) { paddingValue ->
-        NavHost(navController = controller, startDestination = Screen.Splash.route) {
+        NavHost(
+            navController = controller,
+            startDestination = Screen.Splash.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                ) + fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -it },
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                ) + fadeOut(animationSpec = tween(400))
+            },
+            popEnterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { -it },
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                ) + fadeIn(animationSpec = tween(400))
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                ) + fadeOut(animationSpec = tween(400))
+            },
+        ) {
             // Splash
-            composable(Screen.Splash.route) {
+            composable(
+                route = Screen.Splash.route,
+                exitTransition = { fadeOut(animationSpec = tween(400)) },
+            ) {
                 SplashScreen(
                     onNavigateToOnboarding = {
                         controller.navigate(Screen.Onboarding.route) {
@@ -104,7 +129,11 @@ fun MainScreen() {
                 )
             }
             // Onboarding
-            composable(Screen.Onboarding.route) {
+            composable(
+                route = Screen.Onboarding.route,
+                enterTransition = { fadeIn(animationSpec = tween(400)) },
+                exitTransition = { fadeOut(animationSpec = tween(400)) },
+            ) {
                 OnboardingScreen(
                     onNavigateToLogin = {
                         controller.navigate(Screen.Login.route) {
@@ -115,33 +144,30 @@ fun MainScreen() {
             }
             // Login todo
             composable(Screen.Login.route) {
-                HomeScreen(modifier = Modifier.padding(paddingValue))
+                DashboardScreen(modifier = Modifier.padding(paddingValue))
             }
             // Register todo
             composable(Screen.Register.route) {
-                HomeScreen(modifier = Modifier.padding(paddingValue))
+                DashboardScreen(modifier = Modifier.padding(paddingValue))
             }
 
-            composable("home") {
-                HomeScreen(modifier = Modifier.padding(paddingValue))
-            }
             composable(Screen.Dashboard.route) {
                 DashboardScreen(modifier = Modifier.padding(paddingValue))
             }
-            composable("form") {
+            composable(Screen.Form.route) {
                 FormScreen(
                     modifier = Modifier.padding(paddingValue),
                     snackbarHostState = snackBarHostState,
                 )
             }
-            composable("Dev3PlayGround") {
+            composable(Screen.Dev3PlayGround.route) {
                 Dev3PlayGround()
             }
             composable(Screen.RehabSession.route) {
                 RehabSessionScreen(modifier = Modifier.padding(paddingValue))
             }
             composable(
-                route = "user/{id}",
+                route = Screen.User.route,
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
             ) { navBackStackEntry ->
                 val id = navBackStackEntry.arguments?.getString("id") ?: "1"
@@ -150,3 +176,5 @@ fun MainScreen() {
         }
     }
 }
+
+
