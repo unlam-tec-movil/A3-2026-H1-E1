@@ -20,10 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import ar.edu.unlam.mobile.scaffolding.ui.components.SkeletonOverlay
+import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.RehabSessionViewModel
+import com.google.mlkit.vision.pose.Pose
 
 @Composable
 fun RehabSessionScreen(
@@ -32,6 +36,7 @@ fun RehabSessionScreen(
 ) {
     val context = LocalContext.current
     val currentAngle by viewModel.currentAngle.collectAsState()
+    val pose by viewModel.pose.collectAsState()
     var hasCameraPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
@@ -54,17 +59,41 @@ fun RehabSessionScreen(
         }
     }
 
+    RehabSessionContent(
+        hasCameraPermission = hasCameraPermission,
+        currentAngle = currentAngle,
+        pose = pose,
+        onSurfaceReady = { owner, surfaceProvider ->
+            viewModel.startCamera(owner, surfaceProvider)
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun RehabSessionContent(
+    hasCameraPermission: Boolean,
+    currentAngle: Float,
+    pose: Pose?,
+    onSurfaceReady: (androidx.lifecycle.LifecycleOwner, androidx.camera.core.Preview.SurfaceProvider) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         if (hasCameraPermission) {
-            CameraPreviewComponent(
-                modifier = Modifier.fillMaxSize(),
-                onSurfaceReady = { owner, surfaceProvider ->
-                    viewModel.startCamera(owner, surfaceProvider)
-                },
-            )
+            Box(modifier = Modifier.fillMaxSize()) {
+                CameraPreviewComponent(
+                    modifier = Modifier.fillMaxSize(),
+                    onSurfaceReady = onSurfaceReady,
+                )
+                SkeletonOverlay(
+                    pose = pose,
+                    colorFeedback = Color.Green,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
             Text(
                 text = "Ángulo: ${currentAngle.toInt()}°",
                 modifier =
@@ -77,5 +106,18 @@ fun RehabSessionScreen(
         } else {
             Text(text = "Se necesita permiso de cámara para iniciar la sesión.")
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RehabSessionScreenPreview() {
+    GambAppTheme {
+        RehabSessionContent(
+            hasCameraPermission = true,
+            currentAngle = 45f,
+            pose = null,
+            onSurfaceReady = { _, _ -> },
+        )
     }
 }
