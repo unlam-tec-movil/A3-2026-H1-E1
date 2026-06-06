@@ -6,12 +6,9 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -45,7 +42,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -70,7 +66,6 @@ import ar.edu.unlam.mobile.scaffolding.ui.theme.AmberWarning
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
-import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -135,7 +130,7 @@ fun DashboardScreen(
     val entranceProgress by animateFloatAsState(
         targetValue = if (uiState.isLoading) 0f else 1f,
         animationSpec = tween(durationMillis = 850, easing = FastOutSlowInEasing),
-        label = "DashboardEntranceProgress"
+        label = "DashboardEntranceProgress",
     )
 
     Box(
@@ -170,47 +165,51 @@ fun DashboardScreen(
                 // Header (Greeting & Avatar)
                 DashboardHeader(
                     userName = uiState.userName,
-                    modifier = Modifier.graphicsLayer {
-                        val progress = (entranceProgress / 0.6f).coerceIn(0f, 1f)
-                        val easedProgress = FastOutSlowInEasing.transform(progress)
-                        alpha = easedProgress
-                        translationY = -yOffsetPx * (1f - easedProgress)
-                    }
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = (entranceProgress / 0.6f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = -yOffsetPx * (1f - easedProgress)
+                        },
                 )
 
                 // Card 1: ROM Progress Ring Card
                 RomProgressCard(
                     maxRom = uiState.maxRom,
                     targetRom = uiState.targetRom,
-                    modifier = Modifier.graphicsLayer {
-                        val progress = ((entranceProgress - 0.15f) / 0.6f).coerceIn(0f, 1f)
-                        val easedProgress = FastOutSlowInEasing.transform(progress)
-                        alpha = easedProgress
-                        translationY = yOffsetPx * (1f - easedProgress)
-                    }
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = ((entranceProgress - 0.15f) / 0.6f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = yOffsetPx * (1f - easedProgress)
+                        },
                 )
 
                 // Card 2: Steps Summary Card
                 StepsCard(
                     currentSteps = uiState.currentSteps,
                     targetSteps = uiState.targetSteps,
-                    modifier = Modifier.graphicsLayer {
-                        val progress = ((entranceProgress - 0.3f) / 0.6f).coerceIn(0f, 1f)
-                        val easedProgress = FastOutSlowInEasing.transform(progress)
-                        alpha = easedProgress
-                        translationY = yOffsetPx * (1f - easedProgress)
-                    }
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = ((entranceProgress - 0.3f) / 0.6f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = yOffsetPx * (1f - easedProgress)
+                        },
                 )
 
                 // Card 3: Last Active Session Card
                 LastSessionCard(
                     lastSession = uiState.lastSession,
-                    modifier = Modifier.graphicsLayer {
-                        val progress = ((entranceProgress - 0.45f) / 0.55f).coerceIn(0f, 1f)
-                        val easedProgress = FastOutSlowInEasing.transform(progress)
-                        alpha = easedProgress
-                        translationY = yOffsetPx * (1f - easedProgress)
-                    }
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = ((entranceProgress - 0.45f) / 0.55f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = yOffsetPx * (1f - easedProgress)
+                        },
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

@@ -39,4 +39,3 @@ sealed class Screen(
 
     object Dev3PlayGround : Screen("Dev3PlayGround")
 }
-
