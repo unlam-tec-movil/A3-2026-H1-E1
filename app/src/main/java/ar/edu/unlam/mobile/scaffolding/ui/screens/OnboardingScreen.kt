@@ -1,0 +1,257 @@
+package ar.edu.unlam.mobile.scaffolding.ui.screens
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
+import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
+import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.OnboardingViewModel
+
+// Modelo de datos de cada slide
+private data class OnboardingSlide(
+    val emoji: String,
+    val title: String,
+    val description: String,
+)
+
+private val slides =
+    listOf(
+        OnboardingSlide(
+            emoji = "🏋️",
+            title = "Bienvenido a GambApp",
+            description =
+                "Tu compañero de rehabilitación inteligente. Seguimos tu progreso en " +
+                    "tiempo real usando los sensores de tu teléfono para que cada sesión cuente.",
+        ),
+        OnboardingSlide(
+            emoji = "📡",
+            title = "¿Cómo funciona?",
+            description =
+                "La cámara y los sensores detectan tus movimientos. El sistema analiza " +
+                    "ángulos articulares y sincroniza ejercicios para guiarte hacia una recuperación más rápida.",
+        ),
+        OnboardingSlide(
+            emoji = "🔐",
+            title = "Permisos necesarios",
+            description =
+                "GambApp necesita acceso a cámara, ubicación y sensores de actividad para " +
+                    "funcionar correctamente. Tu privacidad siempre está protegida.",
+        ),
+    )
+
+// OnboardingScreen
+@Composable
+fun OnboardingScreen(
+    onNavigateToLogin: () -> Unit,
+    viewModel: OnboardingViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Consume la señal de navegación
+    LaunchedEffect(uiState.navigateToLogin) {
+        if (uiState.navigateToLogin) {
+            viewModel.onNavigationConsumed()
+            onNavigateToLogin()
+        }
+    }
+
+    // Swipe horizontal para cambiar slide
+    var dragAccumulator by remember { mutableFloatStateOf(0f) }
+
+    Box(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .pointerInput(uiState.currentPage) {
+                    detectHorizontalDragGestures(
+                        onDragEnd = {
+                            when {
+                                dragAccumulator < -80f -> viewModel.nextPage()
+                                dragAccumulator > 80f && uiState.currentPage > 0 ->
+                                    viewModel.goToPage(uiState.currentPage - 1)
+                            }
+                            dragAccumulator = 0f
+                        },
+                        onHorizontalDrag = { _, dragAmount ->
+                            dragAccumulator += dragAmount
+                        },
+                    )
+                },
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 32.dp, vertical = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            // Botón "Saltar" — visible en todos los slides
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                TextButton(onClick = viewModel::skipOnboarding) {
+                    Text(
+                        text = "Saltar",
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                        fontSize = 14.sp,
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Contenido animado del slide
+            AnimatedContent(
+                targetState = uiState.currentPage,
+                transitionSpec = {
+                    val direction = if (targetState > initialState) 1 else -1
+                    (
+                        slideInHorizontally(
+                            animationSpec = tween(350),
+                            initialOffsetX = { it * direction },
+                        ) + fadeIn(tween(350))
+                    ) togetherWith
+                        (
+                            slideOutHorizontally(
+                                animationSpec = tween(350),
+                                targetOffsetX = { -it * direction },
+                            ) + fadeOut(tween(350))
+                        )
+                },
+                label = "OnboardingSlide",
+            ) { page ->
+                SlideContent(slide = slides[page])
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Dots indicadores
+            DotsIndicator(
+                totalDots = uiState.totalPages,
+                selectedDot = uiState.currentPage,
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Botón principal
+            val isLastPage = uiState.currentPage == uiState.totalPages - 1
+            Button(
+                onClick = {
+                    if (isLastPage) viewModel.completeOnboarding() else viewModel.nextPage()
+                },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = ElectricIndigo),
+                shape = MaterialTheme.shapes.medium,
+            ) {
+                Text(
+                    text = if (isLastPage) "Empezar" else "Siguiente",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+// Componentes internos
+@Composable
+private fun SlideContent(slide: OnboardingSlide) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text(
+            text = slide.emoji,
+            fontSize = 80.sp,
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = slide.title,
+            fontSize = 26.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = slide.description,
+            fontSize = 15.sp,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            textAlign = TextAlign.Center,
+            lineHeight = 22.sp,
+        )
+    }
+}
+
+@Composable
+private fun DotsIndicator(
+    totalDots: Int,
+    selectedDot: Int,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        repeat(totalDots) { index ->
+            val isSelected = index == selectedDot
+            Box(
+                modifier =
+                    Modifier
+                        .clip(CircleShape)
+                        .size(if (isSelected) 12.dp else 8.dp)
+                        .background(if (isSelected) ElectricIndigo else CyanWave.copy(alpha = 0.35f)),
+            )
+        }
+    }
+}

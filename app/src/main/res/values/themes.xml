@@ -6,8 +6,10 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
-    <!-- Splash Screen Theme -->
-    <style name="Theme.App.Starting" parent="Theme.GambApp">
-        <item name="android:windowBackground">@drawable/splash_background</item>
+    <!-- Splash Screen Theme (core-splashscreen) -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#5F3CF6</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.GambApp</item>
     </style>
 </resources>

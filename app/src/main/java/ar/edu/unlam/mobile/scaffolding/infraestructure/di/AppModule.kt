@@ -15,6 +15,7 @@ import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.StoredCl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.UserDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.db.AppDatabase
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.db.ClinicsDataBase
+import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.repositories.RehabRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.repositories.UserRepositoryImpl
 import dagger.Module
@@ -26,6 +27,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @Provides
+    @Singleton
+    fun providesSessionPreferences(context: Application): SessionPreferences = SessionPreferences(context = context)
+
     @Provides
     @Singleton
     fun providesLocationServicePortImpl(context: Application): LocationServicePort =
