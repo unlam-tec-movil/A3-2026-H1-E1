@@ -2,10 +2,12 @@ package ar.edu.unlam.mobile.scaffolding.infraestructure.di
 
 import android.app.Application
 import androidx.room.Room
+import ar.edu.unlam.mobile.scaffolding.domain.ports.camera.CameraSessionPort
 import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseRepositoryPort
 import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.camera.CameraXSessionAdapter
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.LocationDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.SessionDao
@@ -33,6 +35,10 @@ object AppModule {
     @Singleton
     fun providesLocationServicePortImpl(context: Application): LocationServicePort =
         LocationDataSource(context = context)
+
+    @Provides
+    @Singleton
+    fun providesCameraSessionPort(context: Application): CameraSessionPort = CameraXSessionAdapter(context = context)
 
     @Provides
     @Singleton

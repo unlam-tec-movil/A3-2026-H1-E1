@@ -28,6 +28,8 @@ import androidx.navigation.navArgument
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
 import ar.edu.unlam.mobile.scaffolding.ui.navigation.Screen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.DashboardScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
 
 // Rutas donde el bottom bar y el floatingActionButton no deben aparecer
 private val routesWithoutChrome =
@@ -131,6 +133,9 @@ fun MainScreen() {
             }
             composable("Dev3PlayGround") {
                 Dev3PlayGround()
+            }
+            composable(Screen.RehabSession.route) {
+                RehabSessionScreen(modifier = Modifier.padding(paddingValue))
             }
             composable(
                 route = "user/{id}",

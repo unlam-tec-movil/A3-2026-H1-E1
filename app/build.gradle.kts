@@ -126,6 +126,9 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
+    // Guava (Required for ListenableFuture in CameraX)
+    implementation(libs.guava)
+
     // Testing (Unitarios y Flow testing)
     testImplementation("io.mockk:mockk:1.13.9")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
