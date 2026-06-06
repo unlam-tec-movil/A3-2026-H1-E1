@@ -26,8 +26,8 @@ import androidx.navigation.navArgument
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
 import ar.edu.unlam.mobile.scaffolding.ui.navigation.Screen
-import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.DashboardScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
 
 @Composable
 fun MainScreen() {

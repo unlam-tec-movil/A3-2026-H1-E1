@@ -5,9 +5,9 @@ import androidx.room.Room
 import ar.edu.unlam.mobile.scaffolding.domain.ports.camera.CameraSessionPort
 import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseRepositoryPort
 import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
-import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.camera.CameraXSessionAdapter
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.camera.CameraXSessionAdapter
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.LocationDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.SessionDao
@@ -33,8 +33,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesCameraSessionPort(context: Application): CameraSessionPort =
-        CameraXSessionAdapter(context = context)
+    fun providesCameraSessionPort(context: Application): CameraSessionPort = CameraXSessionAdapter(context = context)
 
     @Provides
     @Singleton
@@ -75,11 +74,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesUserRepository(userDao: UserDao): UserRepository =
-        UserRepositoryImpl(userDao = userDao)
+    fun providesUserRepository(userDao: UserDao): UserRepository = UserRepositoryImpl(userDao = userDao)
 
     @Provides
     @Singleton
-    fun providesRehabRepository(sessionDao: SessionDao): RehabRepository =
-        RehabRepositoryImpl(sessionDao = sessionDao)
+    fun providesRehabRepository(sessionDao: SessionDao): RehabRepository = RehabRepositoryImpl(sessionDao = sessionDao)
 }
