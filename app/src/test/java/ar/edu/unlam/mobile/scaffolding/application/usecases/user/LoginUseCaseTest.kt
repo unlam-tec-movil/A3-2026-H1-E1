@@ -1,6 +1,5 @@
 package ar.edu.unlam.mobile.scaffolding.application.usecases.user
 
-import ar.edu.unlam.mobile.scaffolding.domain.model.User
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.preferences.SessionPreferences
 import com.google.android.gms.tasks.Task
@@ -8,7 +7,6 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GetTokenResult
-import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -33,11 +31,12 @@ class LoginUseCaseTest {
 
     @Before
     fun setUp() {
-        useCase = LoginUseCase(
-            firebaseAuth = firebaseAuth,
-            userRepository = userRepository,
-            sessionPreferences = sessionPreferences,
-        )
+        useCase =
+            LoginUseCase(
+                firebaseAuth = firebaseAuth,
+                userRepository = userRepository,
+                sessionPreferences = sessionPreferences,
+            )
 
         // Encadenado completo: auth → user → token
         every { firebaseAuth.signInWithEmailAndPassword(any(), any()) } returns authResultTask
@@ -113,9 +112,10 @@ class LoginUseCaseTest {
             every { authResultTask.exception } returns Exception("INVALID_PASSWORD")
             every { authResultTask.result } throws Exception("INVALID_PASSWORD")
 
-            val exception = runCatching {
-                useCase("user@test.com", "wrong_password")
-            }.exceptionOrNull()
+            val exception =
+                runCatching {
+                    useCase("user@test.com", "wrong_password")
+                }.exceptionOrNull()
 
             assertEquals("Credenciales incorrectas", exception?.message)
         }
@@ -125,9 +125,10 @@ class LoginUseCaseTest {
         runTest {
             every { authResult.user } returns null
 
-            val exception = runCatching {
-                useCase("user@test.com", "password123")
-            }.exceptionOrNull()
+            val exception =
+                runCatching {
+                    useCase("user@test.com", "password123")
+                }.exceptionOrNull()
 
             assertEquals("Credenciales incorrectas", exception?.message)
         }
@@ -137,9 +138,10 @@ class LoginUseCaseTest {
         runTest {
             every { tokenResult.token } returns null
 
-            val exception = runCatching {
-                useCase("user@test.com", "password123")
-            }.exceptionOrNull()
+            val exception =
+                runCatching {
+                    useCase("user@test.com", "password123")
+                }.exceptionOrNull()
 
             assertEquals("No se pudo obtener el token de sesión", exception?.message)
         }

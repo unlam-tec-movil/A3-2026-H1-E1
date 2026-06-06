@@ -95,19 +95,20 @@ internal fun LoginContent(
     val isLoading = uiState is LoginUiState.Loading
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-
             // Logo
             Image(
                 painter = painterResource(id = R.drawable.gambapp_logo_opt3_round),
@@ -141,13 +142,15 @@ internal fun LoginContent(
                 isError = formState.emailError != null,
                 supportingText = formState.emailError?.let { { Text(it, color = MaterialTheme.colorScheme.error) } },
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next,
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                ),
+                keyboardOptions =
+                    KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                    ),
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isLoading,
             )
@@ -160,45 +163,55 @@ internal fun LoginContent(
                 onValueChange = onPasswordChange,
                 label = { Text("Contraseña") },
                 isError = formState.passwordError != null || uiState is LoginUiState.Error,
-                supportingText = when {
-                    formState.passwordError != null ->
-                        { { Text(formState.passwordError, color = MaterialTheme.colorScheme.error) } }
-                    uiState is LoginUiState.Error ->
-                        { { Text(uiState.message, color = MaterialTheme.colorScheme.error) } }
-                    else -> null
-                },
+                supportingText =
+                    when {
+                        formState.passwordError != null ->
+                            {
+                                { Text(formState.passwordError, color = MaterialTheme.colorScheme.error) }
+                            }
+                        uiState is LoginUiState.Error ->
+                            {
+                                { Text(uiState.message, color = MaterialTheme.colorScheme.error) }
+                            }
+                        else -> null
+                    },
                 singleLine = true,
-                visualTransformation = if (formState.passwordVisible) {
-                    VisualTransformation.None
-                } else {
-                    PasswordVisualTransformation()
-                },
+                visualTransformation =
+                    if (formState.passwordVisible) {
+                        VisualTransformation.None
+                    } else {
+                        PasswordVisualTransformation()
+                    },
                 trailingIcon = {
                     IconButton(onClick = onTogglePasswordVisibility, enabled = !isLoading) {
                         Icon(
-                            imageVector = if (formState.passwordVisible) {
-                                Icons.Filled.VisibilityOff
-                            } else {
-                                Icons.Filled.Visibility
-                            },
-                            contentDescription = if (formState.passwordVisible) {
-                                "Ocultar contraseña"
-                            } else {
-                                "Mostrar contraseña"
-                            },
+                            imageVector =
+                                if (formState.passwordVisible) {
+                                    Icons.Filled.VisibilityOff
+                                } else {
+                                    Icons.Filled.Visibility
+                                },
+                            contentDescription =
+                                if (formState.passwordVisible) {
+                                    "Ocultar contraseña"
+                                } else {
+                                    "Mostrar contraseña"
+                                },
                         )
                     }
                 },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done,
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        focusManager.clearFocus()
-                        onLogin()
-                    },
-                ),
+                keyboardOptions =
+                    KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                            onLogin()
+                        },
+                    ),
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isLoading,
             )
@@ -209,9 +222,10 @@ internal fun LoginContent(
             Button(
                 onClick = onLogin,
                 enabled = !isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = ElectricIndigo),
                 shape = MaterialTheme.shapes.medium,
             ) {

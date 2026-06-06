@@ -144,7 +144,6 @@ class LoginViewModelTest {
             assertTrue(viewModel.uiState.value is LoginUiState.Idle)
         }
 
-
     @Test
     fun `onLogin should emit Success when LoginUseCase succeeds`() =
         runTest(testDispatcher) {
@@ -170,7 +169,6 @@ class LoginViewModelTest {
 
             coVerify { loginUseCase("user@test.com", "password123") }
         }
-
 
     @Test
     fun `onLogin should emit Error with Credenciales incorrectas when LoginUseCase throws`() =
@@ -201,7 +199,6 @@ class LoginViewModelTest {
             assertTrue(state is LoginUiState.Error)
             assertEquals("Error desconocido", (state as LoginUiState.Error).message)
         }
-
 
     @Test
     fun `onErrorConsumed should reset uiState to Idle`() =
