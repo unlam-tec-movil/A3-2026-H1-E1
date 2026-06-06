@@ -7,9 +7,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
+import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
+import androidx.compose.ui.tooling.preview.Preview as ComposePreview
 
 @Composable
 fun CameraPreviewComponent(
@@ -17,7 +18,7 @@ fun CameraPreviewComponent(
     onSurfaceReady: (LifecycleOwner, Preview.SurfaceProvider) -> Unit,
 ) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val previewView =
         remember {
             PreviewView(context).apply {
@@ -33,4 +34,14 @@ fun CameraPreviewComponent(
         factory = { previewView },
         modifier = modifier,
     )
+}
+
+@ComposePreview(showBackground = true)
+@Composable
+fun CameraPreviewComponentPreview() {
+    GambAppTheme {
+        CameraPreviewComponent(
+            onSurfaceReady = { _, _ -> },
+        )
+    }
 }
