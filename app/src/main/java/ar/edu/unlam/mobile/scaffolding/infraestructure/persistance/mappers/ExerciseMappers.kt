@@ -1,7 +1,7 @@
 package ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.mappers
 
-import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.entities.ExerciseEntity
 import ar.edu.unlam.mobile.scaffolding.domain.model.Exercise
+import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.entities.ExerciseEntity
 
 fun ExerciseEntity.toDomain(): Exercise =
     Exercise(

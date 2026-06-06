@@ -6,12 +6,9 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,8 +31,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -47,7 +44,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -72,7 +68,6 @@ import ar.edu.unlam.mobile.scaffolding.ui.theme.AmberWarning
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
-import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -138,7 +133,7 @@ fun DashboardScreen(
     val entranceProgress by animateFloatAsState(
         targetValue = if (uiState.isLoading) 0f else 1f,
         animationSpec = tween(durationMillis = 850, easing = FastOutSlowInEasing),
-        label = "DashboardEntranceProgress"
+        label = "DashboardEntranceProgress",
     )
 
     Box(
@@ -173,58 +168,63 @@ fun DashboardScreen(
                 // Header (Greeting & Avatar)
                 DashboardHeader(
                     userName = uiState.userName,
-                    modifier = Modifier.graphicsLayer {
-                        val progress = (entranceProgress / 0.6f).coerceIn(0f, 1f)
-                        val easedProgress = FastOutSlowInEasing.transform(progress)
-                        alpha = easedProgress
-                        translationY = -yOffsetPx * (1f - easedProgress)
-                    }
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = (entranceProgress / 0.6f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = -yOffsetPx * (1f - easedProgress)
+                        },
                 )
 
                 // Active Routine Banner CTA
                 ActiveRoutineBanner(
                     onNavigateToRoutineList = onNavigateToRoutineList,
-                    modifier = Modifier.graphicsLayer {
-                        val progress = ((entranceProgress - 0.08f) / 0.6f).coerceIn(0f, 1f)
-                        val easedProgress = FastOutSlowInEasing.transform(progress)
-                        alpha = easedProgress
-                        translationY = yOffsetPx * (1f - easedProgress)
-                    }
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = ((entranceProgress - 0.08f) / 0.6f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = yOffsetPx * (1f - easedProgress)
+                        },
                 )
 
                 // Card 1: ROM Progress Ring Card
                 RomProgressCard(
                     maxRom = uiState.maxRom,
                     targetRom = uiState.targetRom,
-                    modifier = Modifier.graphicsLayer {
-                        val progress = ((entranceProgress - 0.15f) / 0.6f).coerceIn(0f, 1f)
-                        val easedProgress = FastOutSlowInEasing.transform(progress)
-                        alpha = easedProgress
-                        translationY = yOffsetPx * (1f - easedProgress)
-                    }
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = ((entranceProgress - 0.15f) / 0.6f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = yOffsetPx * (1f - easedProgress)
+                        },
                 )
 
                 // Card 2: Steps Summary Card
                 StepsCard(
                     currentSteps = uiState.currentSteps,
                     targetSteps = uiState.targetSteps,
-                    modifier = Modifier.graphicsLayer {
-                        val progress = ((entranceProgress - 0.3f) / 0.6f).coerceIn(0f, 1f)
-                        val easedProgress = FastOutSlowInEasing.transform(progress)
-                        alpha = easedProgress
-                        translationY = yOffsetPx * (1f - easedProgress)
-                    }
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = ((entranceProgress - 0.3f) / 0.6f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = yOffsetPx * (1f - easedProgress)
+                        },
                 )
 
                 // Card 3: Last Active Session Card
                 LastSessionCard(
                     lastSession = uiState.lastSession,
-                    modifier = Modifier.graphicsLayer {
-                        val progress = ((entranceProgress - 0.45f) / 0.55f).coerceIn(0f, 1f)
-                        val easedProgress = FastOutSlowInEasing.transform(progress)
-                        alpha = easedProgress
-                        translationY = yOffsetPx * (1f - easedProgress)
-                    }
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = ((entranceProgress - 0.45f) / 0.55f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = yOffsetPx * (1f - easedProgress)
+                        },
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -813,58 +813,63 @@ fun ActiveRoutineBanner(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { onNavigateToRoutineList() },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable { onNavigateToRoutineList() },
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(ElectricIndigo, CyanWave)
-                    )
-                )
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush =
+                            Brush.horizontalGradient(
+                                colors = listOf(ElectricIndigo, CyanWave),
+                            ),
+                    ).padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "Tu Rutina de Hoy 🏋️",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
+                    style =
+                        MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                        ),
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Ver los ejercicios y objetivos asignados para hoy",
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = Color.White.copy(alpha = 0.85f)
-                    )
+                    style =
+                        MaterialTheme.typography.bodyMedium.copy(
+                            color = Color.White.copy(alpha = 0.85f),
+                        ),
                 )
             }
 
             Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.2f)),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
                     contentDescription = "Ver Rutina",
                     tint = Color.White,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
             }
         }
     }
 }
-

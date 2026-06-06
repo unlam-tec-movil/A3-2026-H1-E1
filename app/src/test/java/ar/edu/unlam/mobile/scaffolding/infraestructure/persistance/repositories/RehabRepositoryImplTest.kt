@@ -1,7 +1,7 @@
 package ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.repositories
 
-import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.domain.model.Exercise
+import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.ExerciseDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.SessionDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.entities.ExerciseEntity
@@ -70,16 +70,17 @@ class RehabRepositoryImplTest {
     @Test
     fun `getExercises should call exerciseDao getAllExercises and map to domain model`() =
         runTest {
-            val mockEntities = listOf(
-                ExerciseEntity(
-                    id = "ex1",
-                    name = "Knee Flexion",
-                    description = "Description",
-                    targetAngle = 110f,
-                    repetitions = 10,
-                    sets = 3
+            val mockEntities =
+                listOf(
+                    ExerciseEntity(
+                        id = "ex1",
+                        name = "Knee Flexion",
+                        description = "Description",
+                        targetAngle = 110f,
+                        repetitions = 10,
+                        sets = 3,
+                    ),
                 )
-            )
             every { exerciseDao.getAllExercises() } returns flowOf(mockEntities)
 
             repository.getExercises().collect { exercises ->
@@ -96,16 +97,17 @@ class RehabRepositoryImplTest {
     @Test
     fun `insertExercises should call exerciseDao insertExercises after mapping to entity`() =
         runTest {
-            val exercises = listOf(
-                Exercise(
-                    id = "ex1",
-                    name = "Knee Flexion",
-                    description = "Description",
-                    targetAngle = 110f,
-                    repetitions = 10,
-                    sets = 3
+            val exercises =
+                listOf(
+                    Exercise(
+                        id = "ex1",
+                        name = "Knee Flexion",
+                        description = "Description",
+                        targetAngle = 110f,
+                        repetitions = 10,
+                        sets = 3,
+                    ),
                 )
-            )
             coEvery { exerciseDao.insertExercises(any()) } returns Unit
 
             repository.insertExercises(exercises)

@@ -5,7 +5,6 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -65,33 +64,35 @@ fun RoutineListScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
     ) {
         if (uiState.isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
             )
         } else if (uiState.error != null) {
             Text(
                 text = "Error: ${uiState.error}",
                 color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.align(Alignment.Center)
+                modifier = Modifier.align(Alignment.Center),
             )
         } else {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Beautiful Header with overall stats
                 RoutineHeader(
                     totalExercises = uiState.exercises.size,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -99,25 +100,28 @@ fun RoutineListScreen(
                 // List section title
                 Text(
                     text = "Tus Ejercicios de Hoy",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    ),
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    style =
+                        MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground,
+                        ),
+                    modifier = Modifier.padding(bottom = 12.dp),
                 )
 
                 if (uiState.exercises.isEmpty()) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Text(
                             text = "No tienes rutinas asignadas para hoy.",
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                            )
+                            style =
+                                MaterialTheme.typography.bodyLarge.copy(
+                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                                ),
                         )
                     }
                 } else {
@@ -125,22 +129,23 @@ fun RoutineListScreen(
                     LazyColumn(
                         modifier = Modifier.weight(1f),
                         contentPadding = PaddingValues(bottom = 80.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         itemsIndexed(
                             items = uiState.exercises,
-                            key = { _, exercise -> exercise.id }
+                            key = { _, exercise -> exercise.id },
                         ) { index, exercise ->
                             // Animated transition for each card item on entry
                             val animatedProgress = remember { Animatable(0f) }
                             LaunchedEffect(key1 = exercise.id) {
                                 animatedProgress.animateTo(
                                     targetValue = 1f,
-                                    animationSpec = tween(
-                                        durationMillis = 400,
-                                        delayMillis = index * 80,
-                                        easing = FastOutSlowInEasing
-                                    )
+                                    animationSpec =
+                                        tween(
+                                            durationMillis = 400,
+                                            delayMillis = index * 80,
+                                            easing = FastOutSlowInEasing,
+                                        ),
                                 )
                             }
 
@@ -149,14 +154,15 @@ fun RoutineListScreen(
                                 onStartClick = {
                                     controller.navigate(Screen.RehabSession.route)
                                 },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .graphicsLayer {
-                                        alpha = animatedProgress.value
-                                        translationY = 40f * (1f - animatedProgress.value)
-                                        scaleX = 0.95f + (0.05f * animatedProgress.value)
-                                        scaleY = 0.95f + (0.05f * animatedProgress.value)
-                                    }
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .graphicsLayer {
+                                            alpha = animatedProgress.value
+                                            translationY = 40f * (1f - animatedProgress.value)
+                                            scaleX = 0.95f + (0.05f * animatedProgress.value)
+                                            scaleY = 0.95f + (0.05f * animatedProgress.value)
+                                        },
                             )
                         }
                     }
@@ -174,56 +180,63 @@ fun RoutineHeader(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            ElectricIndigo.copy(alpha = 0.05f),
-                            CyanWave.copy(alpha = 0.05f)
-                        )
-                    )
-                )
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush =
+                            Brush.horizontalGradient(
+                                colors =
+                                    listOf(
+                                        ElectricIndigo.copy(alpha = 0.05f),
+                                        CyanWave.copy(alpha = 0.05f),
+                                    ),
+                            ),
+                    ).padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "Rutina Activa 🎯",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = ElectricIndigo
-                    )
+                    style =
+                        MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = ElectricIndigo,
+                        ),
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Ejercicios recomendados para tu rehabilitación hoy.",
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    )
+                    style =
+                        MaterialTheme.typography.bodyMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        ),
                 )
             }
 
             Box(
-                modifier = Modifier
-                    .size(54.dp)
-                    .clip(CircleShape)
-                    .background(ElectricIndigo.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .size(54.dp)
+                        .clip(CircleShape)
+                        .background(ElectricIndigo.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = "$totalExercises",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = ElectricIndigo,
-                        fontSize = 22.sp
-                    )
+                    style =
+                        MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = ElectricIndigo,
+                            fontSize = 22.sp,
+                        ),
                 )
             }
         }
@@ -239,42 +252,46 @@ fun ExerciseCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(18.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(18.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 // Exercise Name
                 Text(
                     text = exercise.name,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    ),
-                    modifier = Modifier.weight(1f)
+                    style =
+                        MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        ),
+                    modifier = Modifier.weight(1f),
                 )
 
                 // Chevron or active indicator
                 Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(CyanWave.copy(alpha = 0.08f)),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(CyanWave.copy(alpha = 0.08f)),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = "💪",
-                        fontSize = 16.sp
+                        fontSize = 16.sp,
                     )
                 }
             }
@@ -284,11 +301,12 @@ fun ExerciseCard(
             // Exercise Description
             Text(
                 text = exercise.description,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                ),
+                style =
+                    MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    ),
                 maxLines = 3,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
 
             Spacer(modifier = Modifier.height(18.dp))
@@ -296,14 +314,14 @@ fun ExerciseCard(
             // Details/Metrics row (sets, reps, target angle)
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 // Sets Badge
                 DetailBadge(
                     label = "Series",
                     value = "${exercise.sets}",
                     color = ElectricIndigo,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
 
                 // Reps Badge
@@ -311,7 +329,7 @@ fun ExerciseCard(
                     label = "Repeticiones",
                     value = "${exercise.repetitions}",
                     color = EmeraldIdeal,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
 
                 // Target Angle Badge
@@ -319,7 +337,7 @@ fun ExerciseCard(
                     label = "Ángulo Obj.",
                     value = "${exercise.targetAngle.toInt()}°",
                     color = CyanWave,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
             }
 
@@ -328,25 +346,27 @@ fun ExerciseCard(
             // Start Exercise Action Button
             Button(
                 onClick = onStartClick,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = ElectricIndigo,
-                    contentColor = Color.White
-                ),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = ElectricIndigo,
+                        contentColor = Color.White,
+                    ),
                 shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = "Iniciar Ejercicio",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp
-                    )
+                    style =
+                        MaterialTheme.typography.labelLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.5.sp,
+                        ),
                 )
             }
         }
@@ -361,34 +381,37 @@ fun DetailBadge(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(color.copy(alpha = 0.08f))
-            .border(1.dp, color.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
-            .padding(vertical = 10.dp, horizontal = 8.dp),
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(color.copy(alpha = 0.08f))
+                .border(1.dp, color.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
+                .padding(vertical = 10.dp, horizontal = 8.dp),
+        contentAlignment = Alignment.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Text(
                 text = label.uppercase(),
-                style = MaterialTheme.typography.labelSmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 9.sp,
-                    color = color.copy(alpha = 0.8f),
-                    letterSpacing = 0.5.sp
-                )
+                style =
+                    MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 9.sp,
+                        color = color.copy(alpha = 0.8f),
+                        letterSpacing = 0.5.sp,
+                    ),
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = value,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.ExtraBold,
-                    color = color,
-                    fontSize = 16.sp
-                )
+                style =
+                    MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        color = color,
+                        fontSize = 16.sp,
+                    ),
             )
         }
     }

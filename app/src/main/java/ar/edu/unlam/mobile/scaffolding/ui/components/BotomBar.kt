@@ -38,33 +38,34 @@ fun BottomBar(controller: NavHostController) {
     val navBackStackEntry by controller.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    val items = listOf(
-        NavigationItem(
-            label = "Inicio",
-            route = Screen.Dashboard.route,
-            selectedIcon = Icons.Filled.Home,
-            unselectedIcon = Icons.Outlined.Home,
-        ),
-        NavigationItem(
-            label = "Rutinas",
-            route = Screen.RoutineList.route,
-            selectedIcon = Icons.AutoMirrored.Filled.List,
-            unselectedIcon = Icons.AutoMirrored.Outlined.List,
-        ),
-        NavigationItem(
-            label = "Usuario",
-            route = Screen.User.route,
-            selectedIcon = Icons.Filled.Person,
-            unselectedIcon = Icons.Outlined.Person,
-            onClickRoute = Screen.User.createRoute("usuario"),
-        ),
-        NavigationItem(
-            label = "Formulario",
-            route = Screen.Form.route,
-            selectedIcon = Icons.Filled.CheckCircle,
-            unselectedIcon = Icons.Outlined.CheckCircle,
-        ),
-    )
+    val items =
+        listOf(
+            NavigationItem(
+                label = "Inicio",
+                route = Screen.Dashboard.route,
+                selectedIcon = Icons.Filled.Home,
+                unselectedIcon = Icons.Outlined.Home,
+            ),
+            NavigationItem(
+                label = "Rutinas",
+                route = Screen.RoutineList.route,
+                selectedIcon = Icons.AutoMirrored.Filled.List,
+                unselectedIcon = Icons.AutoMirrored.Outlined.List,
+            ),
+            NavigationItem(
+                label = "Usuario",
+                route = Screen.User.route,
+                selectedIcon = Icons.Filled.Person,
+                unselectedIcon = Icons.Outlined.Person,
+                onClickRoute = Screen.User.createRoute("usuario"),
+            ),
+            NavigationItem(
+                label = "Formulario",
+                route = Screen.Form.route,
+                selectedIcon = Icons.Filled.CheckCircle,
+                unselectedIcon = Icons.Outlined.CheckCircle,
+            ),
+        )
 
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -91,20 +92,21 @@ fun BottomBar(controller: NavHostController) {
                 label = {
                     Text(
                         text = item.label,
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        ),
+                        style =
+                            MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            ),
                     )
                 },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                    indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                ),
+                colors =
+                    NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    ),
             )
         }
     }
 }
-

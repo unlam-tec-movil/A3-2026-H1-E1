@@ -21,80 +21,100 @@ data class RoutineListUiState(
 )
 
 @HiltViewModel
-class RoutineListViewModel @Inject constructor(
-    private val rehabRepository: RehabRepository,
-) : ViewModel() {
+class RoutineListViewModel
+    @Inject
+    constructor(
+        private val rehabRepository: RehabRepository,
+    ) : ViewModel() {
+        private val _uiState = MutableStateFlow(RoutineListUiState())
+        val uiState: StateFlow<RoutineListUiState> = _uiState.asStateFlow()
 
-    private val _uiState = MutableStateFlow(RoutineListUiState())
-    val uiState: StateFlow<RoutineListUiState> = _uiState.asStateFlow()
+        init {
+            loadRoutineData()
+        }
 
-    init {
-        loadRoutineData()
-    }
+        private fun loadRoutineData() {
+            viewModelScope.launch {
+                _uiState.update { it.copy(isLoading = true) }
+                try {
+                    prepareMockExercisesIfNeeded()
 
-    private fun loadRoutineData() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            try {
-                prepareMockExercisesIfNeeded()
-                
-                rehabRepository.getExercises()
-                    .catch { e ->
-                        _uiState.update { it.copy(isLoading = false, error = e.localizedMessage ?: "Error desconocido") }
-                    }
-                    .collect { exercisesList ->
-                        _uiState.update { 
-                            it.copy(
-                                exercises = exercisesList,
-                                isLoading = false,
-                                error = null
-                            )
+                    rehabRepository
+                        .getExercises()
+                        .catch { e ->
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = e.localizedMessage ?: "Error desconocido",
+                                )
+                            }
+                        }.collect { exercisesList ->
+                            _uiState.update {
+                                it.copy(
+                                    exercises = exercisesList,
+                                    isLoading = false,
+                                    error = null,
+                                )
+                            }
                         }
+                } catch (e: Exception) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = e.localizedMessage ?: "Error desconocido",
+                        )
                     }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, error = e.localizedMessage ?: "Error desconocido") }
+                }
+            }
+        }
+
+        private suspend fun prepareMockExercisesIfNeeded() {
+            val currentExercises = rehabRepository.getExercises().firstOrNull() ?: emptyList()
+            if (currentExercises.isEmpty()) {
+                val mockExercises =
+                    listOf(
+                        Exercise(
+                            id = "ex_knee_flexion",
+                            name = "Flexión de Rodilla",
+                            description =
+                                "Mantén la espalda recta y dobla lentamente la rodilla " +
+                                    "hacia atrás intentando alcanzar el ángulo objetivo.",
+                            targetAngle = 110f,
+                            repetitions = 10,
+                            sets = 3,
+                        ),
+                        Exercise(
+                            id = "ex_knee_extension",
+                            name = "Extensión de Rodilla",
+                            description =
+                                "Sentado en una silla firme, extiende la pierna " +
+                                    "hacia el frente de manera controlada manteniéndola alineada.",
+                            targetAngle = 0f,
+                            repetitions = 12,
+                            sets = 3,
+                        ),
+                        Exercise(
+                            id = "ex_assisted_squats",
+                            name = "Sentadillas Asistidas",
+                            description =
+                                "Apoya las manos en un soporte y desciende lentamente " +
+                                    "cuidando que las rodillas no pasen la punta de los pies.",
+                            targetAngle = 90f,
+                            repetitions = 8,
+                            sets = 4,
+                        ),
+                        Exercise(
+                            id = "ex_heel_raises",
+                            name = "Elevación de Talones",
+                            description =
+                                "Elévate sobre las puntas de tus pies, sostén un segundo " +
+                                    "la contracción y desciende suavemente.",
+                            targetAngle = 30f,
+                            repetitions = 15,
+                            sets = 3,
+                        ),
+                    )
+                rehabRepository.insertExercises(mockExercises)
             }
         }
     }
-
-    private suspend fun prepareMockExercisesIfNeeded() {
-        val currentExercises = rehabRepository.getExercises().firstOrNull() ?: emptyList()
-        if (currentExercises.isEmpty()) {
-            val mockExercises = listOf(
-                Exercise(
-                    id = "ex_knee_flexion",
-                    name = "Flexión de Rodilla",
-                    description = "Mantén la espalda recta y dobla lentamente la rodilla hacia atrás intentando alcanzar el ángulo objetivo.",
-                    targetAngle = 110f,
-                    repetitions = 10,
-                    sets = 3
-                ),
-                Exercise(
-                    id = "ex_knee_extension",
-                    name = "Extensión de Rodilla",
-                    description = "Sentado en una silla firme, extiende la pierna hacia el frente de manera controlada manteniéndola alineada.",
-                    targetAngle = 0f,
-                    repetitions = 12,
-                    sets = 3
-                ),
-                Exercise(
-                    id = "ex_assisted_squats",
-                    name = "Sentadillas Asistidas",
-                    description = "Apoya las manos en un soporte y desciende lentamente cuidando que las rodillas no pasen la punta de los pies.",
-                    targetAngle = 90f,
-                    repetitions = 8,
-                    sets = 4
-                ),
-                Exercise(
-                    id = "ex_heel_raises",
-                    name = "Elevación de Talones",
-                    description = "Elévate sobre las puntas de tus pies, sostén un segundo la contracción y desciende suavemente.",
-                    targetAngle = 30f,
-                    repetitions = 15,
-                    sets = 3
-                )
-            )
-            rehabRepository.insertExercises(mockExercises)
-        }
-    }
-}

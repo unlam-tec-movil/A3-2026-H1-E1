@@ -1,5 +1,11 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ButtonDefaults
@@ -10,12 +16,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -33,7 +33,6 @@ import ar.edu.unlam.mobile.scaffolding.ui.navigation.Screen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.DashboardScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RoutineListScreen
-
 
 // Rutas donde el bottom bar no debe aparecer
 private val routesWithoutChrome =
@@ -148,21 +147,21 @@ fun MainScreen() {
             composable(Screen.Login.route) {
                 DashboardScreen(
                     onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
-                    modifier = Modifier.padding(paddingValue)
+                    modifier = Modifier.padding(paddingValue),
                 )
             }
             // Register todo
             composable(Screen.Register.route) {
                 DashboardScreen(
                     onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
-                    modifier = Modifier.padding(paddingValue)
+                    modifier = Modifier.padding(paddingValue),
                 )
             }
 
             composable(Screen.Dashboard.route) {
                 DashboardScreen(
                     onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
-                    modifier = Modifier.padding(paddingValue)
+                    modifier = Modifier.padding(paddingValue),
                 )
             }
             composable(Screen.Form.route) {
@@ -190,5 +189,3 @@ fun MainScreen() {
         }
     }
 }
-
-
