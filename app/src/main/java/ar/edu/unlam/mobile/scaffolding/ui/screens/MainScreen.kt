@@ -125,6 +125,9 @@ fun MainScreen() {
             composable("home") {
                 HomeScreen(modifier = Modifier.padding(paddingValue))
             }
+            composable(Screen.Dashboard.route) {
+                DashboardScreen(modifier = Modifier.padding(paddingValue))
+            }
             composable("form") {
                 FormScreen(
                     modifier = Modifier.padding(paddingValue),
