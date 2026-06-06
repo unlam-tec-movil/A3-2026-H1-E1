@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile.scaffolding.data.datasources.device.sensor
+package ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor
 
 import android.app.Service
 import android.content.Intent

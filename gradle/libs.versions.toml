@@ -1,5 +1,5 @@
 [versions]
-agp = "9.1.0"
+agp = "9.2.1"
 kotlin = "2.2.10"
 coreKtx = "1.17.0"
 junit = "4.13.2"
@@ -17,7 +17,7 @@ mapsCompose = "8.3.0"
 material3 = "1.4.0-beta03"
 playServicesLocation = "21.3.0"
 roomV = "2.7.2"
-kspV = "2.0.21-1.0.25"
+kspV = "2.3.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

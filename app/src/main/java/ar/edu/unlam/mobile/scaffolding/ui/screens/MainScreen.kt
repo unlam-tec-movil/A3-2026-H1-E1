@@ -27,6 +27,7 @@ import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
 import ar.edu.unlam.mobile.scaffolding.ui.navigation.Screen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.DashboardScreen
 
 @Composable
 fun MainScreen() {
@@ -35,7 +36,7 @@ fun MainScreen() {
     Scaffold(
         bottomBar = { BottomBar(controller = controller) },
         floatingActionButton = {
-            IconButton(onClick = { controller.navigate("home") }) {
+            IconButton(onClick = { controller.navigate("dashboard") }) {
                 Icon(Icons.Filled.Home, contentDescription = "Home")
             }
         },
@@ -71,7 +72,10 @@ fun MainScreen() {
             }
         },
     ) { paddingValue ->
-        NavHost(navController = controller, startDestination = "Dev3PlayGround") {
+        NavHost(navController = controller, startDestination = "dashboard") {
+            composable("dashboard") {
+                DashboardScreen(modifier = Modifier.padding(paddingValue))
+            }
             composable("home") {
                 HomeScreen(modifier = Modifier.padding(paddingValue))
             }
