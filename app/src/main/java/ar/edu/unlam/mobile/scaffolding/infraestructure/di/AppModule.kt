@@ -8,6 +8,7 @@ import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.camera.CameraXSessionAdapter
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.StepCounterDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.LocationDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.SessionDao
@@ -15,7 +16,6 @@ import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.StoredCl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.UserDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.db.AppDatabase
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.db.ClinicsDataBase
-import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.StepCounterDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.repositories.RehabRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.repositories.UserRepositoryImpl

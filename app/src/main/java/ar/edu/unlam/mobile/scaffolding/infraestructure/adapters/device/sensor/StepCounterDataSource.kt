@@ -28,25 +28,19 @@ class StepCounterDataSource(
             }
         }
 
-    fun getStepsToday(): Int {
-        return prefs.getInt("steps_today", 0)
-    }
+    fun getStepsToday(): Int = prefs.getInt("steps_today", 0)
 
     fun saveStepsToday(steps: Int) {
         prefs.edit().putInt("steps_today", steps).apply()
     }
 
-    fun getLastSensorValue(): Float {
-        return prefs.getFloat("last_sensor_value", -1f)
-    }
+    fun getLastSensorValue(): Float = prefs.getFloat("last_sensor_value", -1f)
 
     fun saveLastSensorValue(value: Float) {
         prefs.edit().putFloat("last_sensor_value", value).apply()
     }
 
-    fun getLastResetDate(): String? {
-        return prefs.getString("last_reset_date", null)
-    }
+    fun getLastResetDate(): String? = prefs.getString("last_reset_date", null)
 
     fun saveLastResetDate(date: String) {
         prefs.edit().putString("last_reset_date", date).apply()

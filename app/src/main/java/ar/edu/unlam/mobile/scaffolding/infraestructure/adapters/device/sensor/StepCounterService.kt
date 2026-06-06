@@ -24,8 +24,9 @@ import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class StepCounterService : Service(), SensorEventListener {
-
+class StepCounterService :
+    Service(),
+    SensorEventListener {
     @Inject
     lateinit var dataSource: StepCounterDataSource
 
@@ -60,7 +61,11 @@ class StepCounterService : Service(), SensorEventListener {
         }
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         // Ensure service runs persistently
         return START_STICKY
     }
@@ -100,7 +105,10 @@ class StepCounterService : Service(), SensorEventListener {
         }
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+    override fun onAccuracyChanged(
+        sensor: Sensor?,
+        accuracy: Int,
+    ) {
         // No action needed
     }
 
@@ -111,35 +119,40 @@ class StepCounterService : Service(), SensorEventListener {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Contador de Pasos",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "Muestra los pasos del día en tiempo real"
-            }
+            val channel =
+                NotificationChannel(
+                    CHANNEL_ID,
+                    "Contador de Pasos",
+                    NotificationManager.IMPORTANCE_LOW,
+                ).apply {
+                    description = "Muestra los pasos del día en tiempo real"
+                }
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
         }
     }
 
     private fun buildNotification(steps: Int): Notification {
-        val notificationIntent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-        val pendingIntentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        } else {
-            PendingIntent.FLAG_UPDATE_CURRENT
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            notificationIntent,
-            pendingIntentFlags
-        )
+        val notificationIntent =
+            Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+        val pendingIntentFlags =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
+        val pendingIntent =
+            PendingIntent.getActivity(
+                this,
+                0,
+                notificationIntent,
+                pendingIntentFlags,
+            )
 
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+        return NotificationCompat
+            .Builder(this, CHANNEL_ID)
             .setContentTitle("Contador de Pasos")
             .setContentText("Has dado $steps pasos hoy")
             .setSmallIcon(R.mipmap.ic_launcher)
@@ -150,4 +163,3 @@ class StepCounterService : Service(), SensorEventListener {
             .build()
     }
 }
-
