@@ -1,6 +1,8 @@
 package ar.edu.unlam.mobile.scaffolding.ui.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -42,6 +44,12 @@ fun BottomBar(controller: NavHostController) {
             route = Screen.Dashboard.route,
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home,
+        ),
+        NavigationItem(
+            label = "Rutinas",
+            route = Screen.RoutineList.route,
+            selectedIcon = Icons.AutoMirrored.Filled.List,
+            unselectedIcon = Icons.AutoMirrored.Outlined.List,
         ),
         NavigationItem(
             label = "Usuario",
