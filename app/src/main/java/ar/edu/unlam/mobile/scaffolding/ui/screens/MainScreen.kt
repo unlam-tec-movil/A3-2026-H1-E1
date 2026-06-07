@@ -39,6 +39,8 @@ private val routesWithoutChrome =
     setOf(
         Screen.Splash.route,
         Screen.Onboarding.route,
+        Screen.Login.route,
+        Screen.Register.route,
     )
 
 @Composable
@@ -143,11 +145,17 @@ fun MainScreen() {
                     },
                 )
             }
-            // Login todo
+            // Login
             composable(Screen.Login.route) {
-                DashboardScreen(
-                    onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
-                    modifier = Modifier.padding(paddingValue),
+                LoginScreen(
+                    onNavigateToDashboard = {
+                        controller.navigate(Screen.Dashboard.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    },
+                    onNavigateToRegister = {
+                        controller.navigate(Screen.Register.route)
+                    },
                 )
             }
             // Register todo

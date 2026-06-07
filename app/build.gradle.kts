@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose.compiler)
+    id("com.google.gms.google-services")
 }
 
 tasks.withType<KotlinCompile>().configureEach {
@@ -64,6 +65,10 @@ configurations.all {
 }
 
 dependencies {
+
+    // Firebase Authentication
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
 
     // Splash Screen
     implementation("androidx.core:core-splashscreen:1.0.1")

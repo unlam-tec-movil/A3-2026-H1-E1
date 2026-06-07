@@ -20,6 +20,7 @@ import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.db.ClinicsDat
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.repositories.RehabRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.repositories.UserRepositoryImpl
+import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,6 +30,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @Provides
+    @Singleton
+    fun providesFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+
     @Provides
     @Singleton
     fun providesStepCounterDataSource(context: Application): StepCounterDataSource =
