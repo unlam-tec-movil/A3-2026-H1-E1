@@ -10,14 +10,25 @@ import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.BuildConfigApiKeyProviderImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseLocationRepositoryImpl
+import ar.edu.unlam.mobile.scaffolding.domain.ports.camera.CameraSessionPort
+import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseRepositoryPort
+import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
+import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
+import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.camera.CameraXSessionAdapter
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.StepCounterDataSource
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.LocationDataSource
+import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.ExerciseDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.SessionDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.StoredClinicsDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.UserDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.db.AppDatabase
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.db.ClinicsDataBase
+import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.repositories.RehabRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.repositories.UserRepositoryImpl
+import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,8 +41,25 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
+    fun providesFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+
+    @Provides
+    @Singleton
+    fun providesStepCounterDataSource(context: Application): StepCounterDataSource =
+        StepCounterDataSource(context = context)
+
+    @Provides
+    @Singleton
+    fun providesSessionPreferences(context: Application): SessionPreferences = SessionPreferences(context = context)
+
+    @Provides
+    @Singleton
     fun providesLocationServicePortImpl(context: Application): LocationServicePort =
         LocationDataSource(context = context)
+
+    @Provides
+    @Singleton
+    fun providesCameraSessionPort(context: Application): CameraSessionPort = CameraXSessionAdapter(context = context)
 
     @Provides
     @Singleton
@@ -78,9 +106,17 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providesExerciseDao(db: AppDatabase): ExerciseDao = db.exerciseDao()
+
+    @Provides
+    @Singleton
     fun providesUserRepository(userDao: UserDao): UserRepository = UserRepositoryImpl(userDao = userDao)
 
     @Provides
     @Singleton
     fun providesRehabRepository(sessionDao: SessionDao): RehabRepository = RehabRepositoryImpl(sessionDao = sessionDao)
+    fun providesRehabRepository(
+        sessionDao: SessionDao,
+        exerciseDao: ExerciseDao,
+    ): RehabRepository = RehabRepositoryImpl(sessionDao = sessionDao, exerciseDao = exerciseDao)
 }

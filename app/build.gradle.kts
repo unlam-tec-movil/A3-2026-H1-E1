@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose.compiler)
+    id("com.google.gms.google-services")
 }
 
 tasks.withType<KotlinCompile>().configureEach {
@@ -76,6 +77,13 @@ configurations.all {
 
 dependencies {
 
+    // Firebase Authentication
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+
+    // Splash Screen
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
     // Base
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -133,6 +141,9 @@ dependencies {
     // Retrofit (Network / API Directions)
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Guava (Required for ListenableFuture in CameraX)
+    implementation(libs.guava)
 
     // Testing (Unitarios y Flow testing)
     testImplementation("io.mockk:mockk:1.13.9")

@@ -1,14 +1,18 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard
 
-import androidx.compose.animation.AnimatedVisibility
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +32,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,7 +44,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,16 +54,20 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.mobile.scaffolding.domain.model.Session
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.StepCounterService
 import ar.edu.unlam.mobile.scaffolding.ui.theme.AmberWarning
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
-import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -68,28 +76,65 @@ const val DASHBOARD_SCREEN_ROUTE = "dashboard"
 
 @Composable
 fun DashboardScreen(
+    onNavigateToRoutineList: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
-    // Control staggered animation states
-    var headerVisible by remember { mutableStateOf(false) }
-    var card1Visible by remember { mutableStateOf(false) }
-    var card2Visible by remember { mutableStateOf(false) }
-    var card3Visible by remember { mutableStateOf(false) }
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestMultiplePermissions(),
+        ) { permissions ->
+            val activityRecognitionGranted =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    permissions[Manifest.permission.ACTIVITY_RECOGNITION] ?: false
+                } else {
+                    true
+                }
 
-    LaunchedEffect(uiState.isLoading) {
-        if (!uiState.isLoading) {
-            headerVisible = true
-            delay(100)
-            card1Visible = true
-            delay(150)
-            card2Visible = true
-            delay(150)
-            card3Visible = true
+            if (activityRecognitionGranted) {
+                val serviceIntent = Intent(context, StepCounterService::class.java)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(serviceIntent)
+                } else {
+                    context.startService(serviceIntent)
+                }
+            }
+        }
+
+    LaunchedEffect(Unit) {
+        val needsActivityRecognition =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION) !=
+                PackageManager.PERMISSION_GRANTED
+
+        val needsPostNotifications =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+                PackageManager.PERMISSION_GRANTED
+
+        if (needsActivityRecognition || needsPostNotifications) {
+            val list = mutableListOf<String>()
+            if (needsActivityRecognition) list.add(Manifest.permission.ACTIVITY_RECOGNITION)
+            if (needsPostNotifications) list.add(Manifest.permission.POST_NOTIFICATIONS)
+            permissionLauncher.launch(list.toTypedArray())
+        } else {
+            val serviceIntent = Intent(context, StepCounterService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent)
+            } else {
+                context.startService(serviceIntent)
+            }
         }
     }
+
+    val entranceProgress by animateFloatAsState(
+        targetValue = if (uiState.isLoading) 0f else 1f,
+        animationSpec = tween(durationMillis = 850, easing = FastOutSlowInEasing),
+        label = "DashboardEntranceProgress",
+    )
 
     Box(
         modifier =
@@ -110,6 +155,9 @@ fun DashboardScreen(
                 modifier = Modifier.align(Alignment.Center),
             )
         } else {
+            val density = LocalDensity.current
+            val yOffsetPx = remember { with(density) { 32.dp.toPx() } }
+
             Column(
                 modifier =
                     Modifier
@@ -118,62 +166,66 @@ fun DashboardScreen(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
                 // Header (Greeting & Avatar)
-                AnimatedVisibility(
-                    visible = headerVisible,
-                    enter =
-                        fadeIn(animationSpec = tween(500)) +
-                            slideInVertically(
-                                initialOffsetY = { -it / 4 },
-                                animationSpec = tween(500),
-                            ),
-                ) {
-                    DashboardHeader(userName = uiState.userName)
-                }
+                DashboardHeader(
+                    userName = uiState.userName,
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = (entranceProgress / 0.6f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = -yOffsetPx * (1f - easedProgress)
+                        },
+                )
+
+                // Active Routine Banner CTA
+                ActiveRoutineBanner(
+                    onNavigateToRoutineList = onNavigateToRoutineList,
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = ((entranceProgress - 0.08f) / 0.6f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = yOffsetPx * (1f - easedProgress)
+                        },
+                )
 
                 // Card 1: ROM Progress Ring Card
-                AnimatedVisibility(
-                    visible = card1Visible,
-                    enter =
-                        fadeIn(animationSpec = tween(600)) +
-                            slideInVertically(
-                                initialOffsetY = { it / 3 },
-                                animationSpec = tween(600),
-                            ),
-                ) {
-                    RomProgressCard(
-                        maxRom = uiState.maxRom,
-                        targetRom = uiState.targetRom,
-                    )
-                }
+                RomProgressCard(
+                    maxRom = uiState.maxRom,
+                    targetRom = uiState.targetRom,
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = ((entranceProgress - 0.15f) / 0.6f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = yOffsetPx * (1f - easedProgress)
+                        },
+                )
 
                 // Card 2: Steps Summary Card
-                AnimatedVisibility(
-                    visible = card2Visible,
-                    enter =
-                        fadeIn(animationSpec = tween(600)) +
-                            slideInVertically(
-                                initialOffsetY = { it / 3 },
-                                animationSpec = tween(600),
-                            ),
-                ) {
-                    StepsCard(
-                        currentSteps = uiState.currentSteps,
-                        targetSteps = uiState.targetSteps,
-                    )
-                }
+                StepsCard(
+                    currentSteps = uiState.currentSteps,
+                    targetSteps = uiState.targetSteps,
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = ((entranceProgress - 0.3f) / 0.6f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = yOffsetPx * (1f - easedProgress)
+                        },
+                )
 
                 // Card 3: Last Active Session Card
-                AnimatedVisibility(
-                    visible = card3Visible,
-                    enter =
-                        fadeIn(animationSpec = tween(600)) +
-                            slideInVertically(
-                                initialOffsetY = { it / 3 },
-                                animationSpec = tween(600),
-                            ),
-                ) {
-                    LastSessionCard(lastSession = uiState.lastSession)
-                }
+                LastSessionCard(
+                    lastSession = uiState.lastSession,
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = ((entranceProgress - 0.45f) / 0.55f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = yOffsetPx * (1f - easedProgress)
+                        },
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -753,4 +805,71 @@ fun HorizontalDivider(
                 .height(thickness)
                 .background(color),
     )
+}
+
+@Composable
+fun ActiveRoutineBanner(
+    onNavigateToRoutineList: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable { onNavigateToRoutineList() },
+        shape = RoundedCornerShape(24.dp),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush =
+                            Brush.horizontalGradient(
+                                colors = listOf(ElectricIndigo, CyanWave),
+                            ),
+                    ).padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Tu Rutina de Hoy 🏋️",
+                    style =
+                        MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                        ),
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Ver los ejercicios y objetivos asignados para hoy",
+                    style =
+                        MaterialTheme.typography.bodyMedium.copy(
+                            color = Color.White.copy(alpha = 0.85f),
+                        ),
+                )
+            }
+
+            Box(
+                modifier =
+                    Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = "Ver Rutina",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        }
+    }
 }

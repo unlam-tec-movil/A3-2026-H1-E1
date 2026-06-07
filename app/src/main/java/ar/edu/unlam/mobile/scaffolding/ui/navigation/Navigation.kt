@@ -30,4 +30,12 @@ sealed class Screen(
     object RoutineList : Screen("routine_list")
 
     object Progress : Screen("progress")
+
+    object Form : Screen("form")
+
+    object User : Screen("user/{id}") {
+        fun createRoute(id: String) = "user/$id"
+    }
+
+    object Dev3PlayGround : Screen("Dev3PlayGround")
 }

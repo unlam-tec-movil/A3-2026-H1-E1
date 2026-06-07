@@ -4,6 +4,7 @@ import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.domain.model.User
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.StepCounterDataSource
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +25,7 @@ import org.junit.Test
 class DashboardViewModelTest {
     private val userRepository = mockk<UserRepository>(relaxed = true)
     private val rehabRepository = mockk<RehabRepository>(relaxed = true)
+    private val stepCounterDataSource = mockk<StepCounterDataSource>(relaxed = true)
 
     private val testDispatcher = StandardTestDispatcher()
 
@@ -64,9 +66,10 @@ class DashboardViewModelTest {
             // Mock the repository calls
             coEvery { userRepository.getUser() } returns flowOf(mockUser)
             coEvery { rehabRepository.getSessions("user_imanol") } returns flowOf(mockSessions)
+            coEvery { stepCounterDataSource.getStepsFlow() } returns flowOf(5000)
 
             // Instantiate ViewModel
-            val viewModel = DashboardViewModel(userRepository, rehabRepository)
+            val viewModel = DashboardViewModel(userRepository, rehabRepository, stepCounterDataSource)
 
             // Advance dispatcher to run init block coroutines
             advanceUntilIdle()
@@ -76,5 +79,6 @@ class DashboardViewModelTest {
             assertEquals("Imanol", uiState.userName)
             assertEquals(112f, uiState.maxRom)
             assertEquals(mockSessions[1], uiState.lastSession)
+            assertEquals(5000, uiState.currentSteps)
         }
 }
