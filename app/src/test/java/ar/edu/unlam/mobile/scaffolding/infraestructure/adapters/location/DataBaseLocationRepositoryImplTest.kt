@@ -17,6 +17,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+@Suppress("CheckResult", "UnusedFlow")
 class DataBaseLocationRepositoryImplTest {
     private lateinit var repository: DataBaseLocationRepositoryImpl
     private val mockClinicDao: StoredClinicsDao = mockk()

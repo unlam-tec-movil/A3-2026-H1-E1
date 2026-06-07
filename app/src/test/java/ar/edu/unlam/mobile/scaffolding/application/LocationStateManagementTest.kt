@@ -21,6 +21,7 @@ import org.junit.Test
  * Integration-style tests for location state management.
  * Tests the workflow of loading clinics from assets, storing them, and retrieving them.
  */
+@Suppress("CheckResult", "UnusedFlow")
 class LocationStateManagementTest {
     private lateinit var getClinicsFromAssetsUseCase: GetClinicsFromAssetsUseCase
     private lateinit var populateClinicsDbUseCase: PopulateClinicsDbUseCase

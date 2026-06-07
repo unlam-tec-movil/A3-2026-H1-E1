@@ -11,6 +11,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
+@Suppress("CheckResult", "UnusedFlow")
 class GetClinicsStoredUseCaseTest {
     private lateinit var useCase: GetClinicsStoredUseCase
     private val mockRepository: DataBaseLocationRepositoryPort = mockk()

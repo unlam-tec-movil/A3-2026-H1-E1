@@ -17,6 +17,7 @@ import org.junit.Test
  * Unit tests for StoredClinicsDao operations.
  * Tests clinic database CRUD operations without needing a real database.
  */
+@Suppress("CheckResult", "UnusedFlow")
 class StoredClinicsDaoTest {
     private lateinit var mockDao: StoredClinicsDao
 
