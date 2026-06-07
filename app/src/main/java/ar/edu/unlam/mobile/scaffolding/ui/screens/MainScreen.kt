@@ -158,11 +158,14 @@ fun MainScreen() {
                     },
                 )
             }
-            // Register todo
+            // Register
             composable(Screen.Register.route) {
-                DashboardScreen(
-                    onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
-                    modifier = Modifier.padding(paddingValue),
+                RegisterScreen(
+                    onNavigateToLogin = {
+                        controller.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Register.route) { inclusive = true }
+                        }
+                    },
                 )
             }
 
