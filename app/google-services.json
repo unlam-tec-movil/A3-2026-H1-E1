@@ -1,20 +1,21 @@
 {
   "project_info": {
-    "project_number": "123456789012",
-    "project_id": "gambapp-placeholder",
-    "storage_bucket": "gambapp-placeholder.appspot.com"
+    "project_number": "677519212308",
+    "project_id": "gamapp-3a9ff",
+    "storage_bucket": "gamapp-3a9ff.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:123456789012:android:abcdef123456789",
+        "mobilesdk_app_id": "1:677519212308:android:395ee35bc21707105b8c01",
         "android_client_info": {
           "package_name": "ar.edu.unlam.mobile.scaffolding"
         }
       },
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "placeholder_api_key"
+          "current_key": "AIzaSyDZqbG2vYBLAE2TSMXl4p_qQrqBW56kCNk"
         }
       ],
       "services": {
