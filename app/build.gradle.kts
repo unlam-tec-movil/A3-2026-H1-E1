@@ -54,12 +54,33 @@ android {
     buildFeatures {
         compose = true
     }
+    testOptions {
+        managedDevices {
+            localDevices {
+                create("pixel6api34") {
+                    device = "Pixel 6"
+                    apiLevel = 34
+                    systemImageSource = "google_apis"
+                }
+            }
+        }
+    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
 }
+kover {
+    reports {
+        filters {
+            excludes {
+                annotatedBy("androidx.compose.runtime.Composable")
+            }
+        }
+    }
+}
+
 configurations.all {
     exclude(group = "com.intellij", module = "annotations")
 }
