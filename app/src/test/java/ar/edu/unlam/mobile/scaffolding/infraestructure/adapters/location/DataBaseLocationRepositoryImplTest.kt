@@ -28,144 +28,154 @@ class DataBaseLocationRepositoryImplTest {
     }
 
     @Test
-    fun `getStoredClinics returns flow of clinics from DAO`() = runTest {
-        // Arrange
-        val clinicEntities = listOf(
-            ClinicEntity(
-                id = 1,
-                name = "Clinic A",
-                address = "Address A",
-                phone = "+123",
-                website = "site.com",
-                lat = -34.6037,
-                lng = -58.5609,
-            ),
-            ClinicEntity(
-                id = 2,
-                name = "Clinic B",
-                address = "Address B",
-                phone = "+456",
-                website = "site2.com",
-                lat = -34.6040,
-                lng = -58.5610,
-            ),
-        )
+    fun `getStoredClinics returns flow of clinics from DAO`() =
+        runTest {
+            // Arrange
+            val clinicEntities =
+                listOf(
+                    ClinicEntity(
+                        id = 1,
+                        name = "Clinic A",
+                        address = "Address A",
+                        phone = "+123",
+                        website = "site.com",
+                        lat = -34.6037,
+                        lng = -58.5609,
+                    ),
+                    ClinicEntity(
+                        id = 2,
+                        name = "Clinic B",
+                        address = "Address B",
+                        phone = "+456",
+                        website = "site2.com",
+                        lat = -34.6040,
+                        lng = -58.5610,
+                    ),
+                )
 
-        every { mockClinicDao.getStoredClinics() } returns flowOf(clinicEntities)
+            every { mockClinicDao.getStoredClinics() } returns flowOf(clinicEntities)
 
-        // Act
-        val result = repository.getStoredClinics()
-        var clinics: List<Clinic>? = null
-        result.collect { clinics = it }
+            // Act
+            val result = repository.getStoredClinics()
+            var clinics: List<Clinic>? = null
+            result.collect { clinics = it }
 
-        // Assert
-        assertEquals(2, clinics?.size)
-        assertEquals("Clinic A", clinics?.get(0)?.name)
-        assertEquals("Clinic B", clinics?.get(1)?.name)
-        verify { mockClinicDao.getStoredClinics() }
-    }
-
-    @Test
-    fun `getStoredClinics returns empty flow when DAO returns no clinics`() = runTest {
-        // Arrange
-        every { mockClinicDao.getStoredClinics() } returns flowOf(emptyList())
-
-        // Act
-        val result = repository.getStoredClinics()
-        var clinics: List<Clinic>? = null
-        result.collect { clinics = it }
-
-        // Assert
-        assertEquals(0, clinics?.size)
-    }
+            // Assert
+            assertEquals(2, clinics?.size)
+            assertEquals("Clinic A", clinics?.get(0)?.name)
+            assertEquals("Clinic B", clinics?.get(1)?.name)
+            verify { mockClinicDao.getStoredClinics() }
+        }
 
     @Test
-    fun `saveAllClinics converts clinics to entities and inserts them`() = runTest {
-        // Arrange
-        val clinics = listOf(
-            Clinic(
-                id = 1,
-                name = "Clinic A",
-                address = "Address A",
-                phone = "+123",
-                website = "site.com",
-                lat = -34.6037,
-                lng = -58.5609,
-            ),
-            Clinic(
-                id = 2,
-                name = "Clinic B",
-                address = "Address B",
-                phone = "+456",
-                website = "site2.com",
-                lat = -34.6040,
-                lng = -58.5610,
-            ),
-        )
+    fun `getStoredClinics returns empty flow when DAO returns no clinics`() =
+        runTest {
+            // Arrange
+            every { mockClinicDao.getStoredClinics() } returns flowOf(emptyList())
 
-        coEvery { mockClinicDao.insertAll(any()) } returns Unit
+            // Act
+            val result = repository.getStoredClinics()
+            var clinics: List<Clinic>? = null
+            result.collect { clinics = it }
 
-        // Act
-        repository.saveAllClinics(clinics)
-
-        // Assert
-        coVerify { mockClinicDao.insertAll(any()) }
-    }
+            // Assert
+            assertEquals(0, clinics?.size)
+        }
 
     @Test
-    fun `saveAllClinics handles empty clinic list`() = runTest {
-        // Arrange
-        val clinics = emptyList<Clinic>()
-        coEvery { mockClinicDao.insertAll(any()) } returns Unit
+    fun `saveAllClinics converts clinics to entities and inserts them`() =
+        runTest {
+            // Arrange
+            val clinics =
+                listOf(
+                    Clinic(
+                        id = 1,
+                        name = "Clinic A",
+                        address = "Address A",
+                        phone = "+123",
+                        website = "site.com",
+                        lat = -34.6037,
+                        lng = -58.5609,
+                    ),
+                    Clinic(
+                        id = 2,
+                        name = "Clinic B",
+                        address = "Address B",
+                        phone = "+456",
+                        website = "site2.com",
+                        lat = -34.6040,
+                        lng = -58.5610,
+                    ),
+                )
 
-        // Act
-        repository.saveAllClinics(clinics)
+            coEvery { mockClinicDao.insertAll(any()) } returns Unit
 
-        // Assert
-        coVerify { mockClinicDao.insertAll(emptyList()) }
-    }
+            // Act
+            repository.saveAllClinics(clinics)
 
-    @Test
-    fun `hasStoredClinics returns true when count is greater than zero`() = runTest {
-        // Arrange
-        coEvery { mockClinicDao.getClinicCount() } returns 5
-
-        // Act
-        val result = repository.hasStoredClinics()
-
-        // Assert
-        assertTrue(result)
-        coVerify { mockClinicDao.getClinicCount() }
-    }
-
-    @Test
-    fun `hasStoredClinics returns false when count is zero`() = runTest {
-        // Arrange
-        coEvery { mockClinicDao.getClinicCount() } returns 0
-
-        // Act
-        val result = repository.hasStoredClinics()
-
-        // Assert
-        assertFalse(result)
-    }
+            // Assert
+            coVerify { mockClinicDao.insertAll(any()) }
+        }
 
     @Test
-    fun `hasStoredClinics returns false when count is negative`() = runTest {
-        // Arrange
-        coEvery { mockClinicDao.getClinicCount() } returns -1
+    fun `saveAllClinics handles empty clinic list`() =
+        runTest {
+            // Arrange
+            val clinics = emptyList<Clinic>()
+            coEvery { mockClinicDao.insertAll(any()) } returns Unit
 
-        // Act
-        val result = repository.hasStoredClinics()
+            // Act
+            repository.saveAllClinics(clinics)
 
-        // Assert
-        assertFalse(result)
-    }
+            // Assert
+            coVerify { mockClinicDao.insertAll(emptyList()) }
+        }
+
+    @Test
+    fun `hasStoredClinics returns true when count is greater than zero`() =
+        runTest {
+            // Arrange
+            coEvery { mockClinicDao.getClinicCount() } returns 5
+
+            // Act
+            val result = repository.hasStoredClinics()
+
+            // Assert
+            assertTrue(result)
+            coVerify { mockClinicDao.getClinicCount() }
+        }
+
+    @Test
+    fun `hasStoredClinics returns false when count is zero`() =
+        runTest {
+            // Arrange
+            coEvery { mockClinicDao.getClinicCount() } returns 0
+
+            // Act
+            val result = repository.hasStoredClinics()
+
+            // Assert
+            assertFalse(result)
+        }
+
+    @Test
+    fun `hasStoredClinics returns false when count is negative`() =
+        runTest {
+            // Arrange
+            coEvery { mockClinicDao.getClinicCount() } returns -1
+
+            // Act
+            val result = repository.hasStoredClinics()
+
+            // Assert
+            assertFalse(result)
+        }
 
     @Test
     fun `getClinicsFromAssets parses JSON and returns clinic list`() {
         // Arrange
-        val jsonContent = """
+        val jsonContent =
+            """
             {
               "meta": {
                 "description": "Clínicas de Kinesiología",
@@ -195,7 +205,7 @@ class DataBaseLocationRepositoryImplTest {
                 }
               ]
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val mockAsset = jsonContent.byteInputStream()
         every { mockContext.assets.open("clinicas_ciudadela_ba.json") } returns mockAsset
@@ -215,7 +225,8 @@ class DataBaseLocationRepositoryImplTest {
     @Test
     fun `getClinicsFromAssets maps all fields correctly`() {
         // Arrange
-        val jsonContent = """
+        val jsonContent =
+            """
             {
               "meta": {"description": "Test"},
               "clinics": [
@@ -230,7 +241,7 @@ class DataBaseLocationRepositoryImplTest {
                 }
               ]
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val mockAsset = jsonContent.byteInputStream()
         every { mockContext.assets.open("clinicas_ciudadela_ba.json") } returns mockAsset
@@ -253,12 +264,13 @@ class DataBaseLocationRepositoryImplTest {
     @Test
     fun `getClinicsFromAssets handles empty clinics array`() {
         // Arrange
-        val jsonContent = """
+        val jsonContent =
+            """
             {
               "meta": {"description": "Test"},
               "clinics": []
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val mockAsset = jsonContent.byteInputStream()
         every { mockContext.assets.open("clinicas_ciudadela_ba.json") } returns mockAsset

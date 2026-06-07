@@ -22,26 +22,27 @@ class GetClinicsFromAssetsUseCaseTest {
     @Test
     fun `invoke returns clinics list from repository`() {
         // Arrange
-        val expectedClinics = listOf(
-            Clinic(
-                id = 0,
-                name = "Centro Integral de Kinesiología",
-                address = "Avenida Gaona 1843",
-                phone = "+5491121643873",
-                website = "",
-                lat = -34.63603901,
-                lng = -58.55649233,
-            ),
-            Clinic(
-                id = 1,
-                name = "Kinesiología Deportiva Traumatológica e Integral",
-                address = "Doctor Gabriel Ardoino 134",
-                phone = "+541173651817",
-                website = "https://www.instagram.com/kdt.rehabilitacion/",
-                lat = -34.63983,
-                lng = -58.56261,
-            ),
-        )
+        val expectedClinics =
+            listOf(
+                Clinic(
+                    id = 0,
+                    name = "Centro Integral de Kinesiología",
+                    address = "Avenida Gaona 1843",
+                    phone = "+5491121643873",
+                    website = "",
+                    lat = -34.63603901,
+                    lng = -58.55649233,
+                ),
+                Clinic(
+                    id = 1,
+                    name = "Kinesiología Deportiva Traumatológica e Integral",
+                    address = "Doctor Gabriel Ardoino 134",
+                    phone = "+541173651817",
+                    website = "https://www.instagram.com/kdt.rehabilitacion/",
+                    lat = -34.63983,
+                    lng = -58.56261,
+                ),
+            )
 
         every { mockRepository.getClinicsFromAssets() } returns expectedClinics
 
@@ -71,15 +72,16 @@ class GetClinicsFromAssetsUseCaseTest {
     @Test
     fun `invoke preserves clinic data integrity`() {
         // Arrange
-        val clinic = Clinic(
-            id = 42,
-            name = "Test Clinic",
-            address = "Test Address",
-            phone = "+5491234567890",
-            website = "https://test.com",
-            lat = -34.6337,
-            lng = -58.5601,
-        )
+        val clinic =
+            Clinic(
+                id = 42,
+                name = "Test Clinic",
+                address = "Test Address",
+                phone = "+5491234567890",
+                website = "https://test.com",
+                lat = -34.6337,
+                lng = -58.5601,
+            )
 
         every { mockRepository.getClinicsFromAssets() } returns listOf(clinic)
 
@@ -101,11 +103,12 @@ class GetClinicsFromAssetsUseCaseTest {
     @Test
     fun `invoke is called and delegates to repository`() {
         // Arrange
-        val clinics = listOf(
-            Clinic(1, "Clinic 1", "Address 1", "+123", "", -34.0, -58.0),
-            Clinic(2, "Clinic 2", "Address 2", "+456", "https://site.com", -34.1, -58.1),
-            Clinic(3, "Clinic 3", "Address 3", "+789", "", -34.2, -58.2),
-        )
+        val clinics =
+            listOf(
+                Clinic(1, "Clinic 1", "Address 1", "+123", "", -34.0, -58.0),
+                Clinic(2, "Clinic 2", "Address 2", "+456", "https://site.com", -34.1, -58.1),
+                Clinic(3, "Clinic 3", "Address 3", "+789", "", -34.2, -58.2),
+            )
 
         every { mockRepository.getClinicsFromAssets() } returns clinics
 
@@ -138,9 +141,10 @@ class GetClinicsFromAssetsUseCaseTest {
     @Test
     fun `invoke can be called multiple times and returns same data`() {
         // Arrange
-        val clinics = listOf(
-            Clinic(1, "Clinic 1", "Address 1", "+123", "", -34.0, -58.0),
-        )
+        val clinics =
+            listOf(
+                Clinic(1, "Clinic 1", "Address 1", "+123", "", -34.0, -58.0),
+            )
 
         every { mockRepository.getClinicsFromAssets() } returns clinics
 

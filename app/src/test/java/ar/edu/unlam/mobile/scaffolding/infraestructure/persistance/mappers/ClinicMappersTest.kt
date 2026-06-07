@@ -9,15 +9,16 @@ class ClinicMappersTest {
     @Test
     fun `clinic to entity mapper preserves all fields`() {
         // Arrange
-        val clinic = Clinic(
-            id = 42,
-            name = "Centro Integral de Kinesiología",
-            address = "Avenida Gaona 1843",
-            phone = "+5491121643873",
-            website = "https://example.com",
-            lat = -34.63603901,
-            lng = -58.55649233,
-        )
+        val clinic =
+            Clinic(
+                id = 42,
+                name = "Centro Integral de Kinesiología",
+                address = "Avenida Gaona 1843",
+                phone = "+5491121643873",
+                website = "https://example.com",
+                lat = -34.63603901,
+                lng = -58.55649233,
+            )
 
         // Act
         val entity = clinic.toEntity()
@@ -35,15 +36,16 @@ class ClinicMappersTest {
     @Test
     fun `clinic to entity mapper handles empty website`() {
         // Arrange
-        val clinic = Clinic(
-            id = 1,
-            name = "Clinic Name",
-            address = "Address",
-            phone = "+123",
-            website = "",
-            lat = 0.0,
-            lng = 0.0,
-        )
+        val clinic =
+            Clinic(
+                id = 1,
+                name = "Clinic Name",
+                address = "Address",
+                phone = "+123",
+                website = "",
+                lat = 0.0,
+                lng = 0.0,
+            )
 
         // Act
         val entity = clinic.toEntity()
@@ -55,15 +57,16 @@ class ClinicMappersTest {
     @Test
     fun `clinic to entity mapper handles special characters in name`() {
         // Arrange
-        val clinic = Clinic(
-            id = 1,
-            name = "Kinesiología y Osteopatía Integral KIO",
-            address = "Urquiza 503",
-            phone = "+541172356257",
-            website = "",
-            lat = -34.64666797,
-            lng = -58.5721729,
-        )
+        val clinic =
+            Clinic(
+                id = 1,
+                name = "Kinesiología y Osteopatía Integral KIO",
+                address = "Urquiza 503",
+                phone = "+541172356257",
+                website = "",
+                lat = -34.64666797,
+                lng = -58.5721729,
+            )
 
         // Act
         val entity = clinic.toEntity()
@@ -75,15 +78,16 @@ class ClinicMappersTest {
     @Test
     fun `clinic to entity mapper preserves precise coordinates`() {
         // Arrange
-        val clinic = Clinic(
-            id = 1,
-            name = "Clinic",
-            address = "Address",
-            phone = "+123",
-            website = "",
-            lat = -34.64168309,
-            lng = -58.56860626,
-        )
+        val clinic =
+            Clinic(
+                id = 1,
+                name = "Clinic",
+                address = "Address",
+                phone = "+123",
+                website = "",
+                lat = -34.64168309,
+                lng = -58.56860626,
+            )
 
         // Act
         val entity = clinic.toEntity()
@@ -96,15 +100,16 @@ class ClinicMappersTest {
     @Test
     fun `entity to clinic mapper preserves all fields`() {
         // Arrange
-        val entity = ClinicEntity(
-            id = 7,
-            name = "Kinesiología y Estética",
-            address = "25 de Mayo 27",
-            phone = "+541146567454",
-            website = "https://example.com",
-            lat = -34.6501572,
-            lng = -58.55523603,
-        )
+        val entity =
+            ClinicEntity(
+                id = 7,
+                name = "Kinesiología y Estética",
+                address = "25 de Mayo 27",
+                phone = "+541146567454",
+                website = "https://example.com",
+                lat = -34.6501572,
+                lng = -58.55523603,
+            )
 
         // Act
         val clinic = entity.toDomain()
@@ -122,15 +127,16 @@ class ClinicMappersTest {
     @Test
     fun `entity to clinic mapper handles empty website`() {
         // Arrange
-        val entity = ClinicEntity(
-            id = 1,
-            name = "Clinic Name",
-            address = "Address",
-            phone = "+123",
-            website = "",
-            lat = 0.0,
-            lng = 0.0,
-        )
+        val entity =
+            ClinicEntity(
+                id = 1,
+                name = "Clinic Name",
+                address = "Address",
+                phone = "+123",
+                website = "",
+                lat = 0.0,
+                lng = 0.0,
+            )
 
         // Act
         val clinic = entity.toDomain()
@@ -142,15 +148,16 @@ class ClinicMappersTest {
     @Test
     fun `roundtrip conversion preserves data`() {
         // Arrange
-        val originalClinic = Clinic(
-            id = 99,
-            name = "Test Clinic",
-            address = "Test Address",
-            phone = "+5491234567890",
-            website = "https://test.com",
-            lat = -34.6234,
-            lng = -58.5678,
-        )
+        val originalClinic =
+            Clinic(
+                id = 99,
+                name = "Test Clinic",
+                address = "Test Address",
+                phone = "+5491234567890",
+                website = "https://test.com",
+                lat = -34.6234,
+                lng = -58.5678,
+            )
 
         // Act
         val entity = originalClinic.toEntity()
@@ -169,15 +176,16 @@ class ClinicMappersTest {
     @Test
     fun `entity to clinic mapper preserves precise coordinates`() {
         // Arrange
-        val entity = ClinicEntity(
-            id = 1,
-            name = "Clinic",
-            address = "Address",
-            phone = "+123",
-            website = "",
-            lat = -34.65436959,
-            lng = -58.55087725,
-        )
+        val entity =
+            ClinicEntity(
+                id = 1,
+                name = "Clinic",
+                address = "Address",
+                phone = "+123",
+                website = "",
+                lat = -34.65436959,
+                lng = -58.55087725,
+            )
 
         // Act
         val clinic = entity.toDomain()
@@ -190,15 +198,16 @@ class ClinicMappersTest {
     @Test
     fun `clinic to entity mapper with zero coordinates`() {
         // Arrange
-        val clinic = Clinic(
-            id = 1,
-            name = "Clinic",
-            address = "Address",
-            phone = "+123",
-            website = "",
-            lat = 0.0,
-            lng = 0.0,
-        )
+        val clinic =
+            Clinic(
+                id = 1,
+                name = "Clinic",
+                address = "Address",
+                phone = "+123",
+                website = "",
+                lat = 0.0,
+                lng = 0.0,
+            )
 
         // Act
         val entity = clinic.toEntity()
@@ -211,15 +220,16 @@ class ClinicMappersTest {
     @Test
     fun `clinic to entity mapper with negative coordinates`() {
         // Arrange
-        val clinic = Clinic(
-            id = 1,
-            name = "Clinic",
-            address = "Address",
-            phone = "+123",
-            website = "",
-            lat = -90.0,
-            lng = -180.0,
-        )
+        val clinic =
+            Clinic(
+                id = 1,
+                name = "Clinic",
+                address = "Address",
+                phone = "+123",
+                website = "",
+                lat = -90.0,
+                lng = -180.0,
+            )
 
         // Act
         val entity = clinic.toEntity()
