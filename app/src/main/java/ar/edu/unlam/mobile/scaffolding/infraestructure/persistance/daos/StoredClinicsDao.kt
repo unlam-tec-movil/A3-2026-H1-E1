@@ -14,4 +14,10 @@ interface StoredClinicsDao {
 
     @Query("SELECT * FROM storedClinics ORDER BY id DESC")
     fun getStoredClinics(): Flow<List<ClinicEntity>>
+
+    @Insert
+    suspend fun insertAll(clinics: List<ClinicEntity>)
+
+    @Query("SELECT COUNT(*) FROM storedClinics")
+    suspend fun getClinicCount(): Int
 }

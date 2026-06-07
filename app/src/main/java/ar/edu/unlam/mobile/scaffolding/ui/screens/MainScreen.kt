@@ -70,7 +70,7 @@ fun MainScreen() {
             }
         },
     ) { paddingValue ->
-        NavHost(navController = controller, startDestination = "dashboard") {
+        NavHost(navController = controller, startDestination = "Dev3PlayGround") {
             composable("dashboard") {
                 DashboardScreen(modifier = Modifier.padding(paddingValue))
             }

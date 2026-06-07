@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -20,11 +21,20 @@ tasks.withType<KotlinCompile>().configureEach {
     }
 }
 
+// Load API_KEY from local.properties
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
+}
+val apiKey: String = (localProperties.getProperty("API_KEY") ?: "").trim { it == '"' }
 android {
+
     namespace = "ar.edu.unlam.mobile.scaffolding"
     compileSdk = 36
 
     defaultConfig {
+        buildConfigField("String", "API_KEY", "\"${apiKey}\"")
         applicationId = "ar.edu.unlam.mobile.scaffolding"
         minSdk = 26
         targetSdk = 36
@@ -52,6 +62,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
         resources {
@@ -95,13 +106,13 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // Room (Persistencia Local)
-//    implementation("androidx.room:room-runtime:2.6.1")
-//    implementation("androidx.room:room-ktx:2.6.1")
-//    ksp("androidx.room:room-compiler:2.6.1")
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+
+    // Maptiler time boyssss
+    implementation(libs.maptiler.sdk.kotlin)
 
     // DataStore (Configuración / Cache de Sesión)
     implementation("androidx.datastore:datastore-preferences:1.0.0")

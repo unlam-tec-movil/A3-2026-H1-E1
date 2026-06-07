@@ -1,12 +1,15 @@
 package ar.edu.unlam.mobile.scaffolding.infraestructure.di
 
 import android.app.Application
+import android.content.Context
 import androidx.room.Room
-import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseRepositoryPort
+import ar.edu.unlam.mobile.scaffolding.domain.ports.location.ApiKeyProvider
+import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseLocationRepositoryPort
 import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
-import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseRepositoryImpl
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.BuildConfigApiKeyProviderImpl
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseLocationRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.LocationDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.SessionDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.StoredClinicsDao
@@ -18,6 +21,7 @@ import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.repositories.
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -41,12 +45,18 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideApiKeyProvider(): ApiKeyProvider = BuildConfigApiKeyProviderImpl()
+
+    @Provides
+    @Singleton
     fun providesStoredClinicsDao(db: ClinicsDataBase): StoredClinicsDao = db.getStoredClinicsDao()
 
     @Provides
     @Singleton
-    fun providesDataBaseRepository(dao: StoredClinicsDao): DataBaseRepositoryPort =
-        DataBaseRepositoryImpl(clinicsDao = dao)
+    fun providesDataBaseRepository(
+        dao: StoredClinicsDao,
+        @ApplicationContext context: Context,
+    ): DataBaseLocationRepositoryPort = DataBaseLocationRepositoryImpl(clinicsDao = dao, context)
 
     @Provides
     @Singleton
@@ -68,11 +78,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesUserRepository(userDao: UserDao): UserRepository =
-        UserRepositoryImpl(userDao = userDao)
+    fun providesUserRepository(userDao: UserDao): UserRepository = UserRepositoryImpl(userDao = userDao)
 
     @Provides
     @Singleton
-    fun providesRehabRepository(sessionDao: SessionDao): RehabRepository =
-        RehabRepositoryImpl(sessionDao = sessionDao)
+    fun providesRehabRepository(sessionDao: SessionDao): RehabRepository = RehabRepositoryImpl(sessionDao = sessionDao)
 }

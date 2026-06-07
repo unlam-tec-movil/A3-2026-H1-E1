@@ -14,6 +14,7 @@ androidXHilt = "1.2.0"
 kover = "0.9.1"
 ktlint = "13.0.0"
 mapsCompose = "8.3.0"
+maptilerSdkKotlin = "1.3.0"
 material3 = "1.4.0-beta03"
 playServicesLocation = "21.3.0"
 roomV = "2.7.2"
@@ -37,6 +38,7 @@ androidx-material-icon = { group = "androidx.compose.material", name = "material
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidXHilt" }
 
+maptiler-sdk-kotlin = { module = "com.maptiler:maptiler-sdk-kotlin", version.ref = "maptilerSdkKotlin" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomV" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomV" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomV" }

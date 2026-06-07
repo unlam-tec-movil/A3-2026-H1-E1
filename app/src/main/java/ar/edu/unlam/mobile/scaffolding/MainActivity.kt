@@ -9,12 +9,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import ar.edu.unlam.mobile.scaffolding.ui.screens.MainScreen
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
+import com.maptiler.maptilersdk.MTConfig
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             GambAppTheme {
                 Surface(
