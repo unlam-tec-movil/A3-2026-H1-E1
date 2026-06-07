@@ -71,6 +71,16 @@ android {
         }
     }
 }
+kover {
+    reports {
+        filters {
+            excludes {
+                annotatedBy("androidx.compose.runtime.Composable")
+            }
+        }
+    }
+}
+
 configurations.all {
     exclude(group = "com.intellij", module = "annotations")
 }
