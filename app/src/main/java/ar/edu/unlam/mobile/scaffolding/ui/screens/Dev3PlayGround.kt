@@ -87,7 +87,6 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
                     event: MTEvent,
                     data: MTData?,
                 ) {
-                    // no-op
                 }
             }
     }
