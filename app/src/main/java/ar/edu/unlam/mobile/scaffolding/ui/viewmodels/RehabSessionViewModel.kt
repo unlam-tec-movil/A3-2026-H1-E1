@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.mobile.scaffolding.data.datasources.device.mlkit.PoseDetectionDataSource
 import ar.edu.unlam.mobile.scaffolding.domain.ports.camera.CameraSessionPort
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.CalculateJointAngleUseCase
+import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,9 +27,13 @@ class RehabSessionViewModel
         private val _currentAngle = MutableStateFlow(0f)
         val currentAngle: StateFlow<Float> = _currentAngle.asStateFlow()
 
+        private val _pose = MutableStateFlow<Pose?>(null)
+        val pose: StateFlow<Pose?> = _pose.asStateFlow()
+
         init {
             viewModelScope.launch {
                 poseDetectionDataSource.poseResult.collect { pose ->
+                    _pose.value = pose
                     val rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER)
                     val rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW)
                     val rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST)
