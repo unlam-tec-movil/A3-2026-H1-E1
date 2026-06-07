@@ -95,7 +95,7 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
     LaunchedEffect(uiState.location, isMapInitialized) {
         if (isMapInitialized) {
             uiState.location?.let { loc ->
-                val target = LngLat(lat = loc.latitude, lng = loc.longitude)
+                val target = LngLat(lng = loc.longitude, lat = loc.latitude)
                 controller.easeTo(cameraOptions = MTCameraOptions(target, zoom = 12.0))
             }
         }
