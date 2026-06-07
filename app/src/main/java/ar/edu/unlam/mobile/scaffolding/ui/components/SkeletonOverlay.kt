@@ -1,5 +1,6 @@
 package ar.edu.unlam.mobile.scaffolding.ui.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.tooling.preview.Preview
+import ar.edu.unlam.mobile.scaffolding.domain.usecase.JointPrecision
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
@@ -17,10 +19,19 @@ import com.google.mlkit.vision.pose.PoseLandmark
 @Composable
 fun SkeletonOverlay(
     pose: Pose?,
-    colorFeedback: Color,
+    precision: JointPrecision,
     modifier: Modifier = Modifier,
 ) {
     if (pose == null) return
+
+    val targetColor =
+        when (precision) {
+            JointPrecision.IDEAL -> Color.Green
+            JointPrecision.WARNING -> Color.Yellow
+            JointPrecision.ERROR -> Color.Red
+        }
+
+    val colorFeedback by animateColorAsState(targetValue = targetColor, label = "colorFeedback")
 
     // Landmarks brazo derecho
     val rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER)
@@ -97,7 +108,7 @@ fun SkeletonOverlayPreview() {
     GambAppTheme {
         SkeletonOverlay(
             pose = null,
-            colorFeedback = Color.Green,
+            precision = JointPrecision.IDEAL,
         )
     }
 }

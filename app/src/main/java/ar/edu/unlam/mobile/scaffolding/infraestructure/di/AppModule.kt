@@ -20,6 +20,8 @@ import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.db.ClinicsDat
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.repositories.RehabRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.repositories.UserRepositoryImpl
+import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
@@ -32,7 +34,25 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun providesFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+    fun providesFirebaseAuth(context: Application): FirebaseAuth {
+        return try {
+            FirebaseAuth.getInstance()
+        } catch (e: IllegalStateException) {
+            // Si el archivo google-services.json no existe, inicializamos con opciones dummy
+            // para evitar que la app crashee al inyectar FirebaseAuth.
+            val options =
+                FirebaseOptions
+                    .Builder()
+                    .setApiKey("unused")
+                    .setApplicationId("unused")
+                    .setProjectId("unused")
+                    .build()
+            if (FirebaseApp.getApps(context).isEmpty()) {
+                FirebaseApp.initializeApp(context, options)
+            }
+            FirebaseAuth.getInstance()
+        }
+    }
 
     @Provides
     @Singleton

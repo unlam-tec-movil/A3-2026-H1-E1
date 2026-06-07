@@ -1,19 +1,26 @@
 package ar.edu.unlam.mobile.scaffolding.domain.usecase
 
+import javax.inject.Inject
 import kotlin.math.abs
 
-class SyncMotorUseCase {
-    enum class Feedback { IDEAL, WARNING, ERROR }
+enum class JointPrecision {
+    IDEAL,
+    WARNING,
+    ERROR,
+}
 
-    fun execute(
-        measuredAngle: Float,
-        targetAngle: Float,
-    ): Feedback {
-        val difference = abs(measuredAngle - targetAngle)
-        return when {
-            difference <= 15f -> Feedback.IDEAL // Tolerancia óptima (Verde)
-            difference <= 30f -> Feedback.WARNING // Tolerancia moderada (Amarillo)
-            else -> Feedback.ERROR // Fuera de rango (Rojo)
+class SyncMotorUseCase
+    @Inject
+    constructor() {
+        fun execute(
+            currentAngle: Float,
+            targetAngle: Float,
+        ): JointPrecision {
+            val diff = abs(currentAngle - targetAngle)
+            return when {
+                diff <= 15f -> JointPrecision.IDEAL
+                diff <= 30f -> JointPrecision.WARNING
+                else -> JointPrecision.ERROR
+            }
         }
     }
-}

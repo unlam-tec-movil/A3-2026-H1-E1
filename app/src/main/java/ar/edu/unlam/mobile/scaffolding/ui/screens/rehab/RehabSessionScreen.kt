@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import ar.edu.unlam.mobile.scaffolding.domain.usecase.JointPrecision
 import ar.edu.unlam.mobile.scaffolding.ui.components.SkeletonOverlay
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.RehabSessionViewModel
@@ -37,6 +38,7 @@ fun RehabSessionScreen(
     val context = LocalContext.current
     val currentAngle by viewModel.currentAngle.collectAsState()
     val pose by viewModel.pose.collectAsState()
+    val precision by viewModel.precision.collectAsState()
     var hasCameraPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
@@ -63,6 +65,7 @@ fun RehabSessionScreen(
         hasCameraPermission = hasCameraPermission,
         currentAngle = currentAngle,
         pose = pose,
+        precision = precision,
         onSurfaceReady = { owner, surfaceProvider ->
             viewModel.startCamera(owner, surfaceProvider)
         },
@@ -75,6 +78,7 @@ fun RehabSessionContent(
     hasCameraPermission: Boolean,
     currentAngle: Float,
     pose: Pose?,
+    precision: JointPrecision,
     onSurfaceReady: (androidx.lifecycle.LifecycleOwner, androidx.camera.core.Preview.SurfaceProvider) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -90,7 +94,7 @@ fun RehabSessionContent(
                 )
                 SkeletonOverlay(
                     pose = pose,
-                    colorFeedback = Color.Green,
+                    precision = precision,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -101,7 +105,12 @@ fun RehabSessionContent(
                         .align(Alignment.TopCenter)
                         .padding(top = 32.dp),
                 style = MaterialTheme.typography.headlineLarge,
-                color = Color.Green,
+                color =
+                    when (precision) {
+                        JointPrecision.IDEAL -> Color.Green
+                        JointPrecision.WARNING -> Color.Yellow
+                        JointPrecision.ERROR -> Color.Red
+                    },
             )
         } else {
             Text(text = "Se necesita permiso de cámara para iniciar la sesión.")
@@ -117,6 +126,7 @@ fun RehabSessionScreenPreview() {
             hasCameraPermission = true,
             currentAngle = 45f,
             pose = null,
+            precision = JointPrecision.IDEAL,
             onSurfaceReady = { _, _ -> },
         )
     }
