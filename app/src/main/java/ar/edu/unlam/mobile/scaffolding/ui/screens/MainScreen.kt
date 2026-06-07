@@ -32,6 +32,7 @@ import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
 import ar.edu.unlam.mobile.scaffolding.ui.navigation.Screen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.DashboardScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RoutineListScreen
 
 // Rutas donde el bottom bar no debe aparecer
 private val routesWithoutChrome =
@@ -159,11 +160,17 @@ fun MainScreen() {
             }
             // Register todo
             composable(Screen.Register.route) {
-                DashboardScreen(modifier = Modifier.padding(paddingValue))
+                DashboardScreen(
+                    onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
+                    modifier = Modifier.padding(paddingValue),
+                )
             }
 
             composable(Screen.Dashboard.route) {
-                DashboardScreen(modifier = Modifier.padding(paddingValue))
+                DashboardScreen(
+                    onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
+                    modifier = Modifier.padding(paddingValue),
+                )
             }
             composable(Screen.Form.route) {
                 FormScreen(
@@ -176,6 +183,9 @@ fun MainScreen() {
             }
             composable(Screen.RehabSession.route) {
                 RehabSessionScreen(modifier = Modifier.padding(paddingValue))
+            }
+            composable(Screen.RoutineList.route) {
+                RoutineListScreen(controller = controller, modifier = Modifier.padding(paddingValue))
             }
             composable(
                 route = Screen.User.route,

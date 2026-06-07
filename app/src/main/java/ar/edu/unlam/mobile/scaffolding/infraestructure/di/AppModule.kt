@@ -11,6 +11,7 @@ import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.camera.CameraXSe
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.StepCounterDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.LocationDataSource
+import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.ExerciseDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.SessionDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.StoredClinicsDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.UserDao
@@ -90,9 +91,16 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providesExerciseDao(db: AppDatabase): ExerciseDao = db.exerciseDao()
+
+    @Provides
+    @Singleton
     fun providesUserRepository(userDao: UserDao): UserRepository = UserRepositoryImpl(userDao = userDao)
 
     @Provides
     @Singleton
-    fun providesRehabRepository(sessionDao: SessionDao): RehabRepository = RehabRepositoryImpl(sessionDao = sessionDao)
+    fun providesRehabRepository(
+        sessionDao: SessionDao,
+        exerciseDao: ExerciseDao,
+    ): RehabRepository = RehabRepositoryImpl(sessionDao = sessionDao, exerciseDao = exerciseDao)
 }
