@@ -1,0 +1,23 @@
+{
+  "skill_name": "android-compose-kotlin-testing",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a ViewModel that retrieves a list of products from a repository inside a coroutine and exposes it as a StateFlow. Write a unit test using runTest to verify that the StateFlow is updated with the correct list when loading is successful.",
+      "expected_output": "A complete unit test class in Kotlin using runTest, UnconfinedTestDispatcher, a fake repository, and MainDispatcherRule, verifying the flow state transitions.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Create a Compose UI test for a login screen. The test needs to enter a username 'john_doe', leave the password blank, click the 'Sign In' button, and assert that the error message 'Password cannot be blank' is displayed.",
+      "expected_output": "A Kotlin test file with a ComposeTestRule checking for text input interaction and finding elements by text/semantics, verifying that error message is displayed.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Write a Compose UI test to verify that a custom Card component displays its content correctly when the font scale is set to 2.0 (accessibility test). Use DeviceConfigurationOverride.",
+      "expected_output": "A Compose test setting up DeviceConfigurationOverride.FontScale(2f) around the content inside setContent, verifying that the components behave as expected.",
+      "files": []
+    }
+  ]
+}

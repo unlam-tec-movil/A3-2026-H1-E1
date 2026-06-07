@@ -17,7 +17,7 @@ Cuando interactúas con un agente de IA en este workspace, el agente analiza aut
 
 ## 🛠️ Skills Disponibles y Casos de Uso
 
-Actualmente disponemos de **19 skills** instaladas en el directorio `.agents/skills/`. A continuación se describe cuándo y para qué debe usarse cada una:
+Actualmente disponemos de **20 skills** instaladas en el directorio `.agents/skills/`. A continuación se describe cuándo y para qué debe usarse cada una:
 
 ### Desarrollo de UI y Jetpack Compose
 *   **`adaptive`**: Úsala cuando necesites adaptar la interfaz para múltiples pantallas (tablets, plegables, desktop).
@@ -39,6 +39,10 @@ Actualmente disponemos de **19 skills** instaladas en el directorio `.agents/ski
 *   **`camera1-to-camerax`**: Úsala para migrar integraciones de cámara heredadas a la suite de CameraX.
 *   **`engage-sdk-integration`**: Integración con el SDK de Google Play Engage.
 *   **`play-billing-library-version-upgrade`**: Migración y mantenimiento de las APIs de compras in-app (Billing Library).
+
+### Pruebas y Calidad de Código
+*   **`testing-setup`**: Úsala para planificar la infraestructura y estrategia de pruebas en Android (pruebas unitarias, de UI, capturas de pantalla, end-to-end).
+*   **`android-compose-kotlin-testing`**: Úsala al escribir, depurar o revisar pruebas en Compose y Kotlin (ViewModels, Coroutines, Flows, Turbine) siguiendo principios de TDD.
 
 ### Identidad y Utilidades de Sistema
 *   **`verified-email`**: Implementación de flujos de autenticación e inicio de sesión seguros mediante Credential Manager.
