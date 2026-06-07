@@ -4,7 +4,6 @@ import android.content.Context
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseLocationRepositoryPort
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.StoredClinicsDao
-import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.entities.ClinicEntity
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.mappers.toDomain
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.mappers.toEntity
 import com.google.gson.Gson

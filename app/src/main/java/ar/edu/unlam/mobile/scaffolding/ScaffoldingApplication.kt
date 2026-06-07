@@ -2,8 +2,6 @@ package ar.edu.unlam.mobile.scaffolding
 
 import android.app.Application
 import android.util.Log
-import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsFromAssetsUseCase
-import ar.edu.unlam.mobile.scaffolding.application.usecases.location.PopulateClinicsDbUseCase
 import ar.edu.unlam.mobile.scaffolding.domain.ports.location.ApiKeyProvider
 import com.maptiler.maptilersdk.MTConfig
 import dagger.hilt.android.HiltAndroidApp

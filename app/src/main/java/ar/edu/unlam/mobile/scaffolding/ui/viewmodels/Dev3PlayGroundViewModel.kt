@@ -1,11 +1,8 @@
 package ar.edu.unlam.mobile.scaffolding.ui.viewmodels
 
 import android.location.Location
-import androidx.compose.ui.graphics.Color
-import androidx.core.graphics.toColorInt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsFromAssetsUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsStoredUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.ObserverLocationUseCase
@@ -88,51 +85,58 @@ class Dev3PlayGroundViewModel
             viewModelScope.launch {
                 getClinicsStoredUseCase().collect { clinics ->
                     if (clinics.isNotEmpty()) {
-                        val features = clinics.map { clinic ->
-                            JsonObject().apply {
-                                addProperty("type", "Feature")
-                                addProperty("id", clinic.id)
-                                
-                                val properties = JsonObject().apply {
-                                    addProperty("name", clinic.name)
-                                    addProperty("address", clinic.address)
-                                    addProperty("phone", clinic.phone)
-                                    addProperty("website", clinic.website)
+                        val features =
+                            clinics.map { clinic ->
+                                JsonObject().apply {
+                                    addProperty("type", "Feature")
+                                    addProperty("id", clinic.id)
+
+                                    val properties =
+                                        JsonObject().apply {
+                                            addProperty("name", clinic.name)
+                                            addProperty("address", clinic.address)
+                                            addProperty("phone", clinic.phone)
+                                            addProperty("website", clinic.website)
+                                        }
+                                    add("properties", properties)
+
+                                    val geometry =
+                                        JsonObject().apply {
+                                            addProperty("type", "Point")
+                                            val coordinates =
+                                                JsonArray().apply {
+                                                    add(clinic.lng)
+                                                    add(clinic.lat)
+                                                }
+                                            add("coordinates", coordinates)
+                                        }
+                                    add("geometry", geometry)
                                 }
-                                add("properties", properties)
-                                
-                                val geometry = JsonObject().apply {
-                                    addProperty("type", "Point")
-                                    val coordinates = JsonArray().apply {
-                                        add(clinic.lng)
-                                        add(clinic.lat)
-                                    }
-                                    add("coordinates", coordinates)
-                                }
-                                add("geometry", geometry)
                             }
-                        }
-                        
-                        val featureCollection = JsonObject().apply {
-                            addProperty("type", "FeatureCollection")
-                            val featuresArray = JsonArray()
-                            features.forEach { featuresArray.add(it) }
-                            add("features", featuresArray)
-                        }
-                        
-                        val src = MTGeoJSONSource(
-                            identifier = "clinics",
-                            jsonString = featureCollection.toString()
-                        )
+
+                        val featureCollection =
+                            JsonObject().apply {
+                                addProperty("type", "FeatureCollection")
+                                val featuresArray = JsonArray()
+                                features.forEach { featuresArray.add(it) }
+                                add("features", featuresArray)
+                            }
+
+                        val src =
+                            MTGeoJSONSource(
+                                identifier = "clinics",
+                                jsonString = featureCollection.toString(),
+                            )
                         style.addSource(src)
-                        
-                        val unclustered = MTCircleLayer(
-                            identifier = "clinicPoints", 
-                            sourceIdentifier = "clinics"
-                        ).apply {
-                            colorConst(android.graphics.Color.BLUE)
-                            radiusConst(8.0)
-                        }
+
+                        val unclustered =
+                            MTCircleLayer(
+                                identifier = "clinicPoints",
+                                sourceIdentifier = "clinics",
+                            ).apply {
+                                colorConst(android.graphics.Color.BLUE)
+                                radiusConst(8.0)
+                            }
                         style.addLayer(unclustered)
                     }
                 }
