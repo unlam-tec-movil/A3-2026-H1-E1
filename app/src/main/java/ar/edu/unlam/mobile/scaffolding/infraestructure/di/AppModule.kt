@@ -109,8 +109,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesRehabRepository(sessionDao: SessionDao): RehabRepository = RehabRepositoryImpl(sessionDao = sessionDao)
-
     fun providesRehabRepository(
         sessionDao: SessionDao,
         exerciseDao: ExerciseDao,
