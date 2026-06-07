@@ -12,6 +12,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -74,6 +76,7 @@ const val DASHBOARD_SCREEN_ROUTE = "dashboard"
 
 @Composable
 fun DashboardScreen(
+    onNavigateToRoutineList: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
@@ -171,6 +174,18 @@ fun DashboardScreen(
                             val easedProgress = FastOutSlowInEasing.transform(progress)
                             alpha = easedProgress
                             translationY = -yOffsetPx * (1f - easedProgress)
+                        },
+                )
+
+                // Active Routine Banner CTA
+                ActiveRoutineBanner(
+                    onNavigateToRoutineList = onNavigateToRoutineList,
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = ((entranceProgress - 0.08f) / 0.6f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = yOffsetPx * (1f - easedProgress)
                         },
                 )
 
@@ -790,4 +805,71 @@ fun HorizontalDivider(
                 .height(thickness)
                 .background(color),
     )
+}
+
+@Composable
+fun ActiveRoutineBanner(
+    onNavigateToRoutineList: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable { onNavigateToRoutineList() },
+        shape = RoundedCornerShape(24.dp),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush =
+                            Brush.horizontalGradient(
+                                colors = listOf(ElectricIndigo, CyanWave),
+                            ),
+                    ).padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Tu Rutina de Hoy 🏋️",
+                    style =
+                        MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                        ),
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Ver los ejercicios y objetivos asignados para hoy",
+                    style =
+                        MaterialTheme.typography.bodyMedium.copy(
+                            color = Color.White.copy(alpha = 0.85f),
+                        ),
+                )
+            }
+
+            Box(
+                modifier =
+                    Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = "Ver Rutina",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        }
+    }
 }
