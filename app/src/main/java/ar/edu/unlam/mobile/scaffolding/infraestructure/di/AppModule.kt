@@ -3,21 +3,16 @@ package ar.edu.unlam.mobile.scaffolding.infraestructure.di
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
+import ar.edu.unlam.mobile.scaffolding.domain.ports.camera.CameraSessionPort
 import ar.edu.unlam.mobile.scaffolding.domain.ports.location.ApiKeyProvider
 import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseLocationRepositoryPort
 import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
-import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.BuildConfigApiKeyProviderImpl
-import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseLocationRepositoryImpl
-import ar.edu.unlam.mobile.scaffolding.domain.ports.camera.CameraSessionPort
-import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseRepositoryPort
-import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
-import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
-import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.camera.CameraXSessionAdapter
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.StepCounterDataSource
-import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseRepositoryImpl
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.BuildConfigApiKeyProviderImpl
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseLocationRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.LocationDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.ExerciseDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.SessionDao
@@ -115,6 +110,7 @@ object AppModule {
     @Provides
     @Singleton
     fun providesRehabRepository(sessionDao: SessionDao): RehabRepository = RehabRepositoryImpl(sessionDao = sessionDao)
+
     fun providesRehabRepository(
         sessionDao: SessionDao,
         exerciseDao: ExerciseDao,
