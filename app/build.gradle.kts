@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -21,11 +22,20 @@ tasks.withType<KotlinCompile>().configureEach {
     }
 }
 
+// Load API_KEY from local.properties
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
+}
+val apiKey: String = (localProperties.getProperty("API_KEY") ?: "").trim { it == '"' }
 android {
+
     namespace = "ar.edu.unlam.mobile.scaffolding"
     compileSdk = 36
 
     defaultConfig {
+        buildConfigField("String", "API_KEY", "\"${apiKey}\"")
         applicationId = "ar.edu.unlam.mobile.scaffolding"
         minSdk = 26
         targetSdk = 36
@@ -53,6 +63,18 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+    testOptions {
+        managedDevices {
+            localDevices {
+                create("pixel6api34") {
+                    device = "Pixel 6"
+                    apiLevel = 34
+                    systemImageSource = "google_apis"
+                }
+            }
+        }
     }
     packaging {
         resources {
@@ -60,6 +82,16 @@ android {
         }
     }
 }
+kover {
+    reports {
+        filters {
+            excludes {
+                annotatedBy("androidx.compose.runtime.Composable")
+            }
+        }
+    }
+}
+
 configurations.all {
     exclude(group = "com.intellij", module = "annotations")
 }
@@ -83,9 +115,12 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icon)
+    implementation(libs.firebase.analytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
@@ -103,13 +138,13 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // Room (Persistencia Local)
-//    implementation("androidx.room:room-runtime:2.6.1")
-//    implementation("androidx.room:room-ktx:2.6.1")
-//    ksp("androidx.room:room-compiler:2.6.1")
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+
+    // Maptiler time boyssss
+    implementation(libs.maptiler.sdk.kotlin)
 
     // DataStore (Configuración / Cache de Sesión)
     implementation("androidx.datastore:datastore-preferences:1.0.0")

@@ -1,15 +1,18 @@
 package ar.edu.unlam.mobile.scaffolding.infraestructure.di
 
 import android.app.Application
+import android.content.Context
 import androidx.room.Room
 import ar.edu.unlam.mobile.scaffolding.domain.ports.camera.CameraSessionPort
-import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseRepositoryPort
+import ar.edu.unlam.mobile.scaffolding.domain.ports.location.ApiKeyProvider
+import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseLocationRepositoryPort
 import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.camera.CameraXSessionAdapter
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.StepCounterDataSource
-import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseRepositoryImpl
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.BuildConfigApiKeyProviderImpl
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseLocationRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.LocationDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.ExerciseDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.SessionDao
@@ -24,6 +27,7 @@ import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -64,12 +68,18 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideApiKeyProvider(): ApiKeyProvider = BuildConfigApiKeyProviderImpl()
+
+    @Provides
+    @Singleton
     fun providesStoredClinicsDao(db: ClinicsDataBase): StoredClinicsDao = db.getStoredClinicsDao()
 
     @Provides
     @Singleton
-    fun providesDataBaseRepository(dao: StoredClinicsDao): DataBaseRepositoryPort =
-        DataBaseRepositoryImpl(clinicsDao = dao)
+    fun providesDataBaseRepository(
+        dao: StoredClinicsDao,
+        @ApplicationContext context: Context,
+    ): DataBaseLocationRepositoryPort = DataBaseLocationRepositoryImpl(clinicsDao = dao, context)
 
     @Provides
     @Singleton
