@@ -14,28 +14,28 @@ import java.time.Instant
 data class HealthSessionData(
     val averageHeartRate: Double?,
     val totalCaloriesBurned: Double?,
-    val averageOxygenSaturation: Double?
+    val averageOxygenSaturation: Double?,
 )
 
 class HealthConnectDataSource(
-    private val context: Context
+    private val context: Context,
 ) {
-    val permissions = setOf(
-        HealthPermission.getReadPermission(HeartRateRecord::class),
-        HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class),
-        HealthPermission.getReadPermission(OxygenSaturationRecord::class)
-    )
+    val permissions =
+        setOf(
+            HealthPermission.getReadPermission(HeartRateRecord::class),
+            HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class),
+            HealthPermission.getReadPermission(OxygenSaturationRecord::class),
+        )
 
-    fun isHealthConnectAvailable(): Boolean {
-        return try {
+    fun isHealthConnectAvailable(): Boolean =
+        try {
             HealthConnectClient.getSdkStatus(context) == HealthConnectClient.SDK_AVAILABLE
         } catch (e: Exception) {
             false
         }
-    }
 
-    private fun getClient(): HealthConnectClient? {
-        return if (isHealthConnectAvailable()) {
+    private fun getClient(): HealthConnectClient? =
+        if (isHealthConnectAvailable()) {
             try {
                 HealthConnectClient.getOrCreate(context)
             } catch (e: Exception) {
@@ -44,7 +44,6 @@ class HealthConnectDataSource(
         } else {
             null
         }
-    }
 
     suspend fun hasAllPermissions(): Boolean {
         val client = getClient() ?: return false
@@ -58,69 +57,78 @@ class HealthConnectDataSource(
 
     fun getPermissionRequestContract() = PermissionController.createRequestPermissionResultContract()
 
-    suspend fun readSessionHealthData(startTime: Instant, endTime: Instant): HealthSessionData {
+    suspend fun readSessionHealthData(
+        startTime: Instant,
+        endTime: Instant,
+    ): HealthSessionData {
         val client = getClient()
         if (client == null) {
             return HealthSessionData(
                 averageHeartRate = null,
                 totalCaloriesBurned = null,
-                averageOxygenSaturation = null
+                averageOxygenSaturation = null,
             )
         }
 
-        val averageHeartRate = try {
-            val response = client.readRecords(
-                ReadRecordsRequest(
-                    recordType = HeartRateRecord::class,
-                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
-                )
-            )
-            val samples = response.records.flatMap { it.samples }
-            if (samples.isNotEmpty()) {
-                samples.map { it.beatsPerMinute.toDouble() }.average()
-            } else {
+        val averageHeartRate =
+            try {
+                val response =
+                    client.readRecords(
+                        ReadRecordsRequest(
+                            recordType = HeartRateRecord::class,
+                            timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                        ),
+                    )
+                val samples = response.records.flatMap { it.samples }
+                if (samples.isNotEmpty()) {
+                    samples.map { it.beatsPerMinute.toDouble() }.average()
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
                 null
             }
-        } catch (e: Exception) {
-            null
-        }
 
-        val totalCaloriesBurned = try {
-            val response = client.readRecords(
-                ReadRecordsRequest(
-                    recordType = ActiveCaloriesBurnedRecord::class,
-                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
-                )
-            )
-            if (response.records.isNotEmpty()) {
-                response.records.sumOf { it.energy.inKilocalories }
-            } else {
+        val totalCaloriesBurned =
+            try {
+                val response =
+                    client.readRecords(
+                        ReadRecordsRequest(
+                            recordType = ActiveCaloriesBurnedRecord::class,
+                            timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                        ),
+                    )
+                if (response.records.isNotEmpty()) {
+                    response.records.sumOf { it.energy.inKilocalories }
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
                 null
             }
-        } catch (e: Exception) {
-            null
-        }
 
-        val averageOxygenSaturation = try {
-            val response = client.readRecords(
-                ReadRecordsRequest(
-                    recordType = OxygenSaturationRecord::class,
-                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
-                )
-            )
-            if (response.records.isNotEmpty()) {
-                response.records.map { it.percentage.value }.average()
-            } else {
+        val averageOxygenSaturation =
+            try {
+                val response =
+                    client.readRecords(
+                        ReadRecordsRequest(
+                            recordType = OxygenSaturationRecord::class,
+                            timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                        ),
+                    )
+                if (response.records.isNotEmpty()) {
+                    response.records.map { it.percentage.value }.average()
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
                 null
             }
-        } catch (e: Exception) {
-            null
-        }
 
         return HealthSessionData(
             averageHeartRate = averageHeartRate,
             totalCaloriesBurned = totalCaloriesBurned,
-            averageOxygenSaturation = averageOxygenSaturation
+            averageOxygenSaturation = averageOxygenSaturation,
         )
     }
 }
