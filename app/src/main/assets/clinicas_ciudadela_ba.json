@@ -1,0 +1,101 @@
+{
+  "meta": {
+    "description": "Clínicas de Kinesiología y Fisioterapia cercanas a Ciudadela, Buenos Aires",
+    "source": "Overture Maps Foundation",
+    "generated_at": "2026-06-04T00:51:36.589629+00:00",
+    "reference_point": "Ciudadela, Buenos Aires (-34.6337, -58.5601)",
+    "total": 10
+  },
+  "clinics": [
+    {
+      "id": 0,
+      "name": "Centro Integral de Kinesiología",
+      "address": "Avenida Gaona 1843",
+      "phone": "+5491121643873",
+      "website": "",
+      "lat": -34.63603901,
+      "lng": -58.55649233
+    },
+    {
+      "id": 1,
+      "name": "Kinesiología Deportiva Traumatológica e Integral",
+      "address": "Doctor Gabriel Ardoino 134",
+      "phone": "+541173651817",
+      "website": "https://www.instagram.com/kdt.rehabilitacion/",
+      "lat": -34.63983,
+      "lng": -58.56261
+    },
+    {
+      "id": 2,
+      "name": "Kinesiología",
+      "address": "Leandro N. Alem 323",
+      "phone": "+541146547032",
+      "website": "",
+      "lat": -34.6405565,
+      "lng": -58.56685225
+    },
+    {
+      "id": 3,
+      "name": "Kinesiologia San Isidro",
+      "address": "Belgrano, 126",
+      "phone": "01164751390",
+      "website": "",
+      "lat": -34.6418782,
+      "lng": -58.5660638
+    },
+    {
+      "id": 4,
+      "name": "DIM Kinesiología de Avanzada",
+      "address": "Avellaneda 40",
+      "phone": "+541155548888",
+      "website": "http://dim.com.ar",
+      "lat": -34.64168309,
+      "lng": -58.56860626
+    },
+    {
+      "id": 5,
+      "name": "Kinesiologia Ciudadela Norte",
+      "address": "Av. Militar 3910",
+      "phone": "+541151210980",
+      "website": "",
+      "lat": -34.62484009,
+      "lng": -58.54991998
+    },
+    {
+      "id": 6,
+      "name": "Kinesiología y Osteopatía Integral KIO",
+      "address": "Urquiza 503",
+      "phone": "+541172356257",
+      "website": "",
+      "lat": -34.64666797,
+      "lng": -58.5721729
+    },
+    {
+      "id": 7,
+      "name": "Kinesiologia y Estética",
+      "address": "25 de Mayo 27",
+      "phone": "+541146567454",
+      "website": "",
+      "lat": -34.6501572,
+      "lng": -58.55523603
+    },
+    {
+      "id": 8,
+      "name": "Kinesiologia y Rehabilitacion Unalome",
+      "address": "J. Luis Pereyra 63",
+      "phone": "+541157451210",
+      "website": "https://bit.ly/3v4NuEU",
+      "lat": -34.65436959,
+      "lng": -58.55087725
+    },
+    {
+      "id": 9,
+      "name": "TDF kinesiología",
+      "address": "República Árabe Siria 1592",
+      "phone": "+541159721320",
+      "website": "",
+      "lat": -34.6201841,
+      "lng": -58.53588978
+    }
+  ]
+}

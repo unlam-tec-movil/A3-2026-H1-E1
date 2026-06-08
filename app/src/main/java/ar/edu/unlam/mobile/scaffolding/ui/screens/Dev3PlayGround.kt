@@ -6,17 +6,23 @@ import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,6 +31,16 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.Dev3PlayGroundViewModel
+import com.maptiler.maptilersdk.events.MTEvent
+import com.maptiler.maptilersdk.map.LngLat
+import com.maptiler.maptilersdk.map.MTMapOptions
+import com.maptiler.maptilersdk.map.MTMapView
+import com.maptiler.maptilersdk.map.MTMapViewController
+import com.maptiler.maptilersdk.map.MTMapViewDelegate
+import com.maptiler.maptilersdk.map.options.MTCameraOptions
+import com.maptiler.maptilersdk.map.style.MTMapReferenceStyle
+import com.maptiler.maptilersdk.map.style.MTMapStyleVariant
+import com.maptiler.maptilersdk.map.types.MTData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,6 +48,10 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
     val context = LocalContext.current
 
     val uiState by vm.locationUiState.collectAsStateWithLifecycle()
+
+    var isMapInitialized by remember { mutableStateOf(false) }
+
+    val controller = remember { MTMapViewController(context = context) }
 
     val locationPermissionLauncher =
         rememberLauncherForActivityResult(
@@ -43,71 +63,113 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
                 Toast.makeText(context, "Location permission denied", Toast.LENGTH_SHORT).show()
             }
         }
+    LaunchedEffect(Unit) {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            vm.onLocationPermissionGranted()
+        } else {
+            vm.onPermissionCheckComplete(granted = false)
+        }
+    }
 
+    LaunchedEffect(controller) {
+        controller.delegate =
+            object : MTMapViewDelegate {
+                override fun onMapViewInitialized() {
+                    isMapInitialized = true
+                    vm.setupClusters(controller.style!!)
+                }
+
+                override fun onEventTriggered(
+                    event: MTEvent,
+                    data: MTData?,
+                ) {
+                }
+            }
+    }
+
+    LaunchedEffect(uiState.location, isMapInitialized) {
+        if (isMapInitialized) {
+            uiState.location?.let { loc ->
+                val target = LngLat(lng = loc.longitude, lat = loc.latitude)
+                controller.easeTo(cameraOptions = MTCameraOptions(target, zoom = 12.0))
+            }
+        }
+    }
     Scaffold(topBar = { TopAppBar(title = { Text(text = "PlayGround dev3") }) }) { paddingValues ->
         Column(
             modifier =
                 Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Button(onClick = {
-                when {
-                    ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                    ) == PackageManager.PERMISSION_GRANTED -> {
-                        Toast
-                            .makeText(
-                                context,
-                                "permission already granted, hot mommies near by and approaching, you better run",
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                        vm.onLocationPermissionGranted()
-                    }
+            DisposableEffect(controller) { onDispose { controller.delegate = null } }
 
-                    ActivityCompat.shouldShowRequestPermissionRationale(
-                        context as Activity,
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                    ) -> {
-                        Toast
-                            .makeText(
-                                context,
-                                "really hot mommies want to know where you are :(",
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                    }
-
-                    else -> {
-                        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                    }
+            // Show loading while clinics are being loaded
+            if (uiState.isLoadingClinics) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator()
                 }
-            }) {
-                Text(text = "Ask for permission")
+            } else if (!uiState.clinicsLoadSuccess && uiState.clinicsLoadError != null) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(text = "Error loading clinics: ${uiState.clinicsLoadError}")
+                }
+            } else if (uiState.isLoadingPermission) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else if (uiState.permissionGranted && uiState.showMap && uiState.location != null) {
+                Box(Modifier.weight(1f)) {
+                    MTMapView(
+                        referenceStyle = MTMapReferenceStyle.OPENSTREETMAP,
+                        options =
+                            MTMapOptions(
+                                zoom = 12.0,
+                                center = LngLat(lng = uiState.location!!.longitude, lat = uiState.location!!.latitude),
+                            ),
+                        controller = controller,
+                        modifier = Modifier.fillMaxSize(),
+                        styleVariant = MTMapStyleVariant.DARK,
+                    )
+                }
+            } else {
+                Button(onClick = {
+                    when {
+                        // ask for permission if before/from settings was denied
+                        ActivityCompat.shouldShowRequestPermissionRationale(
+                            context as Activity,
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                        ) -> {
+                            Toast
+                                .makeText(
+                                    context,
+                                    "Location permission is required to see clinics on the map",
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                        }
+
+                        // ask for the first time
+                        else -> {
+                            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                        }
+                    }
+                }) {
+                    Text(text = "Ask for permission")
+                }
             }
-            uiState.location?.let { location ->
-                Text("Lat:${location.latitude}, Long:${location.longitude}\n ")
-            } ?: Text("Waitting for location permission")
         }
     }
 }
-// "id": "a0571f4e-3773-4077-be8b-1d4032c81a02",
-// "name": "BienKinesio",
-// "category": "physical_therapy",
-// "address": "Juan José Paso 289",
-// "city": "Martínez",
-// "region": "",
-// "postcode": "B1640",
-// "phone": "+541148989030",
-// "website": "http://www.bienkinesio.com/",
-// "lat": -34.48979723,
-// "lng": -58.49666901,
-// "confidence_score": 0.557,
-// "email": "",
-// "manager_name": "",
-// "manager_title": "",
-// "source": "overture",
-// "imported_at": "2026-05-05T23:42:06.298423+00:00"
