@@ -87,122 +87,114 @@ fun MainScreen() {
             }
         },
     ) { paddingValue ->
-        NavHost(navController = controller, startDestination = "Dev3PlayGround") {
-            composable("dashboard") {
-                DashboardScreen(
-                    modifier = Modifier.padding(paddingValue),
-                    onNavigateToRoutineList = {},
+        NavHost(
+            navController = controller,
+            startDestination = Screen.Splash.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                ) + fadeIn(animationSpec = tween(400))
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -it },
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                ) + fadeOut(animationSpec = tween(400))
+            },
+            popEnterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { -it },
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                ) + fadeIn(animationSpec = tween(400))
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                ) + fadeOut(animationSpec = tween(400))
+            },
+        ) {
+            // Splash
+            composable(
+                route = Screen.Splash.route,
+                exitTransition = { fadeOut(animationSpec = tween(400)) },
+            ) {
+                SplashScreen(
+                    onNavigateToOnboarding = {
+                        controller.navigate(Screen.Onboarding.route) {
+                            popUpTo(Screen.Splash.route) { inclusive = true }
+                        }
+                    },
+                    onNavigateToLogin = {
+                        controller.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Splash.route) { inclusive = true }
+                        }
+                    },
                 )
-                NavHost(
-                    navController = controller,
-                    startDestination = Screen.Splash.route,
-                    enterTransition = {
-                        slideInHorizontally(
-                            initialOffsetX = { it },
-                            animationSpec = tween(400, easing = FastOutSlowInEasing),
-                        ) + fadeIn(animationSpec = tween(400))
+            }
+            // Onboarding
+            composable(
+                route = Screen.Onboarding.route,
+                enterTransition = { fadeIn(animationSpec = tween(400)) },
+                exitTransition = { fadeOut(animationSpec = tween(400)) },
+            ) {
+                OnboardingScreen(
+                    onNavigateToLogin = {
+                        controller.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Onboarding.route) { inclusive = true }
+                        }
                     },
-                    exitTransition = {
-                        slideOutHorizontally(
-                            targetOffsetX = { -it },
-                            animationSpec = tween(400, easing = FastOutSlowInEasing),
-                        ) + fadeOut(animationSpec = tween(400))
+                )
+            }
+            // Login
+            composable(Screen.Login.route) {
+                LoginScreen(
+                    onNavigateToDashboard = {
+                        controller.navigate(Screen.Dashboard.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
                     },
-                    popEnterTransition = {
-                        slideInHorizontally(
-                            initialOffsetX = { -it },
-                            animationSpec = tween(400, easing = FastOutSlowInEasing),
-                        ) + fadeIn(animationSpec = tween(400))
+                    onNavigateToRegister = {
+                        controller.navigate(Screen.Register.route)
                     },
-                    popExitTransition = {
-                        slideOutHorizontally(
-                            targetOffsetX = { it },
-                            animationSpec = tween(400, easing = FastOutSlowInEasing),
-                        ) + fadeOut(animationSpec = tween(400))
-                    },
-                ) {
-                    // Splash
-                    composable(
-                        route = Screen.Splash.route,
-                        exitTransition = { fadeOut(animationSpec = tween(400)) },
-                    ) {
-                        SplashScreen(
-                            onNavigateToOnboarding = {
-                                controller.navigate(Screen.Onboarding.route) {
-                                    popUpTo(Screen.Splash.route) { inclusive = true }
-                                }
-                            },
-                            onNavigateToLogin = {
-                                controller.navigate(Screen.Login.route) {
-                                    popUpTo(Screen.Splash.route) { inclusive = true }
-                                }
-                            },
-                        )
-                    }
-                    // Onboarding
-                    composable(
-                        route = Screen.Onboarding.route,
-                        enterTransition = { fadeIn(animationSpec = tween(400)) },
-                        exitTransition = { fadeOut(animationSpec = tween(400)) },
-                    ) {
-                        OnboardingScreen(
-                            onNavigateToLogin = {
-                                controller.navigate(Screen.Login.route) {
-                                    popUpTo(Screen.Onboarding.route) { inclusive = true }
-                                }
-                            },
-                        )
-                    }
-                    // Login
-                    composable(Screen.Login.route) {
-                        LoginScreen(
-                            onNavigateToDashboard = {
-                                controller.navigate(Screen.Dashboard.route) {
-                                    popUpTo(Screen.Login.route) { inclusive = true }
-                                }
-                            },
-                            onNavigateToRegister = {
-                                controller.navigate(Screen.Register.route)
-                            },
-                        )
-                    }
-                    // Register todo
-                    composable(Screen.Register.route) {
-                        DashboardScreen(
-                            onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
-                            modifier = Modifier.padding(paddingValue),
-                        )
-                    }
+                )
+            }
+            // Register todo
+            composable(Screen.Register.route) {
+                DashboardScreen(
+                    onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
+                    modifier = Modifier.padding(paddingValue),
+                )
+            }
 
-                    composable(Screen.Dashboard.route) {
-                        DashboardScreen(
-                            onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
-                            modifier = Modifier.padding(paddingValue),
-                        )
-                    }
-                    composable(Screen.Form.route) {
-                        FormScreen(
-                            modifier = Modifier.padding(paddingValue),
-                            snackbarHostState = snackBarHostState,
-                        )
-                    }
-                    composable(Screen.Dev3PlayGround.route) {
-                        Dev3PlayGround()
-                    }
-                    composable(Screen.RehabSession.route) {
-                        RehabSessionScreen(modifier = Modifier.padding(paddingValue))
-                    }
-                    composable(Screen.RoutineList.route) {
-                        RoutineListScreen(controller = controller, modifier = Modifier.padding(paddingValue))
-                    }
-                    composable(
-                        route = Screen.User.route,
-                        arguments = listOf(navArgument("id") { type = NavType.StringType }),
-                    ) { navBackStackEntry ->
-                        val id = navBackStackEntry.arguments?.getString("id") ?: "1"
-                        UserScreen(userId = id, modifier = Modifier.padding(paddingValue))
-                    }
-                }
+            composable(Screen.Dashboard.route) {
+                DashboardScreen(
+                    onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
+                    modifier = Modifier.padding(paddingValue),
+                )
+            }
+            composable(Screen.Form.route) {
+                FormScreen(
+                    modifier = Modifier.padding(paddingValue),
+                    snackbarHostState = snackBarHostState,
+                )
+            }
+            composable(Screen.Dev3PlayGround.route) {
+                Dev3PlayGround()
+            }
+            composable(Screen.RehabSession.route) {
+                RehabSessionScreen(modifier = Modifier.padding(paddingValue))
+            }
+            composable(Screen.RoutineList.route) {
+                RoutineListScreen(controller = controller, modifier = Modifier.padding(paddingValue))
+            }
+            composable(
+                route = Screen.User.route,
+                arguments = listOf(navArgument("id") { type = NavType.StringType }),
+            ) { navBackStackEntry ->
+                val id = navBackStackEntry.arguments?.getString("id") ?: "1"
+                UserScreen(userId = id, modifier = Modifier.padding(paddingValue))
             }
         }
     }

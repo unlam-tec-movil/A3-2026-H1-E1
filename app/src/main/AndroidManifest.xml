@@ -19,6 +19,15 @@
     <!-- Permisos de Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Permisos de Health Connect -->
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
+    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" />
+    <uses-permission android:name="android.permission.health.READ_OXYGEN_SATURATION" />
+
+    <queries>
+        <package android:name="com.google.android.apps.healthdata" />
+    </queries>
+
     <application
         android:name="ScaffoldingApplication"
         android:allowBackup="true"
@@ -48,6 +57,16 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="health" />
+
+        <!-- Activity-alias para mostrar la justificación de los permisos de Health Connect -->
+        <activity-alias
+            android:name=".ViewPermissionUsageActivity"
+            android:exported="true"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
+        </activity-alias>
             
     </application>
 </manifest>

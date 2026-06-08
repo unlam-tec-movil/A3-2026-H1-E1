@@ -10,6 +10,7 @@ import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.camera.CameraXSessionAdapter
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.health.HealthConnectDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.StepCounterDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.BuildConfigApiKeyProviderImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseLocationRepositoryImpl
@@ -42,6 +43,11 @@ object AppModule {
     @Singleton
     fun providesStepCounterDataSource(context: Application): StepCounterDataSource =
         StepCounterDataSource(context = context)
+
+    @Provides
+    @Singleton
+    fun providesHealthConnectDataSource(context: Application): HealthConnectDataSource =
+        HealthConnectDataSource(context = context)
 
     @Provides
     @Singleton
