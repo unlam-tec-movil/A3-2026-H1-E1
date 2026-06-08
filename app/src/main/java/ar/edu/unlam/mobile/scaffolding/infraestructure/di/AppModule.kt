@@ -10,6 +10,7 @@ import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.camera.CameraXSessionAdapter
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.AccelerometerDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.StepCounterDataSource
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.BuildConfigApiKeyProviderImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseLocationRepositoryImpl
@@ -37,6 +38,11 @@ object AppModule {
     @Provides
     @Singleton
     fun providesFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+
+    @Provides
+    @Singleton
+    fun providesAccelerometerDataSource(context: Application): AccelerometerDataSource =
+        AccelerometerDataSource(context = context)
 
     @Provides
     @Singleton
