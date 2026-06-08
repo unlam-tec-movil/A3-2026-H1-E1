@@ -18,7 +18,9 @@ sealed interface RegisterUiState {
 
     object Success : RegisterUiState
 
-    data class Error(val message: String) : RegisterUiState
+    data class Error(
+        val message: String,
+    ) : RegisterUiState
 }
 
 // Form state

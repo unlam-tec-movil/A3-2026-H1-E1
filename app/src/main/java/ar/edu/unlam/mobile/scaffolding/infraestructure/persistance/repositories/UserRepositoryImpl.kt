@@ -21,8 +21,7 @@ class UserRepositoryImpl
                 entity?.toDomain()
             }
 
-        override suspend fun getUserByEmail(email: String): User? =
-            userDao.getUserByEmail(email)?.toDomain()
+        override suspend fun getUserByEmail(email: String): User? = userDao.getUserByEmail(email)?.toDomain()
 
         override suspend fun saveUser(user: User) {
             userDao.insertUser(user.toEntity())

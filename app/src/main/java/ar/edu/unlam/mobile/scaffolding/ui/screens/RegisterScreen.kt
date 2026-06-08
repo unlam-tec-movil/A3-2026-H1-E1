@@ -234,9 +234,13 @@ internal fun RegisterContent(
                 supportingText =
                     when {
                         formState.confirmPasswordError != null ->
-                            { { Text(formState.confirmPasswordError, color = MaterialTheme.colorScheme.error) } }
+                            {
+                                { Text(formState.confirmPasswordError, color = MaterialTheme.colorScheme.error) }
+                            }
                         globalError != null ->
-                            { { Text(globalError, color = MaterialTheme.colorScheme.error) } }
+                            {
+                                { Text(globalError, color = MaterialTheme.colorScheme.error) }
+                            }
                         else -> null
                     },
                 singleLine = true,
