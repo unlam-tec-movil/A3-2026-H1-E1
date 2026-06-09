@@ -152,7 +152,7 @@ fun RoutineListScreen(
                             ExerciseCard(
                                 exercise = exercise,
                                 onStartClick = {
-                                    controller.navigate(Screen.RehabSession.route)
+                                    controller.navigate(Screen.EnvironmentCheck.route)
                                 },
                                 modifier =
                                     Modifier
