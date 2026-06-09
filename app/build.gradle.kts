@@ -43,6 +43,7 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -182,8 +183,9 @@ dependencies {
     testImplementation("app.cash.turbine:turbine:1.0.0")
 
     // Room Testing Library - for JVM-based integration tests
-    testImplementation(libs.room.testing)
 
+    testImplementation(libs.room.testing)
+    testImplementation(libs.sqlite.bundled)
     // Robolectric - for Android framework simulation in JVM tests
     testImplementation(libs.robolectric)
 
