@@ -75,6 +75,13 @@ android {
                 }
             }
         }
+        unitTests {
+            isReturnDefaultValues = true
+            // Configure JUnit 5 support for JVM-based integration tests
+            all { task ->
+                task.useJUnitPlatform()
+            }
+        }
     }
     packaging {
         resources {
@@ -171,6 +178,24 @@ dependencies {
 
     // Testing (Unitarios y Flow testing)
     testImplementation("io.mockk:mockk:1.13.9")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation("app.cash.turbine:turbine:1.0.0")
+
+    // Room Testing Library - for JVM-based integration tests
+    testImplementation(libs.room.testing)
+
+    // Robolectric - for Android framework simulation in JVM tests
+    testImplementation(libs.robolectric)
+
+    // Kotest - Property-based testing framework
+    testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.kotest.property)
+    testImplementation(libs.kotest.assertions.core)
+
+    // JUnit 5 - for running integration tests alongside JUnit 4
+    testImplementation(libs.junit5.api)
+    testRuntimeOnly(libs.junit5.engine)
+
+    // Coroutine test support
+    testImplementation(libs.kotlinx.coroutines.test)
 }

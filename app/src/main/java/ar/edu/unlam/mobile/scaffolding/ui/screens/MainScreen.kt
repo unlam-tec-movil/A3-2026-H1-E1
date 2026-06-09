@@ -87,7 +87,10 @@ fun MainScreen() {
             }
         },
     ) { paddingValue ->
-        NavHost(navController = controller, startDestination = "Dev3PlayGround") {
+        NavHost(navController = controller, startDestination = Screen.Dev3PlayGround.route) {
+            composable(Screen.Dev3PlayGround.route) {
+                Dev3PlayGround()
+            }
             composable("dashboard") {
                 DashboardScreen(
                     modifier = Modifier.padding(paddingValue),
@@ -185,9 +188,6 @@ fun MainScreen() {
                             modifier = Modifier.padding(paddingValue),
                             snackbarHostState = snackBarHostState,
                         )
-                    }
-                    composable(Screen.Dev3PlayGround.route) {
-                        Dev3PlayGround()
                     }
                     composable(Screen.RehabSession.route) {
                         RehabSessionScreen(modifier = Modifier.padding(paddingValue))

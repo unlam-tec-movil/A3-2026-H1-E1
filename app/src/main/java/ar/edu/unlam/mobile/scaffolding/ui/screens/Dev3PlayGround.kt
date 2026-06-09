@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.copy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,22 +26,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ar.edu.unlam.mobile.scaffolding.R
+import ar.edu.unlam.mobile.scaffolding.ui.components.PulseRingUserLocationMarker
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.Dev3PlayGroundViewModel
+import com.maptiler.maptilersdk.annotations.MTCustomAnnotationView
 import com.maptiler.maptilersdk.events.MTEvent
 import com.maptiler.maptilersdk.map.LngLat
 import com.maptiler.maptilersdk.map.MTMapOptions
 import com.maptiler.maptilersdk.map.MTMapView
 import com.maptiler.maptilersdk.map.MTMapViewController
 import com.maptiler.maptilersdk.map.MTMapViewDelegate
-import com.maptiler.maptilersdk.map.options.MTCameraOptions
 import com.maptiler.maptilersdk.map.style.MTMapReferenceStyle
 import com.maptiler.maptilersdk.map.style.MTMapStyleVariant
 import com.maptiler.maptilersdk.map.types.MTData
+import com.maptiler.maptilersdk.map.types.MTMapCorner
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +68,7 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
                 Toast.makeText(context, "Location permission denied", Toast.LENGTH_SHORT).show()
             }
         }
+
     LaunchedEffect(Unit) {
         if (ContextCompat.checkSelfPermission(
                 context,
@@ -91,14 +97,6 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
             }
     }
 
-    LaunchedEffect(uiState.location, isMapInitialized) {
-        if (isMapInitialized) {
-            uiState.location?.let { loc ->
-                val target = LngLat(lng = loc.longitude, lat = loc.latitude)
-                controller.easeTo(cameraOptions = MTCameraOptions(target, zoom = 12.0))
-            }
-        }
-    }
     Scaffold(topBar = { TopAppBar(title = { Text(text = "PlayGround dev3") }) }) { paddingValues ->
         Column(
             modifier =
@@ -108,66 +106,95 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
         ) {
             DisposableEffect(controller) { onDispose { controller.delegate = null } }
 
-            // Show loading while clinics are being loaded
-            if (uiState.isLoadingClinics) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator()
+            when {
+                uiState.isLoadingClinics || uiState.isLoadingPermission -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
                 }
-            } else if (!uiState.clinicsLoadSuccess && uiState.clinicsLoadError != null) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(text = "Error loading clinics: ${uiState.clinicsLoadError}")
+
+                !uiState.clinicsLoadSuccess && uiState.clinicsLoadError != null -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = "Error loading clinics: ${uiState.clinicsLoadError}")
+                    }
                 }
-            } else if (uiState.isLoadingPermission) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else if (uiState.permissionGranted && uiState.showMap && uiState.location != null) {
-                Box(Modifier.weight(1f)) {
-                    MTMapView(
-                        referenceStyle = MTMapReferenceStyle.OPENSTREETMAP,
-                        options =
-                            MTMapOptions(
-                                zoom = 12.0,
-                                center = LngLat(lng = uiState.location!!.longitude, lat = uiState.location!!.latitude),
-                            ),
-                        controller = controller,
-                        modifier = Modifier.fillMaxSize(),
-                        styleVariant = MTMapStyleVariant.DARK,
-                    )
-                }
-            } else {
-                Button(onClick = {
-                    when {
-                        // ask for permission if before/from settings was denied
-                        ActivityCompat.shouldShowRequestPermissionRationale(
-                            context as Activity,
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                        ) -> {
-                            Toast
-                                .makeText(
-                                    context,
-                                    "Location permission is required to see clinics on the map",
-                                    Toast.LENGTH_SHORT,
-                                ).show()
-                            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+
+                uiState.permissionGranted && uiState.showMap && uiState.location != null -> {
+                    Box(Modifier.weight(1f)) {
+                        MTMapView(
+                            referenceStyle = MTMapReferenceStyle.OPENSTREETMAP,
+                            options =
+                                MTMapOptions(
+                                    zoom = 16.0,
+                                    center =
+                                        LngLat(
+                                            lng = uiState.location!!.longitude,
+                                            lat = uiState.location!!.latitude,
+                                        ),
+                                    highFrequencyEventThrottleMs = 16,
+                                    logoPosition = MTMapCorner.BOTTOM_RIGHT,
+                                    navigationControlIsVisible = true,
+                                ),
+                            controller = controller,
+                            modifier = Modifier.fillMaxSize(),
+                            styleVariant = MTMapStyleVariant.LIGHT,
+                        )
+
+                        MTCustomAnnotationView(
+                            controller = controller,
+                            coordinates =
+                                LngLat(
+                                    lng = uiState.location!!.longitude,
+                                    lat = uiState.location!!.latitude,
+                                ),
+                            modifier = Modifier,
+                        ) {
+                            PulseRingUserLocationMarker(
+                                iconRes = R.drawable.gambapp_logo_opt3_round,
+                                ringColor = Color(0xFF2196F3).copy(alpha = 0.5f),
+                            )
                         }
 
-                        // ask for the first time
-                        else -> {
-                            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                        uiState.clinics.forEach { clinic ->
+
+                            MTCustomAnnotationView(
+                                controller = controller,
+                                coordinates =
+                                    LngLat(
+                                        lng = clinic.lng,
+                                        lat = clinic.lat,
+                                    ),
+                                modifier = Modifier,
+                            ) {
+                                PulseRingUserLocationMarker()
+                            }
                         }
                     }
-                }) {
-                    Text(text = "Ask for permission")
+                }
+
+                else -> {
+                    Button(onClick = {
+                        when {
+                            ActivityCompat.shouldShowRequestPermissionRationale(
+                                context as Activity,
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                            ) -> {
+                                Toast
+                                    .makeText(
+                                        context,
+                                        "Location permission is required to see clinics on the map",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                            }
+
+                            else -> {
+                                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                            }
+                        }
+                    }) {
+                        Text(text = "Ask for permission")
+                    }
                 }
             }
         }
