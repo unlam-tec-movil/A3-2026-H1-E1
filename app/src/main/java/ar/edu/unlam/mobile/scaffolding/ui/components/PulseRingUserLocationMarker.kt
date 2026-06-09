@@ -2,9 +2,7 @@ package ar.edu.unlam.mobile.scaffolding.ui.components
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateValue
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -22,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ar.edu.unlam.mobile.scaffolding.R
 
@@ -45,16 +42,6 @@ fun PulseRingUserLocationMarker(
                 repeatMode = RepeatMode.Restart,
             ),
         label = "pulseScale",
-    )
-    val animatedBoxSize: Dp by transition.animateValue(
-        initialValue = 300.dp,
-        targetValue = 250.dp,
-        typeConverter = Dp.VectorConverter,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(durationMillis = 500),
-                repeatMode = RepeatMode.Reverse,
-            ),
     )
     val alpha by transition.animateFloat(
         initialValue = 0.7f,

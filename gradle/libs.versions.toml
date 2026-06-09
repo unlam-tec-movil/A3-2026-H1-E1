@@ -78,4 +78,4 @@ daggerHiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "dagg
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 kotlin-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-ksp = {id = "com.google.devtools.ksp", version.ref= "kspV"}
+ksp = { id = "com.google.devtools.ksp", version.ref = "kspV" }

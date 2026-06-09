@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.copy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,9 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,8 +51,6 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
 
     val uiState by vm.locationUiState.collectAsStateWithLifecycle()
 
-    var isMapInitialized by remember { mutableStateOf(false) }
-
     val controller = remember { MTMapViewController(context = context) }
 
     val locationPermissionLauncher =
@@ -85,7 +80,6 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
         controller.delegate =
             object : MTMapViewDelegate {
                 override fun onMapViewInitialized() {
-                    isMapInitialized = true
                     vm.setupClusters(controller.style!!)
                 }
 

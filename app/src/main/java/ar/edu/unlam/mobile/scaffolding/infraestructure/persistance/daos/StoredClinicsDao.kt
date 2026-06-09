@@ -1,12 +1,9 @@
 package ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
-import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.entities.AppClinicEntity
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.entities.ClinicEntity
 import kotlinx.coroutines.flow.Flow
 
