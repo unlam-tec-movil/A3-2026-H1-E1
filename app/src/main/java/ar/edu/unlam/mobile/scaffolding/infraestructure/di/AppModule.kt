@@ -41,6 +41,11 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providesAccelerometerDataSource(context: Application): AccelerometerDataSource =
+        AccelerometerDataSource(context = context)
+
+    @Provides
+    @Singleton
     fun providesStepCounterDataSource(context: Application): StepCounterDataSource =
         StepCounterDataSource(context = context)
 
