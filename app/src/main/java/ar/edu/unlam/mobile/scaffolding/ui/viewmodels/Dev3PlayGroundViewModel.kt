@@ -7,12 +7,10 @@ import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsF
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsStoredUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.ObserverLocationUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.PopulateClinicsDbUseCase
+import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.maptiler.maptilersdk.map.style.MTStyle
-import com.maptiler.maptilersdk.map.style.layer.circle.MTCircleLayer
-import com.maptiler.maptilersdk.map.style.layer.circle.colorConst
-import com.maptiler.maptilersdk.map.style.layer.circle.radiusConst
 import com.maptiler.maptilersdk.map.style.source.MTGeoJSONSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,13 +35,18 @@ class Dev3PlayGroundViewModel
         init {
             viewModelScope.launch {
                 try {
-                    // Only populate if database is empty
                     getClinicsStoredUseCase().collect { clinics ->
                         if (clinics.isEmpty()) {
                             val clinicsFromAssets = getClinicsFromAssetsUseCase()
                             populateClinicsDbUseCase(clinicsFromAssets)
                         }
-                        _locationUiState.update { it.copy(isLoadingClinics = false, clinicsLoadSuccess = true) }
+                        _locationUiState.update {
+                            it.copy(
+                                isLoadingClinics = false,
+                                clinicsLoadSuccess = true,
+                                clinics = clinics,
+                            )
+                        }
                     }
                 } catch (e: Exception) {
                     _locationUiState.update {
@@ -90,54 +93,53 @@ class Dev3PlayGroundViewModel
                                 JsonObject().apply {
                                     addProperty("type", "Feature")
                                     addProperty("id", clinic.id)
-
-                                    val properties =
+                                    add(
+                                        "properties",
                                         JsonObject().apply {
                                             addProperty("name", clinic.name)
                                             addProperty("address", clinic.address)
                                             addProperty("phone", clinic.phone)
                                             addProperty("website", clinic.website)
-                                        }
-                                    add("properties", properties)
-
-                                    val geometry =
+                                        },
+                                    )
+                                    add(
+                                        "geometry",
                                         JsonObject().apply {
                                             addProperty("type", "Point")
-                                            val coordinates =
+                                            add(
+                                                "coordinates",
                                                 JsonArray().apply {
                                                     add(clinic.lng)
                                                     add(clinic.lat)
-                                                }
-                                            add("coordinates", coordinates)
-                                        }
-                                    add("geometry", geometry)
+                                                },
+                                            )
+                                        },
+                                    )
                                 }
                             }
 
                         val featureCollection =
                             JsonObject().apply {
                                 addProperty("type", "FeatureCollection")
-                                val featuresArray = JsonArray()
-                                features.forEach { featuresArray.add(it) }
-                                add("features", featuresArray)
+                                add("features", JsonArray().also { arr -> features.forEach { arr.add(it) } })
                             }
 
-                        val src =
+                        style.addSource(
                             MTGeoJSONSource(
                                 identifier = "clinics",
                                 jsonString = featureCollection.toString(),
-                            )
-                        style.addSource(src)
+                            ),
+                        )
 
-                        val unclustered =
-                            MTCircleLayer(
-                                identifier = "clinicPoints",
-                                sourceIdentifier = "clinics",
-                            ).apply {
-                                colorConst(android.graphics.Color.BLUE)
-                                radiusConst(8.0)
-                            }
-                        style.addLayer(unclustered)
+//                        style.addLayer(
+//                            MTCircleLayer(
+//                                identifier = "clinicPoints",
+//                                sourceIdentifier = "clinics",
+//                            ).apply {
+//                                colorConst(android.graphics.Color.BLUE)
+//                                radiusConst(8.0)
+//                            },
+//                        )
                     }
                 }
             }
@@ -151,5 +153,6 @@ class Dev3PlayGroundViewModel
             val permissionGranted: Boolean = false,
             val clinicsLoadSuccess: Boolean = false,
             val clinicsLoadError: String? = null,
+            val clinics: List<Clinic> = emptyList(),
         )
     }

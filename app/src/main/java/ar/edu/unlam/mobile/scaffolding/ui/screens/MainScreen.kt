@@ -34,13 +34,13 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.DashboardScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RoutineListScreen
 
-// Rutas donde el bottom bar no debe aparecer
 private val routesWithoutChrome =
     setOf(
         Screen.Splash.route,
         Screen.Onboarding.route,
         Screen.Login.route,
         Screen.Register.route,
+        Screen.EnvironmentCheck.route,
     )
 
 @Composable
@@ -133,6 +133,7 @@ fun MainScreen() {
                     },
                 )
             }
+
             // Onboarding
             composable(
                 route = Screen.Onboarding.route,
@@ -147,6 +148,7 @@ fun MainScreen() {
                     },
                 )
             }
+
             // Login
             composable(Screen.Login.route) {
                 LoginScreen(
@@ -160,35 +162,76 @@ fun MainScreen() {
                     },
                 )
             }
-            // Register todo
+
+            // Register
             composable(Screen.Register.route) {
-                DashboardScreen(
-                    onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
-                    modifier = Modifier.padding(paddingValue),
+                RegisterScreen(
+                    onNavigateToLogin = {
+                        controller.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Register.route) { inclusive = true }
+                        }
+                    },
                 )
             }
 
+            // Dashboard
             composable(Screen.Dashboard.route) {
                 DashboardScreen(
                     onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
                     modifier = Modifier.padding(paddingValue),
                 )
             }
+
+            // Routine List
+            composable(Screen.RoutineList.route) {
+                RoutineListScreen(
+                    controller = controller,
+                    modifier = Modifier.padding(paddingValue),
+                )
+            }
+
+            // Environment Check
+            composable(Screen.EnvironmentCheck.route) {
+                EnvironmentCheckScreen(
+                    onNavigateToRehab = {
+                        controller.navigate(Screen.RehabSession.route) {
+                            popUpTo(Screen.EnvironmentCheck.route) { inclusive = true }
+                        }
+                    },
+                )
+            }
+
+            // Rehab Session
+            composable(Screen.RehabSession.route) {
+                RehabSessionScreen(modifier = Modifier.padding(paddingValue))
+            }
+
+            // Profile
+            composable(Screen.Profile.route) {
+                ProfileScreen(
+                    onNavigateToLogin = {
+                        controller.navigate(Screen.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    },
+                    modifier = Modifier.padding(paddingValue),
+                )
+            }
+
+            // Form
             composable(Screen.Form.route) {
                 FormScreen(
                     modifier = Modifier.padding(paddingValue),
                     snackbarHostState = snackBarHostState,
                 )
             }
+
+            // Playground
             composable(Screen.Dev3PlayGround.route) {
                 Dev3PlayGround()
             }
-            composable(Screen.RehabSession.route) {
-                RehabSessionScreen(modifier = Modifier.padding(paddingValue))
-            }
-            composable(Screen.RoutineList.route) {
-                RoutineListScreen(controller = controller, modifier = Modifier.padding(paddingValue))
-            }
+
+            // User
             composable(
                 route = Screen.User.route,
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
