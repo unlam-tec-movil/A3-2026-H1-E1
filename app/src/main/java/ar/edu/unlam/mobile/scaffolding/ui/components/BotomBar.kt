@@ -53,11 +53,10 @@ fun BottomBar(controller: NavHostController) {
                 unselectedIcon = Icons.AutoMirrored.Outlined.List,
             ),
             NavigationItem(
-                label = "Usuario",
-                route = Screen.User.route,
+                label = "Perfil",
+                route = Screen.Profile.route,
                 selectedIcon = Icons.Filled.Person,
                 unselectedIcon = Icons.Outlined.Person,
-                onClickRoute = Screen.User.createRoute("usuario"),
             ),
             NavigationItem(
                 label = "Formulario",
