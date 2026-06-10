@@ -242,6 +242,18 @@ fun MainScreen() {
                 )
             }
 
+            // Profile
+            composable(Screen.Profile.route) {
+                ProfileScreen(
+                    onNavigateToLogin = {
+                        controller.navigate(Screen.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    },
+                    modifier = Modifier.padding(paddingValue),
+                )
+            }
+
             // Form
             composable(Screen.Form.route) {
                 FormScreen(

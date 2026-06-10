@@ -27,6 +27,20 @@ class DataBaseLocationRepositoryImpl
                 }
             }
 
+        override suspend fun saveClinic(clinic: Clinic) {
+            clinicsDao.insertClinic(clinic.toEntity())
+        }
+
+        override suspend fun deleteClinic(clinic: Clinic) {
+            // Implement delete logic - currently no delete method in DAO
+            // This would require adding a delete method to StoredClinicsDao
+        }
+
+        override suspend fun updateClinic(clinic: Clinic) {
+            // Implement update logic - currently no update method in DAO
+            // This would require adding an update method to StoredClinicsDao
+        }
+
         override suspend fun saveAllClinics(clinics: List<Clinic>) {
             clinicsDao.insertAll(clinics.map { it.toEntity() })
         }
