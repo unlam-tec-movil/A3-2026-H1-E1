@@ -1,6 +1,6 @@
 package ar.edu.unlam.mobile.scaffolding.ui.viewmodels
 
-import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.LightSensorDataSource
+import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.LightSensorDataSource
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers

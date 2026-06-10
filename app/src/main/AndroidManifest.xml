@@ -53,7 +53,7 @@
 
         <!-- Servicio de Foreground para contar pasos en segundo plano -->
         <service
-            android:name=".infraestructure.adapters.device.sensor.StepCounterService"
+            android:name=".data.datasources.sensor.StepCounterService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="health" />

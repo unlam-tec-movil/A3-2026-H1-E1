@@ -1,13 +1,13 @@
 package ar.edu.unlam.mobile.scaffolding.ui.viewmodels
 
 import ar.edu.unlam.mobile.scaffolding.data.datasources.device.mlkit.PoseDetectionDataSource
+import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.AccelerometerDataSource
 import ar.edu.unlam.mobile.scaffolding.domain.model.PoseResult
 import ar.edu.unlam.mobile.scaffolding.domain.model.SensorReading
 import ar.edu.unlam.mobile.scaffolding.domain.ports.camera.CameraSessionPort
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.CalculateJointAngleUseCase
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.SyncMotorUseCase
-import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.AccelerometerDataSource
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
