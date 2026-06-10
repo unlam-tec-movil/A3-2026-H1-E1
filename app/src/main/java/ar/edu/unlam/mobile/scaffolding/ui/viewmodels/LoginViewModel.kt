@@ -89,7 +89,7 @@ class LoginViewModel
                         loginUseCase(form.email.trim(), form.password)
                         LoginUiState.Success
                     }.getOrElse { e ->
-                        LoginUiState.Error(e.message ?: "Error al iniciar sesión")
+                        LoginUiState.Error(e.message ?: "Error desconocido")
                     }
             }
         }
