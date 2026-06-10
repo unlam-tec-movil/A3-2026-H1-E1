@@ -16,7 +16,7 @@ import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.entities.*
         SessionEntity::class,
         AchievementEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {

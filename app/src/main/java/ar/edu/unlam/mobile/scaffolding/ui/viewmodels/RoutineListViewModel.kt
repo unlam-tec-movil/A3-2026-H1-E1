@@ -79,9 +79,12 @@ class RoutineListViewModel
                             description =
                                 "Mantén la espalda recta y dobla lentamente la rodilla " +
                                     "hacia atrás intentando alcanzar el ángulo objetivo.",
-                            targetAngle = 110f,
+                            targetJoints = listOf("LEFT_HIP", "LEFT_KNEE", "LEFT_ANKLE"),
+                            startAngle = 180f,
+                            endAngle = 90f,
                             repetitions = 10,
                             sets = 3,
+                            bodyPart = "Pierna Izquierda",
                         ),
                         Exercise(
                             id = "ex_knee_extension",
@@ -89,9 +92,12 @@ class RoutineListViewModel
                             description =
                                 "Sentado en una silla firme, extiende la pierna " +
                                     "hacia el frente de manera controlada manteniéndola alineada.",
-                            targetAngle = 0f,
+                            targetJoints = listOf("RIGHT_HIP", "RIGHT_KNEE", "RIGHT_ANKLE"),
+                            startAngle = 90f,
+                            endAngle = 180f,
                             repetitions = 12,
                             sets = 3,
+                            bodyPart = "Pierna Derecha",
                         ),
                         Exercise(
                             id = "ex_assisted_squats",
@@ -99,9 +105,12 @@ class RoutineListViewModel
                             description =
                                 "Apoya las manos en un soporte y desciende lentamente " +
                                     "cuidando que las rodillas no pasen la punta de los pies.",
-                            targetAngle = 90f,
+                            targetJoints = listOf("RIGHT_HIP", "RIGHT_KNEE", "RIGHT_ANKLE"),
+                            startAngle = 180f,
+                            endAngle = 100f,
                             repetitions = 8,
                             sets = 4,
+                            bodyPart = "Piernas",
                         ),
                         Exercise(
                             id = "ex_heel_raises",
@@ -109,9 +118,12 @@ class RoutineListViewModel
                             description =
                                 "Elévate sobre las puntas de tus pies, sostén un segundo " +
                                     "la contracción y desciende suavemente.",
-                            targetAngle = 30f,
+                            targetJoints = listOf("RIGHT_KNEE", "RIGHT_ANKLE", "RIGHT_FOOT_INDEX"),
+                            startAngle = 90f,
+                            endAngle = 120f,
                             repetitions = 15,
                             sets = 3,
+                            bodyPart = "Tobillo Derecho",
                         ),
                     )
                 rehabRepository.insertExercises(mockExercises)

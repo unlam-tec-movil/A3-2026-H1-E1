@@ -152,7 +152,7 @@ fun RoutineListScreen(
                             ExerciseCard(
                                 exercise = exercise,
                                 onStartClick = {
-                                    controller.navigate(Screen.EnvironmentCheck.route)
+                                    controller.navigate(Screen.EnvironmentCheck.createRoute(exercise.id))
                                 },
                                 modifier =
                                     Modifier
@@ -211,7 +211,9 @@ fun RoutineHeader(
                             color = ElectricIndigo,
                         ),
                 )
+
                 Spacer(modifier = Modifier.height(4.dp))
+
                 Text(
                     text = "Ejercicios recomendados para tu rehabilitación hoy.",
                     style =
@@ -335,7 +337,7 @@ fun ExerciseCard(
                 // Target Angle Badge
                 DetailBadge(
                     label = "Ángulo Obj.",
-                    value = "${exercise.targetAngle.toInt()}°",
+                    value = "${exercise.endAngle.toInt()}°",
                     color = CyanWave,
                     modifier = Modifier.weight(1f),
                 )
@@ -359,7 +361,9 @@ fun ExerciseCard(
                     contentDescription = null,
                     modifier = Modifier.size(20.dp),
                 )
+
                 Spacer(modifier = Modifier.width(6.dp))
+
                 Text(
                     text = "Iniciar Ejercicio",
                     style =
@@ -403,7 +407,9 @@ fun DetailBadge(
                         letterSpacing = 0.5.sp,
                     ),
             )
+
             Spacer(modifier = Modifier.height(2.dp))
+
             Text(
                 text = value,
                 style =

@@ -48,6 +48,7 @@ class DashboardViewModelTest {
                     Session(
                         id = 1L,
                         userId = "user_imanol",
+                        exerciseId = "ex1",
                         dateTimestamp = 1000L,
                         durationSeconds = 600,
                         averageRom = 85f,
@@ -56,6 +57,7 @@ class DashboardViewModelTest {
                     Session(
                         id = 2L,
                         userId = "user_imanol",
+                        exerciseId = "ex1",
                         dateTimestamp = 2000L,
                         durationSeconds = 900,
                         averageRom = 112f,

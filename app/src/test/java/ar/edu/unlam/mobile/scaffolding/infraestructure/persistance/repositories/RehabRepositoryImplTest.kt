@@ -29,6 +29,7 @@ class RehabRepositoryImplTest {
                     SessionEntity(
                         id = 1L,
                         userId = userId,
+                        exerciseId = "ex1",
                         dateTimestamp = 123456789L,
                         durationSeconds = 600,
                         averageRom = 85f,
@@ -55,6 +56,7 @@ class RehabRepositoryImplTest {
                 Session(
                     id = 1L,
                     userId = "user_imanol",
+                    exerciseId = "ex1",
                     dateTimestamp = 123456789L,
                     durationSeconds = 600,
                     averageRom = 85f,
@@ -76,9 +78,14 @@ class RehabRepositoryImplTest {
                         id = "ex1",
                         name = "Knee Flexion",
                         description = "Description",
-                        targetAngle = 110f,
+                        targetJoints = "LEFT_HIP,LEFT_KNEE,LEFT_ANKLE",
+                        startAngle = 180f,
+                        endAngle = 90f,
+                        toleranceIdeal = 5f,
+                        toleranceWarning = 15f,
                         repetitions = 10,
                         sets = 3,
+                        bodyPart = "Pierna Izquierda",
                     ),
                 )
             every { exerciseDao.getAllExercises() } returns flowOf(mockEntities)
@@ -88,7 +95,7 @@ class RehabRepositoryImplTest {
                 val exercise = exercises[0]
                 assertEquals("ex1", exercise.id)
                 assertEquals("Knee Flexion", exercise.name)
-                assertEquals(110f, exercise.targetAngle)
+                assertEquals(90f, exercise.endAngle)
             }
 
             coVerify { exerciseDao.getAllExercises() }
@@ -103,9 +110,14 @@ class RehabRepositoryImplTest {
                         id = "ex1",
                         name = "Knee Flexion",
                         description = "Description",
-                        targetAngle = 110f,
+                        targetJoints = listOf("LEFT_HIP", "LEFT_KNEE", "LEFT_ANKLE"),
+                        startAngle = 180f,
+                        endAngle = 90f,
+                        toleranceIdeal = 5f,
+                        toleranceWarning = 15f,
                         repetitions = 10,
                         sets = 3,
+                        bodyPart = "Pierna Izquierda",
                     ),
                 )
             coEvery { exerciseDao.insertExercises(any()) } returns Unit

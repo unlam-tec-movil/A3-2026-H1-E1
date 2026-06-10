@@ -33,6 +33,9 @@ class RehabRepositoryImpl
                 entities.map { it.toDomain() }
             }
 
+        override fun getExerciseById(id: String): Flow<Exercise?> =
+            exerciseDao.getExerciseById(id).map { entity -> entity?.toDomain() }
+
         override suspend fun insertExercises(exercises: List<Exercise>) {
             exerciseDao.insertExercises(exercises.map { it.toEntity() })
         }

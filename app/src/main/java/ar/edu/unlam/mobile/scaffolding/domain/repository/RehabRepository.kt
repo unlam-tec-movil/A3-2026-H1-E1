@@ -11,5 +11,7 @@ interface RehabRepository {
 
     fun getExercises(): Flow<List<Exercise>>
 
+    fun getExerciseById(id: String): Flow<Exercise?>
+
     suspend fun insertExercises(exercises: List<Exercise>)
 }

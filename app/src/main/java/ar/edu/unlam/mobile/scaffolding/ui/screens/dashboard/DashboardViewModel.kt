@@ -103,6 +103,7 @@ class DashboardViewModel
                     listOf(
                         Session(
                             userId = "user_imanol",
+                            exerciseId = "ex_knee_flexion",
                             dateTimestamp = currentTime - 3 * dayInMillis,
                             durationSeconds = 600,
                             averageRom = 85f,
@@ -110,6 +111,7 @@ class DashboardViewModel
                         ),
                         Session(
                             userId = "user_imanol",
+                            exerciseId = "ex_knee_flexion",
                             dateTimestamp = currentTime - 2 * dayInMillis,
                             durationSeconds = 900,
                             averageRom = 98f,
@@ -117,6 +119,7 @@ class DashboardViewModel
                         ),
                         Session(
                             userId = "user_imanol",
+                            exerciseId = "ex_knee_flexion",
                             dateTimestamp = currentTime - dayInMillis,
                             durationSeconds = 1200,
                             averageRom = 112f,

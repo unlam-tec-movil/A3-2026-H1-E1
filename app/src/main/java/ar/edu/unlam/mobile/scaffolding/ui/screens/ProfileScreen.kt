@@ -425,9 +425,9 @@ private fun SessionRow(session: Session) {
 // Previews
 private val sampleSessions =
     listOf(
-        Session(1L, "u1", System.currentTimeMillis() - 86400000L, 600, 95f, 12),
-        Session(2L, "u1", System.currentTimeMillis() - 172800000L, 900, 108f, 18),
-        Session(3L, "u1", System.currentTimeMillis() - 259200000L, 1200, 112f, 20),
+        Session(1L, "u1", "ex_knee_flexion", System.currentTimeMillis() - 86400000L, 600L, 95f, 12),
+        Session(2L, "u1", "ex_knee_flexion", System.currentTimeMillis() - 172800000L, 900L, 108f, 18),
+        Session(3L, "u1", "ex_knee_flexion", System.currentTimeMillis() - 259200000L, 1200L, 112f, 20),
     )
 
 @Preview(name = "Profile · Light", showBackground = true, widthDp = 360, heightDp = 780)
