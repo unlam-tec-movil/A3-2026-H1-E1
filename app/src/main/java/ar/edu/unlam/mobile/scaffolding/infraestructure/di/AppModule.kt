@@ -16,6 +16,7 @@ import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.St
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.BuildConfigApiKeyProviderImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.DataBaseLocationRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.location.LocationDataSource
+import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.ClinicDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.ExerciseDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.SessionDao
 import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.daos.StoredClinicsDao
@@ -38,7 +39,25 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun providesFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+    fun providesFirebaseAuth(
+        @ApplicationContext context: Context,
+    ): FirebaseAuth {
+        if (com.google.firebase.FirebaseApp
+                .getApps(context)
+                .isEmpty()
+        ) {
+            val options =
+                com.google.firebase.FirebaseOptions
+                    .Builder()
+                    .setApiKey("dummy_api_key")
+                    .setApplicationId("ar.edu.unlam.mobile.scaffolding")
+                    .setProjectId("dummy-project")
+                    .build()
+            com.google.firebase.FirebaseApp
+                .initializeApp(context, options)
+        }
+        return FirebaseAuth.getInstance()
+    }
 
     @Provides
     @Singleton
@@ -76,7 +95,8 @@ object AppModule {
                 context = context,
                 klass = ClinicsDataBase::class.java,
                 name = "storedClinicsDB",
-            ).build()
+            ).fallbackToDestructiveMigration()
+            .build()
 
     @Provides
     @Singleton
@@ -101,11 +121,16 @@ object AppModule {
                 context = context,
                 klass = AppDatabase::class.java,
                 name = "app_database",
-            ).build()
+            ).fallbackToDestructiveMigration()
+            .build()
 
     @Provides
     @Singleton
     fun providesUserDao(db: AppDatabase): UserDao = db.userDao()
+
+    @Provides
+    @Singleton
+    fun providesClinicDao(db: AppDatabase): ClinicDao = db.clinicDao()
 
     @Provides
     @Singleton

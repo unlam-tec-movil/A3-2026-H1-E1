@@ -31,6 +31,8 @@ import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
 import ar.edu.unlam.mobile.scaffolding.ui.navigation.Screen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.DashboardScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.EnvironmentCheckScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.PostSessionScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RoutineListScreen
 
@@ -42,6 +44,8 @@ private val routesWithoutChrome =
         Screen.Login.route,
         Screen.Register.route,
         Screen.EnvironmentCheck.route,
+        Screen.RehabSession.route,
+        Screen.PostSession.route,
     )
 
 @Composable
@@ -192,19 +196,50 @@ fun MainScreen() {
             }
 
             // Environment Check
-            composable(Screen.EnvironmentCheck.route) {
+            composable(
+                route = Screen.EnvironmentCheck.route,
+                arguments = listOf(navArgument("exerciseId") { type = NavType.StringType }),
+            ) { navBackStackEntry ->
+                val exerciseId = navBackStackEntry.arguments?.getString("exerciseId") ?: ""
                 EnvironmentCheckScreen(
-                    onNavigateToRehab = {
-                        controller.navigate(Screen.RehabSession.route) {
-                            popUpTo(Screen.EnvironmentCheck.route) { inclusive = true }
-                        }
+                    exerciseId = exerciseId,
+                    onNavigateToSession = { id ->
+                        controller.navigate(Screen.RehabSession.createRoute(id))
                     },
+                    modifier = Modifier.padding(paddingValue),
                 )
             }
 
             // Rehab Session
-            composable(Screen.RehabSession.route) {
-                RehabSessionScreen(modifier = Modifier.padding(paddingValue))
+            composable(
+                route = Screen.RehabSession.route,
+                arguments = listOf(navArgument("exerciseId") { type = NavType.StringType }),
+            ) { navBackStackEntry ->
+                val exerciseId = navBackStackEntry.arguments?.getString("exerciseId") ?: ""
+                RehabSessionScreen(
+                    exerciseId = exerciseId,
+                    onNavigateToPostSession = {
+                        controller.navigate(Screen.PostSession.route) {
+                            popUpTo(Screen.RehabSession.route) { inclusive = true }
+                        }
+                    },
+                    onNavigateBack = {
+                        controller.popBackStack()
+                    },
+                    modifier = Modifier.padding(paddingValue),
+                )
+            }
+
+            // Post Session
+            composable(Screen.PostSession.route) {
+                PostSessionScreen(
+                    onNavigateToDashboard = {
+                        controller.navigate(Screen.Dashboard.route) {
+                            popUpTo(Screen.PostSession.route) { inclusive = true }
+                        }
+                    },
+                    modifier = Modifier.padding(paddingValue),
+                )
             }
 
             // Form

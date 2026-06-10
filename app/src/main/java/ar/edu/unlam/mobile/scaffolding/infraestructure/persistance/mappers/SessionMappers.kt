@@ -7,6 +7,7 @@ fun SessionEntity.toDomain(): Session =
     Session(
         id = id,
         userId = userId,
+        exerciseId = exerciseId,
         dateTimestamp = dateTimestamp,
         durationSeconds = durationSeconds,
         averageRom = averageRom,
@@ -17,6 +18,7 @@ fun Session.toEntity(): SessionEntity =
     SessionEntity(
         id = id,
         userId = userId,
+        exerciseId = exerciseId,
         dateTimestamp = dateTimestamp,
         durationSeconds = durationSeconds,
         averageRom = averageRom,

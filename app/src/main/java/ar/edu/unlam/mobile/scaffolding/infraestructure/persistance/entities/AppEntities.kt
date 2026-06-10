@@ -26,15 +26,21 @@ data class ExerciseEntity(
     @PrimaryKey val id: String,
     val name: String,
     val description: String,
-    val targetAngle: Float,
+    val targetJoints: String, // Stored as comma-separated string or JSON
+    val startAngle: Float,
+    val endAngle: Float,
+    val toleranceIdeal: Float,
+    val toleranceWarning: Float,
     val repetitions: Int,
     val sets: Int,
+    val bodyPart: String,
 )
 
 @Entity(tableName = "sessions")
 data class SessionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val userId: String,
+    val exerciseId: String,
     val dateTimestamp: Long,
     val durationSeconds: Long,
     val averageRom: Float,

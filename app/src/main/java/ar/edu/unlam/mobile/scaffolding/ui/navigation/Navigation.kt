@@ -15,9 +15,13 @@ sealed class Screen(
 
     object Profile : Screen("profile")
 
-    object EnvironmentCheck : Screen("environment_check")
+    object EnvironmentCheck : Screen("environment_check/{exerciseId}") {
+        fun createRoute(exerciseId: String) = "environment_check/$exerciseId"
+    }
 
-    object RehabSession : Screen("rehab_session")
+    object RehabSession : Screen("rehab_session/{exerciseId}") {
+        fun createRoute(exerciseId: String) = "rehab_session/$exerciseId"
+    }
 
     object PostSession : Screen("post_session")
 

@@ -70,13 +70,15 @@ class LoginViewModel
 
         fun onLogin() {
             val form = _formState.value
-
-            // Validación completa antes de enviar
             val emailErr = validateEmail(form.email)
             val passErr = validatePassword(form.password)
 
             if (emailErr != null || passErr != null) {
-                _formState.value = form.copy(emailError = emailErr, passwordError = passErr)
+                _formState.value =
+                    form.copy(
+                        emailError = emailErr,
+                        passwordError = passErr,
+                    )
                 return
             }
 
@@ -84,10 +86,10 @@ class LoginViewModel
                 _uiState.value = LoginUiState.Loading
                 _uiState.value =
                     runCatching {
-                        loginUseCase(email = form.email.trim(), password = form.password)
+                        loginUseCase(form.email.trim(), form.password)
                         LoginUiState.Success
                     }.getOrElse { e ->
-                        LoginUiState.Error(e.message ?: "Error desconocido")
+                        LoginUiState.Error(e.message ?: "Error al iniciar sesión")
                     }
             }
         }

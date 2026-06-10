@@ -11,7 +11,7 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose.compiler)
-    id("com.google.gms.google-services")
+    // id("com.google.gms.google-services")
 }
 
 tasks.withType<KotlinCompile>().configureEach {

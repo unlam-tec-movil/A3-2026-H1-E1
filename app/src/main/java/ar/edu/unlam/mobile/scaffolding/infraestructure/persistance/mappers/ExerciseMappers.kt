@@ -8,9 +8,14 @@ fun ExerciseEntity.toDomain(): Exercise =
         id = id,
         name = name,
         description = description,
-        targetAngle = targetAngle,
+        targetJoints = targetJoints.split(","),
+        startAngle = startAngle,
+        endAngle = endAngle,
+        toleranceIdeal = toleranceIdeal,
+        toleranceWarning = toleranceWarning,
         repetitions = repetitions,
         sets = sets,
+        bodyPart = bodyPart,
     )
 
 fun Exercise.toEntity(): ExerciseEntity =
@@ -18,7 +23,12 @@ fun Exercise.toEntity(): ExerciseEntity =
         id = id,
         name = name,
         description = description,
-        targetAngle = targetAngle,
+        targetJoints = targetJoints.joinToString(","),
+        startAngle = startAngle,
+        endAngle = endAngle,
+        toleranceIdeal = toleranceIdeal,
+        toleranceWarning = toleranceWarning,
         repetitions = repetitions,
         sets = sets,
+        bodyPart = bodyPart,
     )

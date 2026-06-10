@@ -1,7 +1,6 @@
 package ar.edu.unlam.mobile.scaffolding.ui.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -10,20 +9,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.tooling.preview.Preview
+import ar.edu.unlam.mobile.scaffolding.domain.model.PoseResult
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.JointPrecision
-import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
-import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
+import kotlin.math.max
 
 @Composable
 fun SkeletonOverlay(
-    pose: Pose?,
+    poseResult: PoseResult?,
     precision: JointPrecision,
     modifier: Modifier = Modifier,
 ) {
-    if (pose == null) return
+    if (poseResult == null) return
 
+    val pose = poseResult.pose
     val targetColor =
         when (precision) {
             JointPrecision.IDEAL -> Color.Green
@@ -33,82 +32,84 @@ fun SkeletonOverlay(
 
     val colorFeedback by animateColorAsState(targetValue = targetColor, label = "colorFeedback")
 
-    // Landmarks brazo derecho
-    val rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER)
-    val rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW)
-    val rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST)
-
-    // Landmarks brazo izquierdo
-    val leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER)
-    val leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW)
-    val leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST)
-
-    // Animación de puntos para fluidez (Derecha)
-    val rsX by animateFloatAsState(targetValue = rightShoulder?.position?.x ?: 0f, label = "rsX")
-    val rsY by animateFloatAsState(targetValue = rightShoulder?.position?.y ?: 0f, label = "rsY")
-    val reX by animateFloatAsState(targetValue = rightElbow?.position?.x ?: 0f, label = "reX")
-    val reY by animateFloatAsState(targetValue = rightElbow?.position?.y ?: 0f, label = "reY")
-    val rwX by animateFloatAsState(targetValue = rightWrist?.position?.x ?: 0f, label = "rwX")
-    val rwY by animateFloatAsState(targetValue = rightWrist?.position?.y ?: 0f, label = "rwY")
-
-    // Animación de puntos para fluidez (Izquierda)
-    val lsX by animateFloatAsState(targetValue = leftShoulder?.position?.x ?: 0f, label = "lsX")
-    val lsY by animateFloatAsState(targetValue = leftShoulder?.position?.y ?: 0f, label = "lsY")
-    val leX by animateFloatAsState(targetValue = leftElbow?.position?.x ?: 0f, label = "leX")
-    val leY by animateFloatAsState(targetValue = leftElbow?.position?.y ?: 0f, label = "leY")
-    val lwX by animateFloatAsState(targetValue = leftWrist?.position?.x ?: 0f, label = "lwX")
-    val lwY by animateFloatAsState(targetValue = leftWrist?.position?.y ?: 0f, label = "lwY")
-
     Canvas(modifier = modifier.fillMaxSize()) {
-        // Dibujar Brazo Derecho
-        if (rightShoulder != null && rightElbow != null) {
-            drawLine(
-                color = colorFeedback,
-                start = Offset(rsX, rsY),
-                end = Offset(reX, reY),
-                strokeWidth = 10f,
-                cap = StrokeCap.Round,
-            )
-        }
-        if (rightElbow != null && rightWrist != null) {
-            drawLine(
-                color = colorFeedback,
-                start = Offset(reX, reY),
-                end = Offset(rwX, rwY),
-                strokeWidth = 10f,
-                cap = StrokeCap.Round,
+        val canvasWidth = size.width
+        val canvasHeight = size.height
+
+        // Ajustamos las dimensiones de la imagen según la rotación
+        val isRotated = poseResult.imageRotation == 90 || poseResult.imageRotation == 270
+        // ML Kit con InputImage.fromMediaImage(mediaImage, rotation) entrega coordenadas
+        // ya rotadas al espacio "upright" (derecho).
+        val logicalWidth = if (isRotated) poseResult.imageHeight else poseResult.imageWidth
+        val logicalHeight = if (isRotated) poseResult.imageWidth else poseResult.imageHeight
+
+        val scale = max(canvasWidth / logicalWidth.toFloat(), canvasHeight / logicalHeight.toFloat())
+        val offsetX = (canvasWidth - logicalWidth * scale) / 2f
+        val offsetY = (canvasHeight - logicalHeight * scale) / 2f
+
+        fun getCanvasOffset(landmark: PoseLandmark?): Offset? {
+            if (landmark == null) return null
+
+            // Para cámara frontal espejada, invertimos el eje X en el espacio lógico (ya rotado)
+            val rawX = landmark.position.x
+            val rawY = landmark.position.y
+
+            val mirroredX = logicalWidth - rawX
+
+            return Offset(
+                x = mirroredX * scale + offsetX,
+                y = rawY * scale + offsetY,
             )
         }
 
-        // Dibujar Brazo Izquierdo
-        if (leftShoulder != null && leftElbow != null) {
-            drawLine(
-                color = colorFeedback,
-                start = Offset(lsX, lsY),
-                end = Offset(leX, leY),
-                strokeWidth = 10f,
-                cap = StrokeCap.Round,
+        // Definimos las conexiones incluyendo la cabeza
+        val connections =
+            listOf(
+                // Cabeza
+                PoseLandmark.LEFT_EYE to PoseLandmark.RIGHT_EYE,
+                PoseLandmark.LEFT_EYE to PoseLandmark.LEFT_EAR,
+                PoseLandmark.RIGHT_EYE to PoseLandmark.RIGHT_EAR,
+                PoseLandmark.NOSE to PoseLandmark.LEFT_EYE,
+                PoseLandmark.NOSE to PoseLandmark.RIGHT_EYE,
+                // Cuerpo superior
+                PoseLandmark.LEFT_SHOULDER to PoseLandmark.RIGHT_SHOULDER,
+                PoseLandmark.LEFT_SHOULDER to PoseLandmark.LEFT_ELBOW,
+                PoseLandmark.LEFT_ELBOW to PoseLandmark.LEFT_WRIST,
+                PoseLandmark.RIGHT_SHOULDER to PoseLandmark.RIGHT_ELBOW,
+                PoseLandmark.RIGHT_ELBOW to PoseLandmark.RIGHT_WRIST,
+                // Tronco
+                PoseLandmark.LEFT_SHOULDER to PoseLandmark.LEFT_HIP,
+                PoseLandmark.RIGHT_SHOULDER to PoseLandmark.RIGHT_HIP,
+                PoseLandmark.LEFT_HIP to PoseLandmark.RIGHT_HIP,
+                // Piernas
+                PoseLandmark.LEFT_HIP to PoseLandmark.LEFT_KNEE,
+                PoseLandmark.LEFT_KNEE to PoseLandmark.LEFT_ANKLE,
+                PoseLandmark.RIGHT_HIP to PoseLandmark.RIGHT_KNEE,
+                PoseLandmark.RIGHT_KNEE to PoseLandmark.RIGHT_ANKLE,
             )
-        }
-        if (leftElbow != null && leftWrist != null) {
-            drawLine(
-                color = colorFeedback,
-                start = Offset(leX, leY),
-                end = Offset(lwX, lwY),
-                strokeWidth = 10f,
-                cap = StrokeCap.Round,
-            )
-        }
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun SkeletonOverlayPreview() {
-    GambAppTheme {
-        SkeletonOverlay(
-            pose = null,
-            precision = JointPrecision.IDEAL,
-        )
+        connections.forEach { (start, end) ->
+            val startOff = getCanvasOffset(pose.getPoseLandmark(start))
+            val endOff = getCanvasOffset(pose.getPoseLandmark(end))
+            if (startOff != null && endOff != null) {
+                drawLine(
+                    color = colorFeedback.copy(alpha = 0.7f), // Color más mate/transparente
+                    start = startOff,
+                    end = endOff,
+                    strokeWidth = 20f, // Líneas aún más gruesas
+                    cap = StrokeCap.Round,
+                )
+            }
+        }
+
+        pose.allPoseLandmarks.forEach { landmark ->
+            getCanvasOffset(landmark)?.let {
+                drawCircle(
+                    color = Color.White.copy(alpha = 0.9f),
+                    radius = 8f,
+                    center = it,
+                )
+            }
+        }
     }
 }
