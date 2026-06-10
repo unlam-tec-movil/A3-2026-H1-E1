@@ -9,6 +9,7 @@ import ar.edu.unlam.mobile.scaffolding.domain.ports.camera.CameraSessionPort
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.CalculateJointAngleUseCase
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.JointPrecision
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.SyncMotorUseCase
+import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.AccelerometerDataSource
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +27,7 @@ class RehabSessionViewModel
         private val poseDetectionDataSource: PoseDetectionDataSource,
         private val calculateJointAngleUseCase: CalculateJointAngleUseCase,
         private val syncMotorUseCase: SyncMotorUseCase,
+        private val accelerometerDataSource: AccelerometerDataSource,
     ) : ViewModel() {
         private val _currentAngle = MutableStateFlow(0f)
         val currentAngle: StateFlow<Float> = _currentAngle.asStateFlow()
@@ -36,8 +38,17 @@ class RehabSessionViewModel
         private val _pose = MutableStateFlow<Pose?>(null)
         val pose: StateFlow<Pose?> = _pose.asStateFlow()
 
-        // Ángulo objetivo hardcoded por ahora para demostración
-        private val targetAngle = 90f
+        /** true cuando se detecta un impacto o caída. Se resetea con [dismissFallAlert]. */
+        private val _fallDetected = MutableStateFlow(false)
+        val fallDetected: StateFlow<Boolean> = _fallDetected.asStateFlow()
+
+        /**
+         * Ángulo objetivo de la sesión de rehabilitación, en grados.
+         * Es null hasta que la UI lo configure con [setTargetAngle].
+         * Mientras sea null, [precision] no se actualiza.
+         */
+        private val _targetAngle = MutableStateFlow<Float?>(null)
+        val targetAngle: StateFlow<Float?> = _targetAngle.asStateFlow()
 
         init {
             viewModelScope.launch {
@@ -58,10 +69,33 @@ class RehabSessionViewModel
                                 lastPointY = rightWrist.position.y,
                             )
                         _currentAngle.value = angle
-                        _precision.value = syncMotorUseCase.execute(angle, targetAngle)
+                        _targetAngle.value?.let { target ->
+                            _precision.value = syncMotorUseCase.execute(angle, target)
+                        }
                     }
                 }
             }
+
+            viewModelScope.launch {
+                accelerometerDataSource.getReadingsFlow().collect { reading ->
+                    if (accelerometerDataSource.isFallDetected(reading)) {
+                        _fallDetected.value = true
+                    }
+                }
+            }
+        }
+
+        /**
+         * Establece el ángulo objetivo para la sesión actual.
+         * Debe llamarse desde la UI antes o durante la sesión.
+         */
+        fun setTargetAngle(angle: Float) {
+            _targetAngle.value = angle
+        }
+
+        // Descarta la alerta de caída una vez que fue procesada por la UI.
+        fun dismissFallAlert() {
+            _fallDetected.value = false
         }
 
         fun startCamera(
