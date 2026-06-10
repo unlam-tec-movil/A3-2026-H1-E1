@@ -39,8 +39,8 @@ class ProfileViewModelTest {
     private val mockUser = User("uid_1", "Juan Pérez", "juan@test.com", "token")
     private val mockSessions =
         listOf(
-            Session(1L, "uid_1", System.currentTimeMillis() - 86400000L, 600L, 90f, 10),
-            Session(2L, "uid_1", System.currentTimeMillis() - 172800000L, 900L, 105f, 15),
+            Session(1L, "uid_1", "ex_knee_flexion", System.currentTimeMillis() - 86400000L, 600L, 90f, 10),
+            Session(2L, "uid_1", "ex_knee_flexion", System.currentTimeMillis() - 172800000L, 900L, 105f, 15),
         )
 
     @Before
@@ -113,7 +113,15 @@ class ProfileViewModelTest {
         runTest(testDispatcher) {
             val manySessions =
                 (1..15).map {
-                    Session(it.toLong(), "uid_1", System.currentTimeMillis() - it * 86400000L, 600L, 90f, 10)
+                    Session(
+                        it.toLong(),
+                        "uid_1",
+                        "ex_knee_flexion",
+                        System.currentTimeMillis() - it * 86400000L,
+                        600L,
+                        90f,
+                        10,
+                    )
                 }
             every { rehabRepository.getSessions(any()) } returns flowOf(manySessions)
 
