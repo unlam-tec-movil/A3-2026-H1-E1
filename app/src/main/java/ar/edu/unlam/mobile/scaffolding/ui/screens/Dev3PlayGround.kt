@@ -10,12 +10,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,6 +46,7 @@ import com.maptiler.maptilersdk.map.MTMapOptions
 import com.maptiler.maptilersdk.map.MTMapView
 import com.maptiler.maptilersdk.map.MTMapViewController
 import com.maptiler.maptilersdk.map.MTMapViewDelegate
+import com.maptiler.maptilersdk.map.options.MTCameraOptions
 import com.maptiler.maptilersdk.map.style.MTMapReferenceStyle
 import com.maptiler.maptilersdk.map.style.MTMapStyleVariant
 import com.maptiler.maptilersdk.map.types.MTData
@@ -91,7 +99,35 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
             }
     }
 
-    Scaffold(topBar = { TopAppBar(title = { Text(text = "PlayGround dev3") }) }) { paddingValues ->
+    Scaffold(floatingActionButton = {
+        FloatingActionButton(
+            onClick = {
+                uiState.location?.let { location ->
+                    controller.easeTo(
+                        cameraOptions =
+                            MTCameraOptions(
+                                center =
+                                    LngLat(
+                                        lng = location.longitude,
+                                        lat = location.latitude,
+                                    ),
+                            ),
+                    )
+                }
+            },
+            modifier = Modifier.padding(bottom = 75.dp),
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            shape = RoundedCornerShape(30.dp),
+            content = {
+                Icon(
+                    imageVector = Icons.Filled.CenterFocusStrong,
+                    modifier = Modifier,
+                    tint = MaterialTheme.colorScheme.primary,
+                    contentDescription = "",
+                )
+            },
+        )
+    }, floatingActionButtonPosition = FabPosition.End) { paddingValues ->
         Column(
             modifier =
                 Modifier
@@ -194,3 +230,31 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
         }
     }
 }
+
+// FloatingActionButton(
+// onClick = {
+//    uiState.location?.let { location ->
+//        controller.easeTo(
+//            cameraOptions =
+//                MTCameraOptions(
+//                    center =
+//                        LngLat(
+//                            lng = location.longitude,
+//                            lat = location.latitude,
+//                        ),
+//                ),
+//        )
+//    }
+// },
+// modifier = Modifier,
+// containerColor = MaterialTheme.colorScheme.primaryContainer,
+// shape = RoundedCornerShape(30.dp),
+// content = {
+//    Icon(
+//        imageVector = Icons.Filled.CenterFocusStrong,
+//        modifier = Modifier,
+//        tint = MaterialTheme.colorScheme.primary,
+//        contentDescription = "",
+//    )
+// },
+// )
