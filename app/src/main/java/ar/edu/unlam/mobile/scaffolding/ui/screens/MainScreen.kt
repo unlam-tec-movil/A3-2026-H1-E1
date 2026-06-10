@@ -34,7 +34,6 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.DashboardScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RoutineListScreen
 
-// Rutas donde el bottom bar y el chrome no deben aparecer
 private val routesWithoutChrome =
     setOf(
         Screen.Splash.route,
