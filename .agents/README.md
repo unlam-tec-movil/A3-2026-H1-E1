@@ -43,6 +43,7 @@ Actualmente disponemos de **20 skills** instaladas en el directorio `.agents/ski
 ### Pruebas y Calidad de Código
 *   **`testing-setup`**: Úsala para planificar la infraestructura y estrategia de pruebas en Android (pruebas unitarias, de UI, capturas de pantalla, end-to-end).
 *   **`android-compose-kotlin-testing`**: Úsala al escribir, depurar o revisar pruebas en Compose y Kotlin (ViewModels, Coroutines, Flows, Turbine) siguiendo principios de TDD.
+*   **`design-driven-testing`**: Define un flujo de trabajo de tres pasos para el diseño, planificación y validación de suites de pruebas (como pruebas basadas en propiedades o PBT): primero entrega un documento de diseño detallado con diagramas y fórmulas, segundo un plan de implementación estructurado por fases, y tercero ejecuta la suite de pruebas completa para validar el funcionamiento y estilo.
 
 ### Identidad y Utilidades de Sistema
 *   **`verified-email`**: Implementación de flujos de autenticación e inicio de sesión seguros mediante Credential Manager.

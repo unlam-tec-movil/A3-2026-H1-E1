@@ -1,7 +1,7 @@
 package ar.edu.unlam.mobile.scaffolding.application.usecases.user
 
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
-import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.preferences.SessionPreferences
 import com.google.firebase.auth.FirebaseAuth
 import javax.inject.Inject
 

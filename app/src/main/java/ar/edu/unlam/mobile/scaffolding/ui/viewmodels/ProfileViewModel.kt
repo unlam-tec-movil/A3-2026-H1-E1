@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.mobile.scaffolding.application.usecases.user.SignOutUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.user.UpdateUserUseCase
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
-import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.preferences.SessionPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

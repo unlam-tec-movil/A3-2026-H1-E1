@@ -2,7 +2,7 @@ package ar.edu.unlam.mobile.scaffolding.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.LightSensorDataSource
+import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.LightSensorDataSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

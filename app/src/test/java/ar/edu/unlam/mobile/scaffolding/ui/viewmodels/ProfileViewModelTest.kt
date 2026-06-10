@@ -2,11 +2,11 @@ package ar.edu.unlam.mobile.scaffolding.ui.viewmodels
 
 import ar.edu.unlam.mobile.scaffolding.application.usecases.user.SignOutUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.user.UpdateUserUseCase
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.domain.model.User
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
-import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.preferences.SessionPreferences
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every

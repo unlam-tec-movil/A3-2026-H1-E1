@@ -62,8 +62,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.StepCounterService
 import ar.edu.unlam.mobile.scaffolding.domain.model.Session
-import ar.edu.unlam.mobile.scaffolding.infraestructure.adapters.device.sensor.StepCounterService
 import ar.edu.unlam.mobile.scaffolding.ui.theme.AmberWarning
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo

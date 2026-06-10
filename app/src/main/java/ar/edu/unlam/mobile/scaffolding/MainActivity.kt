@@ -12,7 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import ar.edu.unlam.mobile.scaffolding.infraestructure.persistance.preferences.SessionPreferences
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.ui.screens.MainScreen
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
 import dagger.hilt.android.AndroidEntryPoint
