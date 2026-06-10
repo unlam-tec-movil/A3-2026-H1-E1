@@ -26,7 +26,6 @@ import ar.edu.unlam.mobile.scaffolding.domain.model.Exercise
 import ar.edu.unlam.mobile.scaffolding.domain.model.PoseResult
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.JointPrecision
 import ar.edu.unlam.mobile.scaffolding.ui.components.SkeletonOverlay
-import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.CameraPreviewComponent
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.RehabSessionViewModel
 
@@ -59,7 +58,11 @@ fun RehabSessionScreen(
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
             title = { Text("¿Deseas salir?") },
-            text = { Text("Seguro? ya aca algo mas se perderá el progreso de esta sesión.") },
+            text = {
+                Text(
+                    text = "Se perderá el progreso de esta sesión si sales ahora.",
+                )
+            },
             confirmButton = {
                 TextButton(onClick = onNavigateBack) {
                     Text("Salir")
@@ -77,12 +80,18 @@ fun RehabSessionScreen(
         AlertDialog(
             onDismissRequest = { showNextDialog = false },
             title = { Text("¿Siguiente ejercicio?") },
-            text = { Text("Seguro? ya aca algo mas. Podrás continuar con la siguiente actividad de tu rutina.") },
+            text = {
+                Text(
+                    text = "Podrás continuar con la siguiente actividad de tu rutina.",
+                )
+            },
             confirmButton = {
-                TextButton(onClick = {
-                    showNextDialog = false
-                    onNavigateToPostSession() // O la lógica para el siguiente
-                }) {
+                TextButton(
+                    onClick = {
+                        showNextDialog = false
+                        onNavigateToPostSession()
+                    },
+                ) {
                     Text("Siguiente")
                 }
             },
