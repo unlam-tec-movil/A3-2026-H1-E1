@@ -2,6 +2,7 @@ package ar.edu.unlam.mobile.scaffolding.data.network.model
 
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.Path
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.Points
+import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.RouteRequest
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.RouteResponse
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -43,5 +44,34 @@ class GraphHopperModelsTest {
         assertEquals(1, response.paths.size)
         assertEquals(1234.56, response.paths[0].distance, 0.0)
         assertEquals("LineString", response.paths[0].points.type)
+    }
+
+    @Test
+    fun `RouteRequest should initailize with correct values`() {
+        val points = listOf(listOf(-58.0, -34.0), listOf(-58.1, -34.1))
+
+        val request =
+            RouteRequest(
+                points = points,
+                profile = "car",
+                pointsEncoded = true,
+                locale = "en",
+            )
+
+        assertEquals(points, request.points)
+        assertEquals("car", request.profile)
+        assertEquals(true, request.pointsEncoded)
+        assertEquals("en", request.locale)
+    }
+
+    @Test
+    fun `RouteRequest should use default values if not indicated`() {
+        val request =
+            RouteRequest(
+                points = emptyList(),
+            )
+        assertEquals("foot", request.profile)
+        assertEquals(false, request.pointsEncoded)
+        assertEquals("es", request.locale)
     }
 }
