@@ -93,7 +93,7 @@ fun MainScreen() {
     ) { paddingValue ->
         NavHost(
             navController = controller,
-            startDestination = Screen.Splash.route,
+            startDestination = Screen.Dashboard.route,
             enterTransition = {
                 slideInHorizontally(
                     initialOffsetX = { it },

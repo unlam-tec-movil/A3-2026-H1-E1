@@ -15,6 +15,8 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.local.database.ClinicsDa
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.data.datasources.location.BuildConfigApiKeyProviderImpl
 import ar.edu.unlam.mobile.scaffolding.data.datasources.location.LocationDataSource
+import ar.edu.unlam.mobile.scaffolding.data.datasources.remote.apiRouting.RoutingApi
+import ar.edu.unlam.mobile.scaffolding.data.datasources.remote.model.Constants
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.AccelerometerDataSource
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.LightSensorDataSource
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.StepCounterDataSource
@@ -33,11 +35,26 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @Provides
+    @Singleton
+    fun providesRetrofit(): Retrofit =
+        Retrofit
+            .Builder()
+            .baseUrl(Constants.GRAPH_HOPPER_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+    @Provides
+    @Singleton
+    fun providesRoutingApi(retrofit: Retrofit): RoutingApi = retrofit.create(RoutingApi::class.java)
+
     @Provides
     @Singleton
     fun providesFirebaseAuth(

@@ -61,7 +61,7 @@ class Dev3PlayGroundViewModelTest {
             every { getClinicsStoredUseCase() } returns flowOf(emptyList())
             createViewModel()
 
-            val state = viewModel.locationUiState.value
+            val state = viewModel.mapScreenUiState.value
             assertTrue(state.isLoadingClinics)
             assertTrue(state.clinics.isEmpty())
         }
@@ -81,7 +81,7 @@ class Dev3PlayGroundViewModelTest {
             advanceUntilIdle()
 
             // Assert
-            val state = viewModel.locationUiState.value
+            val state = viewModel.mapScreenUiState.value
             assertFalse(state.isLoadingClinics)
             assertTrue(state.clinicsLoadSuccess)
             assertEquals(storedClinics, state.clinics)
@@ -109,7 +109,7 @@ class Dev3PlayGroundViewModelTest {
             coVerify { getClinicsFromAssetsUseCase() }
             coVerify { populateClinicsDbUseCase(clinicsFromAssets) }
 
-            val state = viewModel.locationUiState.value
+            val state = viewModel.mapScreenUiState.value
             assertEquals(clinicsFromAssets, state.clinics)
         }
 
@@ -127,7 +127,7 @@ class Dev3PlayGroundViewModelTest {
             advanceUntilIdle()
 
             // Assert
-            val state = viewModel.locationUiState.value
+            val state = viewModel.mapScreenUiState.value
             assertTrue(state.permissionGranted)
             assertTrue(state.showMap)
             assertEquals(mockLocation, state.location)
@@ -144,7 +144,7 @@ class Dev3PlayGroundViewModelTest {
             viewModel.onPermissionCheckComplete(true)
 
             // Assert
-            val state = viewModel.locationUiState.value
+            val state = viewModel.mapScreenUiState.value
             assertTrue(state.permissionGranted)
             assertFalse(state.isLoadingPermission)
         }
@@ -161,7 +161,7 @@ class Dev3PlayGroundViewModelTest {
             advanceUntilIdle()
 
             // Assert
-            val state = viewModel.locationUiState.value
+            val state = viewModel.mapScreenUiState.value
             assertFalse(state.isLoadingClinics)
             assertFalse(state.clinicsLoadSuccess)
             assertEquals(errorMessage, state.clinicsLoadError)

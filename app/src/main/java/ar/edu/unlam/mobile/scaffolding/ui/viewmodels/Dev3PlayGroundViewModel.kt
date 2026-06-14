@@ -10,6 +10,11 @@ import ar.edu.unlam.mobile.scaffolding.application.usecases.location.PopulateCli
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.maptiler.maptilersdk.helpers.MTDashArrayOption
+import com.maptiler.maptilersdk.helpers.MTNumberOrZoomNumberValues
+import com.maptiler.maptilersdk.helpers.MTPolylineLayerHelper
+import com.maptiler.maptilersdk.helpers.MTPolylineLayerOptions
+import com.maptiler.maptilersdk.helpers.MTStringOrZoomStringValues
 import com.maptiler.maptilersdk.map.style.MTStyle
 import com.maptiler.maptilersdk.map.style.source.MTGeoJSONSource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,8 +34,8 @@ class Dev3PlayGroundViewModel
         private val getClinicsStoredUseCase: GetClinicsStoredUseCase,
     ) : ViewModel() {
         @Suppress("ktlint:standard:backing-property-naming")
-        private val _locationUiState = MutableStateFlow(LocationUiSate())
-        val locationUiState = _locationUiState.asStateFlow()
+        private val _mapScreenUiState = MutableStateFlow(LocationUiSate())
+        val mapScreenUiState = _mapScreenUiState.asStateFlow()
 
         init {
             viewModelScope.launch {
@@ -40,7 +45,7 @@ class Dev3PlayGroundViewModel
                             val clinicsFromAssets = getClinicsFromAssetsUseCase()
                             populateClinicsDbUseCase(clinicsFromAssets)
                         }
-                        _locationUiState.update {
+                        _mapScreenUiState.update {
                             it.copy(
                                 isLoadingClinics = false,
                                 clinicsLoadSuccess = true,
@@ -49,7 +54,7 @@ class Dev3PlayGroundViewModel
                         }
                     }
                 } catch (e: Exception) {
-                    _locationUiState.update {
+                    _mapScreenUiState.update {
                         it.copy(
                             isLoadingClinics = false,
                             clinicsLoadSuccess = false,
@@ -63,7 +68,7 @@ class Dev3PlayGroundViewModel
         fun onLocationPermissionGranted() {
             viewModelScope.launch {
                 observerLocationUseCase().collect { location ->
-                    _locationUiState.update { currentState ->
+                    _mapScreenUiState.update { currentState ->
                         currentState.copy(
                             location = location,
                             showMap = true,
@@ -76,11 +81,130 @@ class Dev3PlayGroundViewModel
         }
 
         fun onPermissionCheckComplete(granted: Boolean) {
-            _locationUiState.update {
+            _mapScreenUiState.update {
                 it.copy(
                     permissionGranted = granted,
                     isLoadingPermission = false,
                 )
+            }
+        }
+
+        fun onCreateRouteClick(style: MTStyle) {
+            viewModelScope.launch {
+                val lineGeoJson =
+                    """
+                                { "type":"FeatureCollection","features":[
+                                  { "type":"Feature",
+                                    "properties": { "name":"Sample Line" },
+                                    "geometry":{
+                                      "type":"LineString",
+                    "coordinates": [
+                      [
+                        -58.546716,
+                        -34.641723
+                      ],
+                      [
+                        -58.547347,
+                        -34.641253
+                      ],
+                      [
+                        -58.551644,
+                        -34.638118
+                      ],
+                      [
+                        -58.551832,
+                        -34.637974
+                      ],
+                      [
+                        -58.551631,
+                        -34.638206
+                      ],
+                      [
+                        -58.55141,
+                        -34.638367
+                      ],
+                      [
+                        -58.551497,
+                        -34.638388
+                      ],
+                      [
+                        -58.551564,
+                        -34.638393
+                      ],
+                      [
+                        -58.553995,
+                        -34.638332
+                      ],
+                      [
+                        -58.554032,
+                        -34.639461
+                      ],
+                      [
+                        -58.553236,
+                        -34.63948
+                      ],
+                      [
+                        -58.553244,
+                        -34.639907
+                      ],
+                      [
+                        -58.55784,
+                        -34.639843
+                      ],
+                      [
+                        -58.55825,
+                        -34.639872
+                      ],
+                      [
+                        -58.558715,
+                        -34.639893
+                      ],
+                      [
+                        -58.55849,
+                        -34.640892
+                      ],
+                      [
+                        -58.558396,
+                        -34.641016
+                      ],
+                      [
+                        -58.557967,
+                        -34.64166
+                      ],
+                      [
+                        -58.55756,
+                        -34.642218
+                      ],
+                      [
+                        -58.557498,
+                        -34.642293
+                      ],
+                      [
+                        -58.557439,
+                        -34.642248
+                      ]
+                    ]}
+                                  }
+                                ]}
+                    """.trimIndent()
+
+                // Clean up any previous run
+                style.removeLayerById("basic-polyline")
+                style.removeSourceById("basic-polyline-source")
+
+                val helper: MTPolylineLayerHelper = style.polylineHelper()
+                val opts =
+                    MTPolylineLayerOptions(
+                        data = lineGeoJson,
+                        layerId = "basic-polyline",
+                        sourceId = "basic-polyline-source",
+                        lineColor = MTStringOrZoomStringValues.StringValue("#E63946"),
+                        lineWidth = MTNumberOrZoomNumberValues.Number(3.0),
+                        lineOpacity = MTNumberOrZoomNumberValues.Number(0.9),
+                        // Use either numeric or string dash patterns; here numeric values
+                        lineDashArray = MTDashArrayOption.Numbers(listOf(2.0, 1.0)),
+                    )
+                helper.addPolyline(opts)
             }
         }
 
@@ -130,17 +254,27 @@ class Dev3PlayGroundViewModel
                                 jsonString = featureCollection.toString(),
                             ),
                         )
-
-//                        style.addLayer(
-//                            MTCircleLayer(
-//                                identifier = "clinicPoints",
-//                                sourceIdentifier = "clinics",
-//                            ).apply {
-//                                colorConst(android.graphics.Color.BLUE)
-//                                radiusConst(8.0)
-//                            },
-//                        )
                     }
+                }
+            }
+        }
+
+        fun onSearchBarInputChange(newValue: String) {
+            _mapScreenUiState.update { currentState ->
+                currentState.copy(searchBarText = newValue)
+            }
+        }
+
+        fun onClinicSelectedChange(
+            newClinic: Clinic,
+            style: MTStyle?,
+        ) {
+            _mapScreenUiState.update { currentState ->
+                currentState.copy(selectedClinic = newClinic)
+            }
+            viewModelScope.launch {
+                style?.let {
+                    onCreateRouteClick(style)
                 }
             }
         }
@@ -154,5 +288,14 @@ class Dev3PlayGroundViewModel
             val clinicsLoadSuccess: Boolean = false,
             val clinicsLoadError: String? = null,
             val clinics: List<Clinic> = emptyList(),
-        )
+            val selectedClinic: Clinic? = null,
+            var searchBarText: String = "",
+        ) {
+            val filteredClinics: List<Clinic>
+                get() =
+                    clinics.filter {
+                        it.name.contains(searchBarText, ignoreCase = true) &&
+                            searchBarText.isNotEmpty()
+                    }
+        }
     }
