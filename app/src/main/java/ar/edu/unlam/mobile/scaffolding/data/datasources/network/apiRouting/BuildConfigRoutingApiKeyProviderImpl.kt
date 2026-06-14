@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile.scaffolding.data.datasources.location
+package ar.edu.unlam.mobile.scaffolding.data.datasources.network.apiRouting
 
 import ar.edu.unlam.mobile.scaffolding.BuildConfig
 import ar.edu.unlam.mobile.scaffolding.application.port.out.routing.RoutingApiKeyProvider

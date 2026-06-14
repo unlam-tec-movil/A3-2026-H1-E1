@@ -18,8 +18,8 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.local.database.AppDataba
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.database.ClinicsDataBase
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.data.datasources.location.BuildConfigApiKeyProviderImpl
-import ar.edu.unlam.mobile.scaffolding.data.datasources.location.BuildConfigRoutingApiKeyProviderImpl
 import ar.edu.unlam.mobile.scaffolding.data.datasources.location.LocationDataSource
+import ar.edu.unlam.mobile.scaffolding.data.datasources.network.apiRouting.BuildConfigRoutingApiKeyProviderImpl
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.apiRouting.RoutingApi
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.Constants
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.AccelerometerDataSource
