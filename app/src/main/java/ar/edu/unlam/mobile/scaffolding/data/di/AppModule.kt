@@ -3,6 +3,10 @@ package ar.edu.unlam.mobile.scaffolding.data.di
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
+import ar.edu.unlam.mobile.scaffolding.application.port.inn.routing.GetRouteUseCase
+import ar.edu.unlam.mobile.scaffolding.application.port.out.routing.RoutingApiKeyProvider
+import ar.edu.unlam.mobile.scaffolding.application.port.out.routing.RoutingRepository
+import ar.edu.unlam.mobile.scaffolding.application.service.routing.GetRouteInteractor
 import ar.edu.unlam.mobile.scaffolding.data.datasources.camera.CameraXSessionAdapter
 import ar.edu.unlam.mobile.scaffolding.data.datasources.device.health.HealthConnectDataSource
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.ClinicDao
@@ -14,12 +18,16 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.local.database.AppDataba
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.database.ClinicsDataBase
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.data.datasources.location.BuildConfigApiKeyProviderImpl
+import ar.edu.unlam.mobile.scaffolding.data.datasources.location.BuildConfigRoutingApiKeyProviderImpl
 import ar.edu.unlam.mobile.scaffolding.data.datasources.location.LocationDataSource
+import ar.edu.unlam.mobile.scaffolding.data.datasources.network.apiRouting.RoutingApi
+import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.Constants
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.AccelerometerDataSource
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.LightSensorDataSource
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.StepCounterDataSource
 import ar.edu.unlam.mobile.scaffolding.data.repositories.DataBaseLocationRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repositories.RehabRepositoryImpl
+import ar.edu.unlam.mobile.scaffolding.data.repositories.RoutingRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repositories.UserRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.domain.ports.camera.CameraSessionPort
 import ar.edu.unlam.mobile.scaffolding.domain.ports.location.ApiKeyProvider
@@ -27,12 +35,16 @@ import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseLocationRep
 import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
+import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -40,21 +52,50 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
+    fun providesRoutingRepository(
+        api: RoutingApi,
+        routingApiKeyProvider: RoutingApiKeyProvider,
+    ): RoutingRepository =
+        RoutingRepositoryImpl(
+            api = api,
+            routingApiKeyProvider = routingApiKeyProvider,
+        )
+
+    @Provides
+    @Singleton
+    fun providesGetRouteUsecase(routeRepo: RoutingRepository): GetRouteUseCase =
+        GetRouteInteractor(routRepo = routeRepo)
+
+    @Provides
+    @Singleton
+    fun providesRetrofit(): Retrofit =
+        Retrofit
+            .Builder()
+            .baseUrl(Constants.GRAPH_HOPPER_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+    @Provides
+    @Singleton
+    fun providesRoutingApi(retrofit: Retrofit): RoutingApi = retrofit.create(RoutingApi::class.java)
+
+    @Provides
+    @Singleton
     fun providesFirebaseAuth(
         @ApplicationContext context: Context,
     ): FirebaseAuth {
-        if (com.google.firebase.FirebaseApp
+        if (FirebaseApp
                 .getApps(context)
                 .isEmpty()
         ) {
             val options =
-                com.google.firebase.FirebaseOptions
+                FirebaseOptions
                     .Builder()
                     .setApiKey("dummy_api_key")
                     .setApplicationId("ar.edu.unlam.mobile.scaffolding")
                     .setProjectId("dummy-project")
                     .build()
-            com.google.firebase.FirebaseApp
+            FirebaseApp
                 .initializeApp(context, options)
         }
         return FirebaseAuth.getInstance()
@@ -107,6 +148,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideApiKeyProvider(): ApiKeyProvider = BuildConfigApiKeyProviderImpl()
+
+    @Provides
+    @Singleton
+    fun provideRoutingApiKeyProvider(): RoutingApiKeyProvider = BuildConfigRoutingApiKeyProviderImpl()
 
     @Provides
     @Singleton

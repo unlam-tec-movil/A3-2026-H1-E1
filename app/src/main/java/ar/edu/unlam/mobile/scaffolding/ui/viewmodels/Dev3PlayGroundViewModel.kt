@@ -3,13 +3,21 @@ package ar.edu.unlam.mobile.scaffolding.ui.viewmodels
 import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ar.edu.unlam.mobile.scaffolding.application.port.inn.routing.GetRouteUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsFromAssetsUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsStoredUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.ObserverLocationUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.PopulateClinicsDbUseCase
+import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.RouteResponse
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.maptiler.maptilersdk.helpers.MTDashArrayOption
+import com.maptiler.maptilersdk.helpers.MTNumberOrZoomNumberValues
+import com.maptiler.maptilersdk.helpers.MTPolylineLayerHelper
+import com.maptiler.maptilersdk.helpers.MTPolylineLayerOptions
+import com.maptiler.maptilersdk.helpers.MTStringOrZoomStringValues
 import com.maptiler.maptilersdk.map.style.MTStyle
 import com.maptiler.maptilersdk.map.style.source.MTGeoJSONSource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,10 +35,11 @@ class Dev3PlayGroundViewModel
         private val getClinicsFromAssetsUseCase: GetClinicsFromAssetsUseCase,
         private val populateClinicsDbUseCase: PopulateClinicsDbUseCase,
         private val getClinicsStoredUseCase: GetClinicsStoredUseCase,
+        private val getRouteUseCase: GetRouteUseCase,
     ) : ViewModel() {
         @Suppress("ktlint:standard:backing-property-naming")
-        private val _locationUiState = MutableStateFlow(LocationUiSate())
-        val locationUiState = _locationUiState.asStateFlow()
+        private val _mapScreenUiState = MutableStateFlow(LocationUiSate())
+        val mapScreenUiState = _mapScreenUiState.asStateFlow()
 
         init {
             viewModelScope.launch {
@@ -40,7 +49,7 @@ class Dev3PlayGroundViewModel
                             val clinicsFromAssets = getClinicsFromAssetsUseCase()
                             populateClinicsDbUseCase(clinicsFromAssets)
                         }
-                        _locationUiState.update {
+                        _mapScreenUiState.update {
                             it.copy(
                                 isLoadingClinics = false,
                                 clinicsLoadSuccess = true,
@@ -49,7 +58,7 @@ class Dev3PlayGroundViewModel
                         }
                     }
                 } catch (e: Exception) {
-                    _locationUiState.update {
+                    _mapScreenUiState.update {
                         it.copy(
                             isLoadingClinics = false,
                             clinicsLoadSuccess = false,
@@ -63,7 +72,7 @@ class Dev3PlayGroundViewModel
         fun onLocationPermissionGranted() {
             viewModelScope.launch {
                 observerLocationUseCase().collect { location ->
-                    _locationUiState.update { currentState ->
+                    _mapScreenUiState.update { currentState ->
                         currentState.copy(
                             location = location,
                             showMap = true,
@@ -76,11 +85,79 @@ class Dev3PlayGroundViewModel
         }
 
         fun onPermissionCheckComplete(granted: Boolean) {
-            _locationUiState.update {
+            _mapScreenUiState.update {
                 it.copy(
                     permissionGranted = granted,
                     isLoadingPermission = false,
                 )
+            }
+        }
+
+        fun onCreateRouteClick(
+            style: MTStyle,
+            clinicSelected: Clinic,
+        ) {
+            viewModelScope.launch {
+                val response: RouteResponse =
+                    getRouteUseCase.invoke(
+                        origin =
+                            LatLng(
+                                _mapScreenUiState.value.location!!.latitude,
+                                _mapScreenUiState.value.location!!.longitude,
+                            ),
+                        destination =
+                            LatLng(
+                                clinicSelected.lat,
+                                clinicSelected.lng,
+                            ),
+                    )
+                val points = response.paths[0].points
+                val feature =
+                    JsonObject().apply {
+                        addProperty("type", "Feature")
+                        add("properties", JsonObject())
+                        add(
+                            "geometry",
+                            JsonObject().apply {
+                                addProperty("type", "LineString")
+                                add(
+                                    "coordinates",
+                                    JsonArray().apply {
+                                        points.coordinates.forEach { coordenadas ->
+                                            add(
+                                                JsonArray().apply {
+                                                    add(coordenadas[0])
+                                                    add(coordenadas[1])
+                                                },
+                                            )
+                                        }
+                                    },
+                                )
+                            },
+                        )
+                    }
+                val featureCollection =
+                    JsonObject().apply {
+                        addProperty("type", "FeatureCollection")
+                        add("features", JsonArray().apply { add(feature) })
+                    }
+                val lineGeoJson = featureCollection.toString()
+
+                style.removeLayerById("basic-polyline")
+                style.removeSourceById("basic-polyline-source")
+
+                val helper: MTPolylineLayerHelper = style.polylineHelper()
+                val opts =
+                    MTPolylineLayerOptions(
+                        data = lineGeoJson,
+                        layerId = "basic-polyline",
+                        sourceId = "basic-polyline-source",
+                        lineColor = MTStringOrZoomStringValues.StringValue("#E63946"),
+                        lineWidth = MTNumberOrZoomNumberValues.Number(3.0),
+                        lineOpacity = MTNumberOrZoomNumberValues.Number(0.9),
+                        lineDashArray = MTDashArrayOption.Numbers(listOf(2.0, 1.0)),
+                    )
+                helper.addPolyline(opts)
             }
         }
 
@@ -130,18 +207,23 @@ class Dev3PlayGroundViewModel
                                 jsonString = featureCollection.toString(),
                             ),
                         )
-
-//                        style.addLayer(
-//                            MTCircleLayer(
-//                                identifier = "clinicPoints",
-//                                sourceIdentifier = "clinics",
-//                            ).apply {
-//                                colorConst(android.graphics.Color.BLUE)
-//                                radiusConst(8.0)
-//                            },
-//                        )
                     }
                 }
+            }
+        }
+
+        fun onSearchBarInputChange(newValue: String) {
+            _mapScreenUiState.update { currentState ->
+                currentState.copy(searchBarText = newValue)
+            }
+        }
+
+        fun onClinicSelectedChange(
+            newClinic: Clinic,
+            style: MTStyle?,
+        ) {
+            _mapScreenUiState.update { currentState ->
+                currentState.copy(selectedClinic = newClinic)
             }
         }
 
@@ -154,5 +236,14 @@ class Dev3PlayGroundViewModel
             val clinicsLoadSuccess: Boolean = false,
             val clinicsLoadError: String? = null,
             val clinics: List<Clinic> = emptyList(),
-        )
+            val selectedClinic: Clinic? = null,
+            var searchBarText: String = "",
+        ) {
+            val filteredClinics: List<Clinic>
+                get() =
+                    clinics.filter {
+                        it.name.contains(searchBarText, ignoreCase = true) &&
+                            searchBarText.isNotEmpty()
+                    }
+        }
     }

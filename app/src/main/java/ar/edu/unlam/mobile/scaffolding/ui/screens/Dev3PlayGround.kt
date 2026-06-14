@@ -6,27 +6,48 @@ import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CenterFocusStrong
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Healing
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +58,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ar.edu.unlam.mobile.scaffolding.R
+import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import ar.edu.unlam.mobile.scaffolding.ui.components.PulseRingUserLocationMarker
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.Dev3PlayGroundViewModel
 import com.maptiler.maptilersdk.annotations.MTCustomAnnotationView
@@ -56,8 +78,11 @@ import com.maptiler.maptilersdk.map.types.MTMapCorner
 @Composable
 fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
     val context = LocalContext.current
+    var searchBarState by remember { mutableStateOf<Boolean>(false) }
+    var showBottomSheetCard by remember { mutableStateOf<Boolean>(false) }
+    var showFabReposition by remember { mutableStateOf<Boolean>(true) }
 
-    val uiState by vm.locationUiState.collectAsStateWithLifecycle()
+    val uiState by vm.mapScreenUiState.collectAsStateWithLifecycle()
 
     val controller = remember { MTMapViewController(context = context) }
 
@@ -100,33 +125,33 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
     }
 
     Scaffold(floatingActionButton = {
-        FloatingActionButton(
-            onClick = {
-                uiState.location?.let { location ->
-                    controller.easeTo(
-                        cameraOptions =
-                            MTCameraOptions(
-                                center =
-                                    LngLat(
-                                        lng = location.longitude,
-                                        lat = location.latitude,
-                                    ),
-                            ),
+        if (showFabReposition) {
+            FloatingActionButton(
+                onClick = {
+                    uiState.location?.let { location ->
+                        controller.easeTo(
+                            cameraOptions =
+                                MTCameraOptions(
+                                    center =
+                                        LngLat(
+                                            lng = location.longitude,
+                                            lat = location.latitude,
+                                        ),
+                                ),
+                        )
+                    }
+                },
+                modifier = Modifier.padding(bottom = 75.dp),
+                shape = RoundedCornerShape(30.dp),
+                content = {
+                    Icon(
+                        imageVector = Icons.Filled.CenterFocusStrong,
+                        modifier = Modifier,
+                        contentDescription = "",
                     )
-                }
-            },
-            modifier = Modifier.padding(bottom = 75.dp),
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            shape = RoundedCornerShape(30.dp),
-            content = {
-                Icon(
-                    imageVector = Icons.Filled.CenterFocusStrong,
-                    modifier = Modifier,
-                    tint = MaterialTheme.colorScheme.primary,
-                    contentDescription = "",
-                )
-            },
-        )
+                },
+            )
+        }
     }, floatingActionButtonPosition = FabPosition.End) { paddingValues ->
         Column(
             modifier =
@@ -150,7 +175,11 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
                 }
 
                 uiState.permissionGranted && uiState.showMap && uiState.location != null -> {
-                    Box(Modifier.weight(1f)) {
+                    Box(
+                        Modifier
+                            .weight(1f)
+                            .fillMaxSize(),
+                    ) {
                         MTMapView(
                             referenceStyle = MTMapReferenceStyle.OPENSTREETMAP,
                             options =
@@ -163,12 +192,67 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
                                         ),
                                     highFrequencyEventThrottleMs = 16,
                                     logoPosition = MTMapCorner.BOTTOM_RIGHT,
-                                    navigationControlIsVisible = true,
                                 ),
                             controller = controller,
                             modifier = Modifier.fillMaxSize(),
-                            styleVariant = MTMapStyleVariant.LIGHT,
+                            styleVariant = MTMapStyleVariant.DARK,
                         )
+                        DockedSearchBar(
+                            shape = RoundedCornerShape(8.dp),
+                            modifier =
+                                Modifier
+                                    .align(Alignment.TopCenter)
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                                    .padding(top = 8.dp),
+                            onExpandedChange = { searchBarState = it },
+                            expanded = searchBarState,
+                            inputField = {
+                                SearchBarDefaults.InputField(
+                                    query = uiState.searchBarText,
+                                    onQueryChange = { newValue -> vm.onSearchBarInputChange(newValue = newValue) },
+                                    onSearch = { searchBarState = !searchBarState },
+                                    expanded = searchBarState,
+                                    placeholder = { Text("Search clinics...") },
+                                    onExpandedChange = { searchBarState = !searchBarState },
+                                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "") },
+                                    trailingIcon = {
+                                        if (uiState.searchBarText.isNotEmpty()) {
+                                            IconButton(onClick = { vm.onSearchBarInputChange("") }) {
+                                                Icon(Icons.Default.Close, contentDescription = null)
+                                            }
+                                        }
+                                    },
+                                )
+                            },
+                        ) {
+                            if (uiState.filteredClinics.isNotEmpty()) {
+                                Column(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .verticalScroll(rememberScrollState()),
+                                ) {
+                                    uiState.filteredClinics.forEach { clinic ->
+                                        ListItem(
+                                            headlineContent = { Text(clinic.name) },
+                                            supportingContent = { Text(clinic.phone) },
+                                            leadingContent = { Icon(Icons.Default.Healing, null) },
+                                            modifier =
+                                                Modifier.clickable {
+                                                    controller.easeTo(
+                                                        cameraOptions =
+                                                            MTCameraOptions(
+                                                                center = LngLat(lng = clinic.lng, lat = clinic.lat),
+                                                                zoom = 14.0,
+                                                            ),
+                                                    )
+                                                    searchBarState = !searchBarState
+                                                },
+                                        )
+                                    }
+                                }
+                            }
+                        }
 
                         MTCustomAnnotationView(
                             controller = controller,
@@ -182,6 +266,7 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
                             PulseRingUserLocationMarker(
                                 iconRes = R.drawable.gambapp_logo_opt3_round,
                                 ringColor = Color(0xFF2196F3).copy(alpha = 0.5f),
+                                onRingClicked = {},
                             )
                         }
 
@@ -196,7 +281,37 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
                                     ),
                                 modifier = Modifier,
                             ) {
-                                PulseRingUserLocationMarker()
+                                PulseRingUserLocationMarker(onRingClicked = {
+                                    showBottomSheetCard = true
+                                    showFabReposition = false
+                                    vm.onClinicSelectedChange(clinic, controller.style)
+                                })
+                            }
+                        }
+                        Column(
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            AnimatedVisibility(
+                                visible = showBottomSheetCard,
+                                enter = scaleIn() + expandVertically(),
+                                exit = scaleOut() + shrinkVertically(),
+                            ) {
+                                uiState.selectedClinic?.let { clinicSelected ->
+                                    BottomSheetCard(
+                                        modifier = Modifier,
+                                        clinic = clinicSelected,
+                                        onCloseClick = {
+                                            showBottomSheetCard = false
+                                            showFabReposition = true
+                                        },
+                                        onGenerateRouteClick = {
+                                            showBottomSheetCard = false
+                                            showFabReposition = true
+                                            vm.onCreateRouteClick(style = controller.style!!, clinicSelected)
+                                        },
+                                    )
+                                }
                             }
                         }
                     }
@@ -231,30 +346,26 @@ fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
     }
 }
 
-// FloatingActionButton(
-// onClick = {
-//    uiState.location?.let { location ->
-//        controller.easeTo(
-//            cameraOptions =
-//                MTCameraOptions(
-//                    center =
-//                        LngLat(
-//                            lng = location.longitude,
-//                            lat = location.latitude,
-//                        ),
-//                ),
-//        )
-//    }
-// },
-// modifier = Modifier,
-// containerColor = MaterialTheme.colorScheme.primaryContainer,
-// shape = RoundedCornerShape(30.dp),
-// content = {
-//    Icon(
-//        imageVector = Icons.Filled.CenterFocusStrong,
-//        modifier = Modifier,
-//        tint = MaterialTheme.colorScheme.primary,
-//        contentDescription = "",
-//    )
-// },
-// )
+@Composable
+fun BottomSheetCard(
+    clinic: Clinic,
+    modifier: Modifier = Modifier,
+    onCloseClick: () -> Unit,
+    onGenerateRouteClick: () -> Unit,
+) {
+    Card(
+        modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 90.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = clinic.name, style = MaterialTheme.typography.titleLarge)
+            Text(text = clinic.address, style = MaterialTheme.typography.bodyMedium)
+            Row(modifier = modifier.fillMaxWidth()) {
+                OutlinedButton(onClick = { onCloseClick() }) { Text(text = "Hide card") }
+                OutlinedButton(onClick = { onGenerateRouteClick() }) { Text(text = "Generate route") }
+            }
+        }
+    }
+}

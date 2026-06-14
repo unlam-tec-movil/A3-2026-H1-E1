@@ -11,7 +11,7 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose.compiler)
-    // id("com.google.gms.google-services")
+    id("com.google.gms.google-services")
 }
 
 tasks.withType<KotlinCompile>().configureEach {
@@ -29,6 +29,7 @@ if (localPropertiesFile.exists()) {
     localPropertiesFile.inputStream().use { localProperties.load(it) }
 }
 val apiKey: String = (localProperties.getProperty("API_KEY") ?: "").trim { it == '"' }
+val graphHopperApiKey: String = (localProperties.getProperty("GRAPH_HOPPER_API_KEY") ?: "").trim { it == '"' }
 android {
 
     namespace = "ar.edu.unlam.mobile.scaffolding"
@@ -36,6 +37,7 @@ android {
 
     defaultConfig {
         buildConfigField("String", "API_KEY", "\"${apiKey}\"")
+        buildConfigField("String", "GRAPH_HOPPER_API_KEY", "\"${graphHopperApiKey}\"")
         applicationId = "ar.edu.unlam.mobile.scaffolding"
         minSdk = 26
         targetSdk = 36
@@ -207,4 +209,7 @@ android {
         // Coroutine test support
         testImplementation(libs.kotlinx.coroutines.test)
     }
+}
+dependencies {
+    implementation(libs.androidx.compose.animation)
 }

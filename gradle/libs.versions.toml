@@ -27,6 +27,7 @@ coroutines = "1.8.0"
 junit5 = "5.10.0"
 sqliteBundled = "2.5.0-alpha11"
 robolectric = "4.12.1"
+animation = "1.11.2"
 
 
 [libraries]
@@ -70,6 +71,7 @@ maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = 
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
+androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation" }
 
 
 [plugins]
