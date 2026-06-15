@@ -1,7 +1,7 @@
 package ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao
 
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.database.BaseIntegrationTest
-import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.ClinicEntity
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.AppClinicEntity
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.double
 import io.kotest.property.arbitrary.int
@@ -17,14 +17,14 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class StoredClinicsDaoIntegrationTest : BaseIntegrationTest() {
-    private val dao get() = database.getStoredClinicsDao()
+    private val dao get() = database.clinicDao()
 
     @Test
     fun `insert and retrieve clinic`() =
         runTest {
             // Arrange
             val clinic =
-                ClinicEntity(
+                AppClinicEntity(
                     id = 1,
                     name = "Test Clinic",
                     address = "123 Street",
@@ -36,7 +36,7 @@ class StoredClinicsDaoIntegrationTest : BaseIntegrationTest() {
 
             // Act
             dao.insertClinic(clinic)
-            val result = dao.getStoredClinics().first()
+            val result = dao.getClinics().first()
 
             // Assert
             Assert.assertEquals(1, result.size)
@@ -49,8 +49,8 @@ class StoredClinicsDaoIntegrationTest : BaseIntegrationTest() {
             // Arrange
             val clinics =
                 listOf(
-                    ClinicEntity(1, "Clinic A", "", "", "", 0.0, 0.0),
-                    ClinicEntity(2, "Clinic B", "", "", "", 0.0, 0.0),
+                    AppClinicEntity(1, "Clinic A", "", "", "", 0.0, 0.0),
+                    AppClinicEntity(2, "Clinic B", "", "", "", 0.0, 0.0),
                 )
 
             // Act
@@ -66,7 +66,7 @@ class StoredClinicsDaoIntegrationTest : BaseIntegrationTest() {
         runTest {
             // Arrange
             val clinic =
-                ClinicEntity(
+                AppClinicEntity(
                     id = 10,
                     name = "Clínica de Rehabilitación e Investigación",
                     address = "Av. de Mayo 1370, 5° piso",
@@ -78,7 +78,7 @@ class StoredClinicsDaoIntegrationTest : BaseIntegrationTest() {
 
             // Act
             dao.insertClinic(clinic)
-            val result = dao.getStoredClinics().first().find { it.id == 10 }
+            val result = dao.getClinics().first().find { it.id == 10 }
 
             // Assert
             Assert.assertNotNull(result)
@@ -93,7 +93,7 @@ class StoredClinicsDaoIntegrationTest : BaseIntegrationTest() {
             val lat = -34.64666797
             val lng = -58.5721729
             val clinic =
-                ClinicEntity(
+                AppClinicEntity(
                     id = 20,
                     name = "Precision Test",
                     address = "",
@@ -105,7 +105,7 @@ class StoredClinicsDaoIntegrationTest : BaseIntegrationTest() {
 
             // Act
             dao.insertClinic(clinic)
-            val result = dao.getStoredClinics().first().first { it.id == 20 }
+            val result = dao.getClinics().first().first { it.id == 20 }
 
             // Assert
             Assert.assertEquals(lat, result.lat, 0.000000001)
@@ -116,13 +116,13 @@ class StoredClinicsDaoIntegrationTest : BaseIntegrationTest() {
     fun `insertClinic with same id replaces existing entry`() =
         runTest {
             // Arrange
-            val original = ClinicEntity(1, "Original", "", "", "", 0.0, 0.0)
-            val replacement = ClinicEntity(1, "Replacement", "New Address", "", "", 1.1, 1.1)
+            val original = AppClinicEntity(1, "Original", "", "", "", 0.0, 0.0)
+            val replacement = AppClinicEntity(1, "Replacement", "New Address", "", "", 1.1, 1.1)
 
             // Act
             dao.insertClinic(original)
             dao.insertClinic(replacement)
-            val result = dao.getStoredClinics().first()
+            val result = dao.getClinics().first()
 
             // Assert
             Assert.assertEquals(1, result.size)
@@ -143,7 +143,7 @@ class StoredClinicsDaoIntegrationTest : BaseIntegrationTest() {
             ) { id, name, lat, lng ->
                 // Arrange
                 val clinic =
-                    ClinicEntity(
+                    AppClinicEntity(
                         id = id,
                         name = name,
                         address = "Random Address ${Arb.string(5).next()}",
@@ -155,7 +155,7 @@ class StoredClinicsDaoIntegrationTest : BaseIntegrationTest() {
 
                 // Act
                 dao.insertClinic(clinic)
-                val result = dao.getStoredClinics().first().find { it.id == id }
+                val result = dao.getClinics().first().find { it.id == id }
 
                 // Assert
                 Assert.assertNotNull("Clinic with id $id should be found", result)

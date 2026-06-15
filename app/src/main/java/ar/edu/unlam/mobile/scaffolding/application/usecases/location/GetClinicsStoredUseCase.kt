@@ -10,5 +10,5 @@ class GetClinicsStoredUseCase
     constructor(
         private val dataBaseRepositoryImpl: DataBaseLocationRepositoryPort,
     ) {
-        operator fun invoke(): Flow<List<Clinic>> = dataBaseRepositoryImpl.getStoredClinics()
+        operator fun invoke(): Flow<List<Clinic>> = dataBaseRepositoryImpl.getClinics()
     }

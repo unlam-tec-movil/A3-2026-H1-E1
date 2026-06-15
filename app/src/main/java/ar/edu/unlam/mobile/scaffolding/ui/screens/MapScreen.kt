@@ -60,7 +60,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import ar.edu.unlam.mobile.scaffolding.ui.components.PulseRingUserLocationMarker
-import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.Dev3PlayGroundViewModel
+import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.MapScreenViewModel
 import com.maptiler.maptilersdk.annotations.MTCustomAnnotationView
 import com.maptiler.maptilersdk.events.MTEvent
 import com.maptiler.maptilersdk.map.LngLat
@@ -76,7 +76,7 @@ import com.maptiler.maptilersdk.map.types.MTMapCorner
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Dev3PlayGround(vm: Dev3PlayGroundViewModel = hiltViewModel()) {
+fun Dev3PlayGround(vm: MapScreenViewModel = hiltViewModel()) {
     val context = LocalContext.current
     var searchBarState by remember { mutableStateOf<Boolean>(false) }
     var showBottomSheetCard by remember { mutableStateOf<Boolean>(false) }

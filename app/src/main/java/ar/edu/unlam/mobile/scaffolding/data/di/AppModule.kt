@@ -9,13 +9,11 @@ import ar.edu.unlam.mobile.scaffolding.application.port.out.routing.RoutingRepos
 import ar.edu.unlam.mobile.scaffolding.application.service.routing.GetRouteInteractor
 import ar.edu.unlam.mobile.scaffolding.data.datasources.camera.CameraXSessionAdapter
 import ar.edu.unlam.mobile.scaffolding.data.datasources.device.health.HealthConnectDataSource
-import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.ClinicDao
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.ClinicsDao
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.ExerciseDao
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.SessionDao
-import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.StoredClinicsDao
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.UserDao
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.database.AppDatabase
-import ar.edu.unlam.mobile.scaffolding.data.datasources.local.database.ClinicsDataBase
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.data.datasources.location.BuildConfigApiKeyProviderImpl
 import ar.edu.unlam.mobile.scaffolding.data.datasources.location.LocationDataSource
@@ -136,18 +134,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesClinicsDatabase(context: Application): ClinicsDataBase =
-        Room
-            .databaseBuilder(
-                context = context,
-                klass = ClinicsDataBase::class.java,
-                name = "storedClinicsDB",
-            ).fallbackToDestructiveMigration()
-            .build()
-
-    @Provides
-    @Singleton
-    fun providesApiKeyProvider(): ApiKeyProvider = BuildConfigApiKeyProviderImpl()
+    fun providesMapApiKeyProvider(): ApiKeyProvider = BuildConfigApiKeyProviderImpl()
 
     @Provides
     @Singleton
@@ -155,12 +142,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesStoredClinicsDao(db: ClinicsDataBase): StoredClinicsDao = db.getStoredClinicsDao()
-
-    @Provides
-    @Singleton
     fun providesDataBaseRepository(
-        dao: StoredClinicsDao,
+        dao: ClinicsDao,
         @ApplicationContext context: Context,
     ): DataBaseLocationRepositoryPort = DataBaseLocationRepositoryImpl(clinicsDao = dao, context)
 
@@ -181,7 +164,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesClinicDao(db: AppDatabase): ClinicDao = db.clinicDao()
+    fun providesClinicDao(db: AppDatabase): ClinicsDao = db.clinicDao()
 
     @Provides
     @Singleton

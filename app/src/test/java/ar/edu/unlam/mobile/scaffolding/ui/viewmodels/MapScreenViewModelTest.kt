@@ -33,7 +33,7 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class Dev3PlayGroundViewModelTest {
+class MapScreenViewModelTest {
     private val observerLocationUseCase = mockk<ObserverLocationUseCase>(relaxed = true)
     private val getClinicsFromAssetsUseCase = mockk<GetClinicsFromAssetsUseCase>(relaxed = true)
     private val populateClinicsDbUseCase = mockk<PopulateClinicsDbUseCase>(relaxed = true)
@@ -41,7 +41,7 @@ class Dev3PlayGroundViewModelTest {
     private val getRouteUseCase = mockk<GetRouteUseCase>(relaxed = true)
 
     private val testDispatcher = StandardTestDispatcher()
-    private lateinit var viewModel: Dev3PlayGroundViewModel
+    private lateinit var viewModel: MapScreenViewModel
 
     @Before
     fun setUp() {
@@ -55,7 +55,7 @@ class Dev3PlayGroundViewModelTest {
 
     private fun createViewModel() {
         viewModel =
-            Dev3PlayGroundViewModel(
+            MapScreenViewModel(
                 observerLocationUseCase,
                 getClinicsFromAssetsUseCase,
                 populateClinicsDbUseCase,

@@ -47,7 +47,7 @@ class GetClinicsStoredUseCaseTest {
                     ),
                 )
 
-            every { mockRepository.getStoredClinics() } returns flowOf(clinics)
+            every { mockRepository.getClinics() } returns flowOf(clinics)
 
             // Act
             val flow = useCase()
@@ -58,14 +58,14 @@ class GetClinicsStoredUseCaseTest {
             assertEquals(2, collectedClinics?.size)
             assertEquals(clinics[0].name, collectedClinics?.get(0)?.name)
             assertEquals(clinics[1].name, collectedClinics?.get(1)?.name)
-            verify { mockRepository.getStoredClinics() }
+            verify { mockRepository.getClinics() }
         }
 
     @Test
     fun `invoke returns empty flow when no clinics stored`() =
         runTest {
             // Arrange
-            every { mockRepository.getStoredClinics() } returns flowOf(emptyList())
+            every { mockRepository.getClinics() } returns flowOf(emptyList())
 
             // Act
             val flow = useCase()
@@ -74,7 +74,7 @@ class GetClinicsStoredUseCaseTest {
 
             // Assert
             assertEquals(0, collectedClinics?.size)
-            verify { mockRepository.getStoredClinics() }
+            verify { mockRepository.getClinics() }
         }
 
     @Test
@@ -94,7 +94,7 @@ class GetClinicsStoredUseCaseTest {
                     )
                 }
 
-            every { mockRepository.getStoredClinics() } returns flowOf(clinics)
+            every { mockRepository.getClinics() } returns flowOf(clinics)
 
             // Act
             val flow = useCase()
@@ -103,7 +103,7 @@ class GetClinicsStoredUseCaseTest {
 
             // Assert
             assertEquals(10, collectedClinics?.size)
-            verify { mockRepository.getStoredClinics() }
+            verify { mockRepository.getClinics() }
         }
 
     @Test
@@ -121,7 +121,7 @@ class GetClinicsStoredUseCaseTest {
                     lng = -58.5601,
                 )
 
-            every { mockRepository.getStoredClinics() } returns flowOf(listOf(clinic))
+            every { mockRepository.getClinics() } returns flowOf(listOf(clinic))
 
             // Act
             val flow = useCase()
@@ -137,13 +137,13 @@ class GetClinicsStoredUseCaseTest {
     fun `invoke delegates to repository getStoredClinics`() =
         runTest {
             // Arrange
-            every { mockRepository.getStoredClinics() } returns flowOf(emptyList())
+            every { mockRepository.getClinics() } returns flowOf(emptyList())
 
             // Act
             useCase()
 
             // Assert
-            verify { mockRepository.getStoredClinics() }
+            verify { mockRepository.getClinics() }
         }
 
     @Test
@@ -161,7 +161,7 @@ class GetClinicsStoredUseCaseTest {
                     lng = -58.567890,
                 )
 
-            every { mockRepository.getStoredClinics() } returns flowOf(listOf(clinic))
+            every { mockRepository.getClinics() } returns flowOf(listOf(clinic))
 
             // Act
             val flow = useCase()
@@ -190,7 +190,7 @@ class GetClinicsStoredUseCaseTest {
                     Clinic(2, "Clinic 2", "Address 2", "+456", "", -34.1, -58.1),
                 )
 
-            every { mockRepository.getStoredClinics() } returns flowOf(clinics)
+            every { mockRepository.getClinics() } returns flowOf(clinics)
 
             // Act
             val flow = useCase()

@@ -54,7 +54,7 @@ class AppModuleTest {
 
     @Test
     fun `providesApikey should return a ApiKeyProvider instance`() {
-        val provider = AppModule.providesApiKeyProvider()
+        val provider = AppModule.providesMapApiKeyProvider()
         assertNotNull(provider)
         assertTrue(provider is ApiKeyProvider)
     }
