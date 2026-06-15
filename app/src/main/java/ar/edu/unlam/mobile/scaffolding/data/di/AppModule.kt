@@ -147,11 +147,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideApiKeyProvider(): ApiKeyProvider = BuildConfigApiKeyProviderImpl()
+    fun providesApiKeyProvider(): ApiKeyProvider = BuildConfigApiKeyProviderImpl()
 
     @Provides
     @Singleton
-    fun provideRoutingApiKeyProvider(): RoutingApiKeyProvider = BuildConfigRoutingApiKeyProviderImpl()
+    fun providesRoutingApiKeyProvider(): RoutingApiKeyProvider = BuildConfigRoutingApiKeyProviderImpl()
 
     @Provides
     @Singleton
