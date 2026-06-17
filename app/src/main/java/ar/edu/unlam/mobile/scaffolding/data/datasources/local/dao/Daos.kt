@@ -1,7 +1,12 @@
 package ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao
 
-import androidx.room.*
-import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.AppClinicEntity
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.SessionEntity
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.UserEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,13 +25,27 @@ interface UserDao {
 }
 
 @Dao
-interface ClinicDao {
-    @Query("SELECT * FROM clinics")
-    fun getAllClinics(): Flow<List<AppClinicEntity>>
-
+interface ClinicsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertClinics(clinics: List<AppClinicEntity>)
+    suspend fun insertClinic(c: AppClinicEntity)
+
+    @Query("SELECT * FROM clinics ORDER BY id DESC")
+    fun getClinics(): Flow<List<AppClinicEntity>>
+
+    @Insert
+    suspend fun insertAll(clinics: List<AppClinicEntity>)
+
+    @Query("SELECT COUNT(*) FROM clinics")
+    suspend fun getClinicCount(): Int
 }
+// @Dao
+// interface ClinicsDao {
+//    @Query("SELECT * FROM clinics")
+//    fun getAllClinics(): Flow<List<AppClinicEntity>>
+//
+//    @Insert(onConflict = OnConflictStrategy.REPLACE)
+//    suspend fun insertClinics(clinics: List<AppClinicEntity>)
+// }
 
 @Dao
 interface SessionDao {

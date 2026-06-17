@@ -11,14 +11,25 @@ data class UserEntity(
     val sessionToken: String?,
 )
 
+//
+// @Entity(tableName = "clinics")
+// data class AppClinicEntity(
+//    @PrimaryKey val id: String,
+//    val name: String,
+//    val address: String,
+//    val latitude: Double,
+//    val longitude: Double,
+//    val phone: String,
+// )
 @Entity(tableName = "clinics")
 data class AppClinicEntity(
-    @PrimaryKey val id: String,
+    @PrimaryKey val id: Int,
     val name: String,
     val address: String,
-    val latitude: Double,
-    val longitude: Double,
     val phone: String,
+    val website: String,
+    val lat: Double,
+    val lng: Double,
 )
 
 @Entity(tableName = "exercises")

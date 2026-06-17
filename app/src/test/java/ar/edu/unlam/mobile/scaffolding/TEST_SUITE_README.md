@@ -102,7 +102,7 @@ Tests the use case for retrieving stored clinics via Flow.
 
 ### 4. **DAO Tests**
 
-#### `StoredClinicsDaoTest.kt`
+#### `ClinicsDaoTest.kt`
 Tests database operations at the DAO level (mocked).
 
 **Tests:**

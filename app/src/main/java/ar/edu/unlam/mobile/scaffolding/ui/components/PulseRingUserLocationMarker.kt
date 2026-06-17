@@ -7,6 +7,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -31,6 +32,7 @@ private val RING_COLOR = Color(0xFFF32133).copy(alpha = 0.5f)
 fun PulseRingUserLocationMarker(
     iconRes: Int = R.drawable.ward_icon,
     ringColor: Color = RING_COLOR,
+    onRingClicked: () -> Unit,
 ) {
     val transition = rememberInfiniteTransition(label = "pulse")
     val scale by transition.animateFloat(
@@ -72,6 +74,7 @@ fun PulseRingUserLocationMarker(
             contentScale = ContentScale.Fit,
             modifier =
                 Modifier
+                    .clickable(enabled = true, onClick = { onRingClicked() })
                     .size(ICON_SIZE)
                     .clip(CircleShape),
         )

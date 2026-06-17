@@ -1,8 +1,8 @@
 package ar.edu.unlam.mobile.scaffolding.data.repositories
 
 import android.content.Context
-import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.StoredClinicsDao
-import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.ClinicEntity
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.ClinicsDao
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.AppClinicEntity
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -20,7 +20,7 @@ import org.junit.Test
 @Suppress("CheckResult", "UnusedFlow")
 class DataBaseLocationRepositoryImplTest {
     private lateinit var repository: DataBaseLocationRepositoryImpl
-    private val mockClinicDao: StoredClinicsDao = mockk()
+    private val mockClinicDao: ClinicsDao = mockk()
     private val mockContext: Context = mockk()
 
     @Before
@@ -29,12 +29,12 @@ class DataBaseLocationRepositoryImplTest {
     }
 
     @Test
-    fun `getStoredClinics returns flow of clinics from DAO`() =
+    fun `getClinics returns flow of clinics from DAO`() =
         runTest {
             // Arrange
             val clinicEntities =
                 listOf(
-                    ClinicEntity(
+                    AppClinicEntity(
                         id = 1,
                         name = "Clinic A",
                         address = "Address A",
@@ -43,7 +43,7 @@ class DataBaseLocationRepositoryImplTest {
                         lat = -34.6037,
                         lng = -58.5609,
                     ),
-                    ClinicEntity(
+                    AppClinicEntity(
                         id = 2,
                         name = "Clinic B",
                         address = "Address B",
@@ -54,10 +54,10 @@ class DataBaseLocationRepositoryImplTest {
                     ),
                 )
 
-            every { mockClinicDao.getStoredClinics() } returns flowOf(clinicEntities)
+            every { mockClinicDao.getClinics() } returns flowOf(clinicEntities)
 
             // Act
-            val result = repository.getStoredClinics()
+            val result = repository.getClinics()
             var clinics: List<Clinic>? = null
             result.collect { clinics = it }
 
@@ -65,17 +65,17 @@ class DataBaseLocationRepositoryImplTest {
             assertEquals(2, clinics?.size)
             assertEquals("Clinic A", clinics?.get(0)?.name)
             assertEquals("Clinic B", clinics?.get(1)?.name)
-            verify { mockClinicDao.getStoredClinics() }
+            verify { mockClinicDao.getClinics() }
         }
 
     @Test
-    fun `getStoredClinics returns empty flow when DAO returns no clinics`() =
+    fun `getClinics returns empty flow when DAO returns no clinics`() =
         runTest {
             // Arrange
-            every { mockClinicDao.getStoredClinics() } returns flowOf(emptyList())
+            every { mockClinicDao.getClinics() } returns flowOf(emptyList())
 
             // Act
-            val result = repository.getStoredClinics()
+            val result = repository.getClinics()
             var clinics: List<Clinic>? = null
             result.collect { clinics = it }
 

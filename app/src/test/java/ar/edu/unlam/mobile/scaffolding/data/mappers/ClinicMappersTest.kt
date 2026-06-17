@@ -1,6 +1,6 @@
 package ar.edu.unlam.mobile.scaffolding.data.mappers
 
-import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.ClinicEntity
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.AppClinicEntity
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -21,7 +21,7 @@ class ClinicMappersTest {
             )
 
         // Act
-        val entity = clinic.toEntity()
+        val entity = clinic.toAppEntity()
 
         // Assert
         assertEquals(42, entity.id)
@@ -48,7 +48,7 @@ class ClinicMappersTest {
             )
 
         // Act
-        val entity = clinic.toEntity()
+        val entity = clinic.toAppEntity()
 
         // Assert
         assertEquals("", entity.website)
@@ -69,7 +69,7 @@ class ClinicMappersTest {
             )
 
         // Act
-        val entity = clinic.toEntity()
+        val entity = clinic.toAppEntity()
 
         // Assert
         assertEquals("Kinesiología y Osteopatía Integral KIO", entity.name)
@@ -90,7 +90,7 @@ class ClinicMappersTest {
             )
 
         // Act
-        val entity = clinic.toEntity()
+        val entity = clinic.toAppEntity()
 
         // Assert
         assertEquals(-34.64168309, entity.lat, 0.00000001)
@@ -101,7 +101,7 @@ class ClinicMappersTest {
     fun `entity to clinic mapper preserves all fields`() {
         // Arrange
         val entity =
-            ClinicEntity(
+            AppClinicEntity(
                 id = 7,
                 name = "Kinesiología y Estética",
                 address = "25 de Mayo 27",
@@ -128,7 +128,7 @@ class ClinicMappersTest {
     fun `entity to clinic mapper handles empty website`() {
         // Arrange
         val entity =
-            ClinicEntity(
+            AppClinicEntity(
                 id = 1,
                 name = "Clinic Name",
                 address = "Address",
@@ -160,7 +160,7 @@ class ClinicMappersTest {
             )
 
         // Act
-        val entity = originalClinic.toEntity()
+        val entity = originalClinic.toAppEntity()
         val roundTripClinic = entity.toDomain()
 
         // Assert
@@ -177,7 +177,7 @@ class ClinicMappersTest {
     fun `entity to clinic mapper preserves precise coordinates`() {
         // Arrange
         val entity =
-            ClinicEntity(
+            AppClinicEntity(
                 id = 1,
                 name = "Clinic",
                 address = "Address",
@@ -210,7 +210,7 @@ class ClinicMappersTest {
             )
 
         // Act
-        val entity = clinic.toEntity()
+        val entity = clinic.toAppEntity()
 
         // Assert
         assertEquals(0.0, entity.lat, 0.0001)
@@ -232,7 +232,7 @@ class ClinicMappersTest {
             )
 
         // Act
-        val entity = clinic.toEntity()
+        val entity = clinic.toAppEntity()
 
         // Assert
         assertEquals(-90.0, entity.lat, 0.0001)

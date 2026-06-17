@@ -2,7 +2,7 @@ package ar.edu.unlam.mobile.scaffolding.data.datasources.local.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.ClinicDao
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.ClinicsDao
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.ExerciseDao
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.SessionDao
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.UserDao
@@ -16,13 +16,13 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.*
         SessionEntity::class,
         AchievementEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
 
-    abstract fun clinicDao(): ClinicDao
+    abstract fun clinicDao(): ClinicsDao
 
     abstract fun sessionDao(): SessionDao
 

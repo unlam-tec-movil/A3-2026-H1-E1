@@ -1,10 +1,10 @@
 package ar.edu.unlam.mobile.scaffolding.data.mappers
 
-import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.ClinicEntity
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.AppClinicEntity
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 
-fun Clinic.toEntity(): ClinicEntity =
-    ClinicEntity(
+fun AppClinicEntity.toDomain(): Clinic =
+    Clinic(
         id = id,
         name = name,
         address = address,
@@ -14,8 +14,8 @@ fun Clinic.toEntity(): ClinicEntity =
         lng = lng,
     )
 
-fun ClinicEntity.toDomain(): Clinic =
-    Clinic(
+fun Clinic.toAppEntity(): AppClinicEntity =
+    AppClinicEntity(
         id = id,
         name = name,
         address = address,

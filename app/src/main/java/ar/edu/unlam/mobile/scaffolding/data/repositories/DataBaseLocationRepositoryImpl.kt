@@ -1,9 +1,9 @@
 package ar.edu.unlam.mobile.scaffolding.data.repositories
 
 import android.content.Context
-import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.StoredClinicsDao
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.ClinicsDao
+import ar.edu.unlam.mobile.scaffolding.data.mappers.toAppEntity
 import ar.edu.unlam.mobile.scaffolding.data.mappers.toDomain
-import ar.edu.unlam.mobile.scaffolding.data.mappers.toEntity
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseLocationRepositoryPort
 import com.google.gson.Gson
@@ -17,18 +17,18 @@ import javax.inject.Inject
 class DataBaseLocationRepositoryImpl
     @Inject
     constructor(
-        private val clinicsDao: StoredClinicsDao,
+        private val clinicsDao: ClinicsDao,
         @ApplicationContext private val context: Context,
     ) : DataBaseLocationRepositoryPort {
-        override fun getStoredClinics(): Flow<List<Clinic>> =
-            clinicsDao.getStoredClinics().map { entities ->
+        override fun getClinics(): Flow<List<Clinic>> =
+            clinicsDao.getClinics().map { entities ->
                 entities.map { clinicEntity ->
                     clinicEntity.toDomain()
                 }
             }
 
         override suspend fun saveClinic(clinic: Clinic) {
-            clinicsDao.insertClinic(clinic.toEntity())
+            clinicsDao.insertClinic(clinic.toAppEntity())
         }
 
         override suspend fun deleteClinic(clinic: Clinic) {
@@ -42,7 +42,7 @@ class DataBaseLocationRepositoryImpl
         }
 
         override suspend fun saveAllClinics(clinics: List<Clinic>) {
-            clinicsDao.insertAll(clinics.map { it.toEntity() })
+            clinicsDao.insertAll(clinics.map { it.toAppEntity() })
         }
 
         override suspend fun hasStoredClinics(): Boolean = clinicsDao.getClinicCount() > 0

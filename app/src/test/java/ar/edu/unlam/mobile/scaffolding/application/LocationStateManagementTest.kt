@@ -47,7 +47,7 @@ class LocationStateManagementTest {
 
             every { mockRepository.getClinicsFromAssets() } returns assetsClinicss
             coEvery { mockRepository.saveAllClinics(any()) } returns Unit
-            every { mockRepository.getStoredClinics() } returns flowOf(assetsClinicss)
+            every { mockRepository.getClinics() } returns flowOf(assetsClinicss)
 
             // Act - Step 1: Load from assets
             val assetsLoaded = getClinicsFromAssetsUseCase()
@@ -84,7 +84,7 @@ class LocationStateManagementTest {
 
             every { mockRepository.getClinicsFromAssets() } returns listOf(clinic)
             coEvery { mockRepository.saveAllClinics(any()) } returns Unit
-            every { mockRepository.getStoredClinics() } returns flowOf(listOf(clinic))
+            every { mockRepository.getClinics() } returns flowOf(listOf(clinic))
 
             // Act
             val loaded = getClinicsFromAssetsUseCase()
@@ -111,7 +111,7 @@ class LocationStateManagementTest {
             // Arrange
             every { mockRepository.getClinicsFromAssets() } returns emptyList()
             coEvery { mockRepository.saveAllClinics(any()) } returns Unit
-            every { mockRepository.getStoredClinics() } returns flowOf(emptyList())
+            every { mockRepository.getClinics() } returns flowOf(emptyList())
 
             // Act
             val loaded = getClinicsFromAssetsUseCase()
@@ -136,7 +136,7 @@ class LocationStateManagementTest {
 
             every { mockRepository.getClinicsFromAssets() } returns clinics
             coEvery { mockRepository.saveAllClinics(any()) } returns Unit
-            every { mockRepository.getStoredClinics() } returns flowOf(clinics)
+            every { mockRepository.getClinics() } returns flowOf(clinics)
 
             // Act
             val load1 = getClinicsFromAssetsUseCase()
@@ -190,7 +190,7 @@ class LocationStateManagementTest {
 
             every { mockRepository.getClinicsFromAssets() } returns largeClinics
             coEvery { mockRepository.saveAllClinics(any()) } returns Unit
-            every { mockRepository.getStoredClinics() } returns flowOf(largeClinics)
+            every { mockRepository.getClinics() } returns flowOf(largeClinics)
 
             // Act
             val loaded = getClinicsFromAssetsUseCase()
@@ -221,7 +221,7 @@ class LocationStateManagementTest {
 
             every { mockRepository.getClinicsFromAssets() } returns listOf(clinic)
             coEvery { mockRepository.saveAllClinics(any()) } returns Unit
-            every { mockRepository.getStoredClinics() } returns flowOf(listOf(clinic))
+            every { mockRepository.getClinics() } returns flowOf(listOf(clinic))
 
             // Act
             val loaded = getClinicsFromAssetsUseCase()
@@ -254,7 +254,7 @@ class LocationStateManagementTest {
 
             every { mockRepository.getClinicsFromAssets() } returns listOf(clinic)
             coEvery { mockRepository.saveAllClinics(any()) } returns Unit
-            every { mockRepository.getStoredClinics() } returns flowOf(listOf(clinic))
+            every { mockRepository.getClinics() } returns flowOf(listOf(clinic))
 
             // Act
             val loaded = getClinicsFromAssetsUseCase()
@@ -280,7 +280,7 @@ class LocationStateManagementTest {
 
             every { mockRepository.getClinicsFromAssets() } returns clinics
             coEvery { mockRepository.saveAllClinics(any()) } returns Unit
-            every { mockRepository.getStoredClinics() } returns flowOf(clinics)
+            every { mockRepository.getClinics() } returns flowOf(clinics)
 
             // Act
             getClinicsFromAssetsUseCase()
@@ -290,6 +290,6 @@ class LocationStateManagementTest {
             // Assert
             verify { mockRepository.getClinicsFromAssets() }
             coVerify { mockRepository.saveAllClinics(clinics) }
-            verify { mockRepository.getStoredClinics() }
+            verify { mockRepository.getClinics() }
         }
 }
