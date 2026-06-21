@@ -19,13 +19,13 @@ import org.junit.Test
 
 @Suppress("CheckResult", "UnusedFlow")
 class DataBaseLocationRepositoryImplTest {
-    private lateinit var repository: DataBaseLocationRepositoryImpl
+    private lateinit var repository: ClinicsRepositoryImpl
     private val mockClinicDao: ClinicsDao = mockk()
     private val mockContext: Context = mockk()
 
     @Before
     fun setUp() {
-        repository = DataBaseLocationRepositoryImpl(mockClinicDao, mockContext)
+        repository = ClinicsRepositoryImpl(mockClinicDao, mockContext)
     }
 
     @Test

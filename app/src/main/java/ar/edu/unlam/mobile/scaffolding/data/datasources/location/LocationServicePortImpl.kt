@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.os.Looper
-import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
+import ar.edu.unlam.mobile.scaffolding.application.port.out.local.location.LocationServicePort
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -14,7 +14,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
-class LocationDataSource(
+class LocationServicePortImpl(
     private val context: Context,
 ) : LocationServicePort {
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)

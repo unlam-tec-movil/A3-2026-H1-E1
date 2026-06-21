@@ -1,7 +1,7 @@
 package ar.edu.unlam.mobile.scaffolding.application.usecases.location
 
+import ar.edu.unlam.mobile.scaffolding.application.port.out.local.db.ClinicsRepositoryPort
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
-import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseLocationRepositoryPort
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -12,7 +12,7 @@ import org.junit.Test
 
 class GetClinicsFromAssetsUseCaseTest {
     private lateinit var useCase: GetClinicsFromAssetsUseCase
-    private val mockRepository: DataBaseLocationRepositoryPort = mockk()
+    private val mockRepository: ClinicsRepositoryPort = mockk()
 
     @Before
     fun setUp() {

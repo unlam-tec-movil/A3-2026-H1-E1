@@ -38,14 +38,6 @@ interface ClinicsDao {
     @Query("SELECT COUNT(*) FROM clinics")
     suspend fun getClinicCount(): Int
 }
-// @Dao
-// interface ClinicsDao {
-//    @Query("SELECT * FROM clinics")
-//    fun getAllClinics(): Flow<List<AppClinicEntity>>
-//
-//    @Insert(onConflict = OnConflictStrategy.REPLACE)
-//    suspend fun insertClinics(clinics: List<AppClinicEntity>)
-// }
 
 @Dao
 interface SessionDao {

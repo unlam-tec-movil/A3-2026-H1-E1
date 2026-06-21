@@ -41,5 +41,5 @@ sealed class Screen(
         fun createRoute(id: String) = "user/$id"
     }
 
-    object Dev3PlayGround : Screen("Dev3PlayGround")
+    object MapScreen : Screen("MapScreen")
 }

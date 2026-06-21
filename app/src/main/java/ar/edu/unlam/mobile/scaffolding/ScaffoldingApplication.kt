@@ -2,7 +2,7 @@ package ar.edu.unlam.mobile.scaffolding
 
 import android.app.Application
 import android.util.Log
-import ar.edu.unlam.mobile.scaffolding.domain.ports.location.ApiKeyProvider
+import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.map.ApiKeyProvider
 import com.maptiler.maptilersdk.MTConfig
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject

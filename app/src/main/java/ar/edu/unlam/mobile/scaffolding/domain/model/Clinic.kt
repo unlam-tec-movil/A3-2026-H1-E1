@@ -1,5 +1,8 @@
 package ar.edu.unlam.mobile.scaffolding.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Clinic(
     val id: Int,
     val name: String,

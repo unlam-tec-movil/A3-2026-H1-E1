@@ -1,6 +1,7 @@
 package ar.edu.unlam.mobile.scaffolding.application.service.routing
 
-import ar.edu.unlam.mobile.scaffolding.application.port.out.routing.RoutingRepository
+import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.routing.RoutingRepository
+import ar.edu.unlam.mobile.scaffolding.application.service.remote.routing.GetRouteInteractor
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.RouteResponse
 import com.google.android.gms.maps.model.LatLng
 import io.mockk.coEvery

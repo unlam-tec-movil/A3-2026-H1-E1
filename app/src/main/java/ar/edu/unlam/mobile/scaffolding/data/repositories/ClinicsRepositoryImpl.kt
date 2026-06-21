@@ -1,11 +1,11 @@
 package ar.edu.unlam.mobile.scaffolding.data.repositories
 
 import android.content.Context
+import ar.edu.unlam.mobile.scaffolding.application.port.out.local.db.ClinicsRepositoryPort
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.ClinicsDao
 import ar.edu.unlam.mobile.scaffolding.data.mappers.toAppEntity
 import ar.edu.unlam.mobile.scaffolding.data.mappers.toDomain
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
-import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseLocationRepositoryPort
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
@@ -14,12 +14,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class DataBaseLocationRepositoryImpl
+class ClinicsRepositoryImpl
     @Inject
     constructor(
         private val clinicsDao: ClinicsDao,
         @ApplicationContext private val context: Context,
-    ) : DataBaseLocationRepositoryPort {
+    ) : ClinicsRepositoryPort {
         override fun getClinics(): Flow<List<Clinic>> =
             clinicsDao.getClinics().map { entities ->
                 entities.map { clinicEntity ->

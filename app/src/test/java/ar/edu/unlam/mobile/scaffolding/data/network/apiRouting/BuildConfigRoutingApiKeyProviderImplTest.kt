@@ -1,7 +1,7 @@
 package ar.edu.unlam.mobile.scaffolding.data.network.apiRouting
 
 import ar.edu.unlam.mobile.scaffolding.BuildConfig
-import ar.edu.unlam.mobile.scaffolding.data.datasources.network.apiRouting.BuildConfigRoutingApiKeyProviderImpl
+import ar.edu.unlam.mobile.scaffolding.data.datasources.network.routing.BuildConfigRoutingApiKeyProviderImpl
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 

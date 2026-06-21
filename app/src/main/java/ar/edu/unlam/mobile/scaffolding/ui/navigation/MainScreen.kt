@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile.scaffolding.ui.screens
+package ar.edu.unlam.mobile.scaffolding.ui.navigation
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -8,6 +8,8 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -18,7 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
@@ -28,9 +32,17 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
+import ar.edu.unlam.mobile.scaffolding.ui.components.FABShortCut
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
-import ar.edu.unlam.mobile.scaffolding.ui.navigation.Screen
-import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.DashboardScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.DashboardScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.FormScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.LoginScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.MapScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.OnboardingScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.ProfileScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.RegisterScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.SplashScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.UserScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.EnvironmentCheckScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.PostSessionScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
@@ -54,8 +66,20 @@ fun MainScreen() {
     val currentBackStack by controller.currentBackStackEntryAsState()
     val currentRoute = currentBackStack?.destination?.route
     val showChrome = currentRoute !in routesWithoutChrome
+    var showFab by remember { mutableStateOf(true) }
+
+    showFab = currentRoute != Screen.MapScreen.route
 
     Scaffold(
+        floatingActionButton = {
+            if (showFab) {
+                FABShortCut(
+                    modifier = Modifier,
+                    onClick = { controller.navigate(Screen.MapScreen.route) },
+                    icon = Icons.Default.Map,
+                )
+            }
+        },
         bottomBar = { if (showChrome) BottomBar(controller = controller) },
         snackbarHost = {
             SnackbarHost(snackBarHostState) { data ->
@@ -90,10 +114,11 @@ fun MainScreen() {
                 }
             }
         },
-    ) { paddingValue ->
+    ) { paddingValues ->
+
         NavHost(
             navController = controller,
-            startDestination = Screen.Dev3PlayGround.route,
+            startDestination = Screen.Dashboard.route,
             enterTransition = {
                 slideInHorizontally(
                     initialOffsetX = { it },
@@ -182,7 +207,7 @@ fun MainScreen() {
             composable(Screen.Dashboard.route) {
                 DashboardScreen(
                     onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
-                    modifier = Modifier.padding(paddingValue),
+                    modifier = Modifier.padding(paddingValues),
                 )
             }
 
@@ -190,7 +215,7 @@ fun MainScreen() {
             composable(Screen.RoutineList.route) {
                 RoutineListScreen(
                     controller = controller,
-                    modifier = Modifier.padding(paddingValue),
+                    modifier = Modifier.padding(paddingValues),
                 )
             }
 
@@ -205,7 +230,7 @@ fun MainScreen() {
                     onNavigateToSession = { id ->
                         controller.navigate(Screen.RehabSession.createRoute(id))
                     },
-                    modifier = Modifier.padding(paddingValue),
+                    modifier = Modifier.padding(paddingValues),
                 )
             }
 
@@ -225,7 +250,7 @@ fun MainScreen() {
                     onNavigateBack = {
                         controller.popBackStack()
                     },
-                    modifier = Modifier.padding(paddingValue),
+                    modifier = Modifier.padding(paddingValues),
                 )
             }
 
@@ -237,7 +262,7 @@ fun MainScreen() {
                             popUpTo(Screen.PostSession.route) { inclusive = true }
                         }
                     },
-                    modifier = Modifier.padding(paddingValue),
+                    modifier = Modifier.padding(paddingValues),
                 )
             }
 
@@ -249,21 +274,25 @@ fun MainScreen() {
                             popUpTo(0) { inclusive = true }
                         }
                     },
-                    modifier = Modifier.padding(paddingValue),
+                    modifier = Modifier.padding(paddingValues),
                 )
             }
 
             // Form
             composable(Screen.Form.route) {
                 FormScreen(
-                    modifier = Modifier.padding(paddingValue),
+                    modifier = Modifier.padding(paddingValues),
                     snackbarHostState = snackBarHostState,
                 )
             }
 
             // Playground
-            composable(Screen.Dev3PlayGround.route) {
-                Dev3PlayGround()
+            composable(
+                route = Screen.MapScreen.route,
+                enterTransition = { slideInHorizontally(animationSpec = tween(500, easing = FastOutSlowInEasing)) },
+                exitTransition = { slideOutHorizontally(animationSpec = tween(500, easing = FastOutSlowInEasing)) },
+            ) {
+                MapScreen()
             }
 
             // User
@@ -272,7 +301,7 @@ fun MainScreen() {
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
             ) { navBackStackEntry ->
                 val id = navBackStackEntry.arguments?.getString("id") ?: "1"
-                UserScreen(userId = id, modifier = Modifier.padding(paddingValue))
+                UserScreen(userId = id, modifier = Modifier.padding(paddingValues))
             }
         }
     }
