@@ -57,12 +57,3 @@ data class SessionEntity(
     val averageRom: Float,
     val successfulReps: Int,
 )
-
-@Entity(tableName = "achievements")
-data class AchievementEntity(
-    @PrimaryKey val id: String,
-    val title: String,
-    val description: String,
-    val isUnlocked: Boolean,
-    val unlockedAtTimestamp: Long?,
-)
