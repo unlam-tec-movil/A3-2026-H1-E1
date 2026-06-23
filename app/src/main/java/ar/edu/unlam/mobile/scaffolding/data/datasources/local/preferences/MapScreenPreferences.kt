@@ -1,7 +1,6 @@
 package ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences
 
 import android.content.Context
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
