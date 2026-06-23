@@ -44,27 +44,28 @@ class ProgressViewModelTest {
     }
 
     @Test
-    fun `loadProgressData should transition from loading to success`() = runTest(testDispatcher) {
-        coEvery { rehabRepository.getSessions("user_imanol") } returns flowOf(emptyList())
-        coEvery { rehabRepository.getExercises() } returns flowOf(emptyList())
-        coEvery { healthConnectDataSource.hasAllPermissions() } returns false
+    fun `loadProgressData should transition from loading to success`() =
+        runTest(testDispatcher) {
+            coEvery { rehabRepository.getSessions("user_imanol") } returns flowOf(emptyList())
+            coEvery { rehabRepository.getExercises() } returns flowOf(emptyList())
+            coEvery { healthConnectDataSource.hasAllPermissions() } returns false
 
-        val viewModel = ProgressViewModel(rehabRepository, healthConnectDataSource)
+            val viewModel = ProgressViewModel(rehabRepository, healthConnectDataSource)
 
-        viewModel.uiState.test {
-            // Initial state (emitted immediately on connection because uiState is a StateFlow)
-            val initialState = awaitItem()
-            assertTrue(initialState.isLoading)
+            viewModel.uiState.test {
+                // Initial state (emitted immediately on connection because uiState is a StateFlow)
+                val initialState = awaitItem()
+                assertTrue(initialState.isLoading)
 
-            // Let coroutines run
-            advanceUntilIdle()
+                // Let coroutines run
+                advanceUntilIdle()
 
-            // Success state (use expectMostRecentItem to consume intermediate loading updates)
-            val successState = expectMostRecentItem()
-            assertFalse(successState.isLoading)
-            assertNull(successState.error)
+                // Success state (use expectMostRecentItem to consume intermediate loading updates)
+                val successState = expectMostRecentItem()
+                assertFalse(successState.isLoading)
+                assertNull(successState.error)
+            }
         }
-    }
 
     @Test
     fun `loadProgressData should load sessions and complete 7 days timeline correctly`() =
@@ -147,7 +148,8 @@ class ProgressViewModelTest {
                 assertTrue(successState.isHealthConnectLinked)
 
                 // The last item (index 6) should correspond to today (or generated mock if no session today)
-                // The item corresponding to yesterday (index 5) should match the first mock session (id = 1L, ROM = 112f)
+                // The item corresponding to yesterday (index 5) should match
+                // the first mock session (id = 1L, ROM = 112f)
                 val yesterdayItem = successState.sessionsData[5]
                 assertEquals(1L, yesterdayItem.id)
                 assertEquals(112f, yesterdayItem.averageRom)
