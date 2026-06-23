@@ -40,12 +40,14 @@ import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.outlined.LocalHospital
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.SearchOff
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -74,6 +76,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ar.edu.unlam.mobile.scaffolding.R
+import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import ar.edu.unlam.mobile.scaffolding.toHex
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomSheetCard
 import ar.edu.unlam.mobile.scaffolding.ui.components.FABShortCut
@@ -134,14 +137,10 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                     },
             )
         }
-    val clinicToDisplay =
-        remember(uiState.selectedClinic) {
-            if (uiState.selectedClinic != null) uiState.selectedClinic else null
-        }
-
-    LaunchedEffect(showBottomSheetCard) {
-        if (!showBottomSheetCard) {
-            vm.onHideCardSheet()
+    var clinicToDisplay by remember { mutableStateOf<Clinic?>(null) }
+    LaunchedEffect(uiState.selectedClinic) {
+        if (uiState.selectedClinic != null) {
+            clinicToDisplay = uiState.selectedClinic
         }
     }
 
@@ -157,9 +156,10 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                         ),
                     )
                 }
-                vm.onHideCardSheet()
+
                 showBottomSheetCard = false
                 showFabReposition = true
+                vm.onHideCardSheetAndRemoveRouteLayer()
             }
 
             DragState.RIGHT -> {
@@ -183,21 +183,41 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
     }
 
     Scaffold(floatingActionButton = {
-        if (showFabReposition) {
-            FABShortCut(
-                modifier = Modifier.padding(bottom = 90.dp),
-                onClick = {
-                    uiState.location?.let { location ->
-                        vm.centerCameraOn(
-                            LngLat(
-                                lng = location.longitude,
-                                lat = location.latitude,
-                            ),
-                        )
-                    }
-                },
-                icon = Icons.Default.MyLocation,
-            )
+        Column(
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(bottom = 90.dp),
+        ) {
+            AnimatedVisibility(
+                visible = (uiState.lastSavedClinicId != null || uiState.selectedClinic != null) && !showBottomSheetCard,
+                enter = scaleIn(),
+                exit = scaleOut(),
+            ) {
+                FABShortCut(
+                    onClick = {
+                        showBottomSheetCard = true
+                        showFabReposition = false
+                        vm.onRestoreLastRouteClick(routeColor)
+                    },
+                    icon = Icons.Default.Update,
+                )
+            }
+            if (showFabReposition) {
+                FABShortCut(
+                    modifier = Modifier,
+                    onClick = {
+                        uiState.location?.let { location ->
+                            vm.centerCameraOn(
+                                LngLat(
+                                    lng = location.longitude,
+                                    lat = location.latitude,
+                                ),
+                            )
+                        }
+                    },
+                    icon = Icons.Default.MyLocation,
+                )
+            }
         }
     }, floatingActionButtonPosition = FabPosition.End) { paddingValues ->
 
@@ -444,7 +464,7 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                         enter = scaleIn() + expandVertically(),
                         exit = scaleOut() + shrinkVertically(),
                     ) {
-                        (uiState.selectedClinic ?: clinicToDisplay)?.let { clinicSelected ->
+                        clinicToDisplay?.let { clinicSelected ->
 
                             Box(
                                 contentAlignment = Alignment.CenterStart,
@@ -487,14 +507,6 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                                     distance = uiState.routeDistance,
                                     estimatedArrival = uiState.routeTime,
                                     onCloseClick = {
-                                        uiState.location?.let { location ->
-                                            vm.centerCameraOn(
-                                                LngLat(
-                                                    lng = location.longitude,
-                                                    lat = location.latitude,
-                                                ),
-                                            )
-                                        }
                                         showBottomSheetCard = false
                                         showFabReposition = true
                                     },

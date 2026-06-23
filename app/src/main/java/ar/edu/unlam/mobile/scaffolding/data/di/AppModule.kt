@@ -6,6 +6,7 @@ import androidx.room.Room
 import ar.edu.unlam.mobile.scaffolding.application.port.out.local.db.ClinicsRepositoryPort
 import ar.edu.unlam.mobile.scaffolding.application.port.out.local.db.HasStoredClinicsUseCase
 import ar.edu.unlam.mobile.scaffolding.application.port.out.local.location.LocationServicePort
+import ar.edu.unlam.mobile.scaffolding.application.port.out.local.prefs.MapPrefsRepositoryPort
 import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.map.ApiKeyProvider
 import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.routing.RoutingApi
 import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.routing.RoutingApiKeyProvider
@@ -20,6 +21,7 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.ExerciseDao
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.SessionDao
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.UserDao
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.database.AppDatabase
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.MapScreenPreferences
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.data.datasources.location.BuildConfigApiKeyProviderImpl
 import ar.edu.unlam.mobile.scaffolding.data.datasources.location.LocationServicePortImpl
@@ -29,6 +31,7 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.AccelerometerData
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.LightSensorDataSource
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.StepCounterDataSource
 import ar.edu.unlam.mobile.scaffolding.data.repositories.ClinicsRepositoryImpl
+import ar.edu.unlam.mobile.scaffolding.data.repositories.MapPrefsRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repositories.RehabRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repositories.RoutingRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repositories.UserRepositoryImpl
@@ -129,6 +132,16 @@ object AppModule {
     @Provides
     @Singleton
     fun providesSessionPreferences(context: Application): SessionPreferences = SessionPreferences(context = context)
+
+    @Provides
+    @Singleton
+    fun providesMapScreenPreferences(context: Application): MapScreenPreferences =
+        MapScreenPreferences(context = context)
+
+    @Provides
+    @Singleton
+    fun providesMapPrefsRepository(mapPrefs: MapScreenPreferences): MapPrefsRepositoryPort =
+        MapPrefsRepositoryImpl(mapPrefs)
 
     @Provides
     @Singleton

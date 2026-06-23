@@ -11,6 +11,8 @@ import ar.edu.unlam.mobile.scaffolding.application.service.local.db.getNearestCl
 import ar.edu.unlam.mobile.scaffolding.application.service.local.remote.routing.GetRouteUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsStoredUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.ObserverLocationUseCase
+import ar.edu.unlam.mobile.scaffolding.application.usecases.mapprefs.GetLastDestinationClinicIdUseCase
+import ar.edu.unlam.mobile.scaffolding.application.usecases.mapprefs.SaveLastDestinationClinicIdUseCase
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.RouteResponse
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import com.google.android.gms.maps.model.LatLng
@@ -37,6 +39,41 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+// --------------------------------------------------------------------------
+// UI State
+// --------------------------------------------------------------------------
+
+data class LocationUiState(
+    val location: Location? = null,
+    val showMap: Boolean = false,
+    val isLoadingClinics: Boolean = true,
+    val isLoadingPermission: Boolean = true,
+    val permissionGranted: Boolean = false,
+    val clinicsLoadSuccess: Boolean = false,
+    val clinicsLoadError: String? = null,
+    val clinics: List<Clinic> = emptyList(),
+    val clinicsNear: List<Clinic> = emptyList(),
+    val selectedClinic: Clinic? = null,
+    val searchBarText: String = "",
+    val routeDistance: Double? = null,
+    val routeTime: String? = null,
+    val mapInitialized: Boolean = false,
+    val lastSavedClinicId: Int? = null,
+) {
+    // Returns all clinics when search is empty; filters by name otherwise
+    val filteredClinics: List<Clinic>
+        get() =
+            if (searchBarText.isEmpty()) {
+                clinics
+            } else {
+                clinics.filter { it.name.contains(searchBarText, ignoreCase = true) }
+            }
+}
+
+// --------------------------------------------------------------------------
+// ViewModel
+// --------------------------------------------------------------------------
+
 @HiltViewModel
 class MapScreenViewModel
     @Inject
@@ -45,15 +82,24 @@ class MapScreenViewModel
         private val observerLocationUseCase: ObserverLocationUseCase,
         private val getClinicsStoredUseCase: GetClinicsStoredUseCase,
         private val getRouteUseCase: GetRouteUseCase,
+        private val saveLastDestinationClinicIdUseCase: SaveLastDestinationClinicIdUseCase,
+        private val getLastDestinationClinicIdUseCase: GetLastDestinationClinicIdUseCase,
     ) : ViewModel() {
+        companion object {
+            private const val ROUTE_LAYER_ID = "basic-polyline"
+            private const val ROUTE_SOURCE_ID = "basic-polyline-source"
+            private const val NEARBY_DISPLAY_COUNT = 15
+            private const val NEARBY_SORT_COUNT = 60
+            private const val CLUSTER_COUNT = 12
+            private const val DEFAULT_MAP_ZOOM = 15.0
+        }
+
         val mapController: MTMapViewController by lazy {
             MTMapViewController(context).apply {
                 delegate =
                     object : MTMapViewDelegate {
                         override fun onMapViewInitialized() {
-                            _mapScreenUiState.update { currentState ->
-                                currentState.copy(mapInitialized = true)
-                            }
+                            _mapScreenUiState.update { it.copy(mapInitialized = true) }
                             if (_mapScreenUiState.value.location != null) {
                                 setupClusters()
                             }
@@ -62,39 +108,17 @@ class MapScreenViewModel
                         override fun onEventTriggered(
                             event: MTEvent,
                             data: MTData?,
-                        ) {
-                        }
+                        ) = Unit
                     }
             }
         }
 
-        @Suppress("ktlint:standard:backing-property-naming")
-        private val _mapScreenUiState = MutableStateFlow(LocationUiSate())
+        private val _mapScreenUiState = MutableStateFlow(LocationUiState())
         val mapScreenUiState = _mapScreenUiState.asStateFlow()
 
         init {
-
-            viewModelScope.launch {
-                getClinicsStoredUseCase()
-                    .catch { e ->
-                        // This handles the error and updates the state
-                        _mapScreenUiState.update { currentState ->
-                            currentState.copy(
-                                isLoadingClinics = false,
-                                clinicsLoadSuccess = false,
-                                clinicsLoadError = e.message ?: "Unknown error",
-                            )
-                        }
-                    }.collect { allClinicsInRoom ->
-                        _mapScreenUiState.update { currentState ->
-                            currentState.copy(
-                                clinics = allClinicsInRoom,
-                                isLoadingClinics = false,
-                                clinicsLoadSuccess = true,
-                            )
-                        }
-                    }
-            }
+            loadClinics()
+            loadLastSavedClinic()
         }
 
         override fun onCleared() {
@@ -102,28 +126,30 @@ class MapScreenViewModel
             mapController.destroy()
         }
 
+        // ------------------------------------------------------------------
+        // Public event handlers
+        // ------------------------------------------------------------------
+
         fun onLocationPermissionGranted() {
             viewModelScope.launch {
                 observerLocationUseCase().collect { location ->
-                    _mapScreenUiState.update { currentState ->
-                        val nearby =
-                            currentState.clinics.getNearestClinics(
-                                userLat = location.latitude,
-                                userLng = location.longitude,
-                                count = 15,
-                            )
-
-                        currentState.copy(
+                    _mapScreenUiState.update { current ->
+                        current.copy(
                             location = location,
                             showMap = true,
                             permissionGranted = true,
                             isLoadingPermission = false,
-                            clinicsNear = nearby,
-                            clinics =
-                                currentState.clinics.getNearestClinics(
+                            clinicsNear =
+                                current.clinics.getNearestClinics(
                                     userLat = location.latitude,
                                     userLng = location.longitude,
-                                    count = 60,
+                                    count = NEARBY_DISPLAY_COUNT,
+                                ),
+                            clinics =
+                                current.clinics.getNearestClinics(
+                                    userLat = location.latitude,
+                                    userLng = location.longitude,
+                                    count = NEARBY_SORT_COUNT,
                                 ),
                         )
                     }
@@ -131,59 +157,71 @@ class MapScreenViewModel
             }
         }
 
-        fun onCallTriggered() {
-            _mapScreenUiState.value.selectedClinic?.phone?.takeIf { it.isNotEmpty() }?.let { phoneNumber ->
-
-                val intent =
-                    Intent(Intent.ACTION_DIAL).apply {
-                        data = "tel:${Uri.encode(phoneNumber)}".toUri()
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    }
-                context.startActivity(intent)
-            }
-        }
-
         fun onPermissionCheckComplete(granted: Boolean) {
             _mapScreenUiState.update {
-                it.copy(
-                    permissionGranted = granted,
-                    isLoadingPermission = false,
-                )
+                it.copy(permissionGranted = granted, isLoadingPermission = false)
             }
         }
 
-        fun onHideCardSheet() {
-            val style = mapController.style ?: return
-            style.removeLayerById("basic-polyline")
-            style.removeSourceById("basic-polyline-source")
-            _mapScreenUiState.update { currentState ->
-                currentState.copy(selectedClinic = null)
+        fun onClinicSelectedChange(newClinic: Clinic) {
+            _mapScreenUiState.update {
+                it.copy(selectedClinic = newClinic, routeDistance = null, routeTime = null)
             }
+        }
+
+        fun onSearchBarInputChange(newValue: String) {
+            _mapScreenUiState.update { it.copy(searchBarText = newValue) }
+        }
+
+        fun onCallTriggered() {
+            val phone =
+                _mapScreenUiState.value.selectedClinic
+                    ?.phone
+                    ?.takeIf { it.isNotEmpty() } ?: return
+
+            val intent =
+                Intent(Intent.ACTION_DIAL).apply {
+                    data = "tel:${Uri.encode(phone)}".toUri()
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+            context.startActivity(intent)
+        }
+
+        fun onRestoreLastRouteClick(hexColor: String) {
+            val savedId = _mapScreenUiState.value.lastSavedClinicId ?: return
+            val clinic = _mapScreenUiState.value.clinics.find { it.id == savedId } ?: return
+            onClinicSelectedChange(clinic)
+            onCreateRouteClick(hexColor)
+        }
+
+        fun onHideCardSheetAndRemoveRouteLayer() {
+            val style = mapController.style ?: return
+            style.removeLayerById(ROUTE_LAYER_ID)
+            style.removeSourceById(ROUTE_SOURCE_ID)
         }
 
         fun onCreateRouteClick(hexColor: String) {
             viewModelScope.launch {
+                val state = _mapScreenUiState.value
                 val userLocation =
-                    LatLng(
-                        _mapScreenUiState.value.location!!.latitude,
-                        _mapScreenUiState.value.location!!.longitude,
-                    )
-                val destination =
-                    LatLng(
-                        _mapScreenUiState.value.selectedClinic!!.lat,
-                        _mapScreenUiState.value.selectedClinic!!.lng,
-                    )
+                    state.location?.let {
+                        LatLng(it.latitude, it.longitude)
+                    } ?: return@launch
+                val clinic = state.selectedClinic ?: return@launch
 
+                saveLastDestinationClinicIdUseCase(clinic.id)
+
+                val destination = LatLng(clinic.lat, clinic.lng)
                 val response: RouteResponse =
-                    getRouteUseCase.invoke(
+                    getRouteUseCase(
                         origin = userLocation,
                         destination = destination,
                     )
+
                 val routeDistance = response.paths.firstOrNull()?.distance
                 val path = response.paths.firstOrNull()
                 val timeInMills = path?.time ?: 0L
-                val min = (timeInMills / 60000).toInt()
-                val fTime = if (min < 60) "$min min" else "${min / 60}h ${min % 60}min"
+                val fTime = formatTravelTime(timeInMills)
 
                 _mapScreenUiState.update { currentState ->
                     currentState.copy(
@@ -191,6 +229,7 @@ class MapScreenViewModel
                         routeTime = fTime,
                     )
                 }
+
                 val points = response.paths[0].points
                 val feature =
                     JsonObject().apply {
@@ -222,137 +261,144 @@ class MapScreenViewModel
                         add("features", JsonArray().apply { add(feature) })
                     }
                 val lineGeoJson = featureCollection.toString()
-                val style =
-                    mapController.style?.let { style ->
 
-                        style.removeLayerById("basic-polyline")
-                        style.removeSourceById("basic-polyline-source")
+                mapController.style?.let { style ->
+                    style.removeLayerById(ROUTE_LAYER_ID)
+                    style.removeSourceById(ROUTE_SOURCE_ID)
 
-                        val helper: MTPolylineLayerHelper = style.polylineHelper()
-                        val opts =
-                            MTPolylineLayerOptions(
-                                data = lineGeoJson,
-                                layerId = "basic-polyline",
-                                sourceId = "basic-polyline-source",
-                                lineColor = MTStringOrZoomStringValues.StringValue(hexColor),
-                                lineWidth = MTNumberOrZoomNumberValues.Number(4.0),
-                                lineOpacity = MTNumberOrZoomNumberValues.Number(0.9),
-                                lineDashArray = MTDashArrayOption.Numbers(listOf(2.0, 1.0)),
-                            )
-                        helper.addPolyline(opts)
-                    }
+                    val helper: MTPolylineLayerHelper = style.polylineHelper()
+                    val opts =
+                        MTPolylineLayerOptions(
+                            data = lineGeoJson,
+                            layerId = ROUTE_LAYER_ID,
+                            sourceId = ROUTE_SOURCE_ID,
+                            lineColor = MTStringOrZoomStringValues.StringValue(hexColor),
+                            lineWidth = MTNumberOrZoomNumberValues.Number(4.0),
+                            lineOpacity = MTNumberOrZoomNumberValues.Number(0.9),
+                            lineDashArray = MTDashArrayOption.Numbers(listOf(2.0, 1.0)),
+                        )
+                    helper.addPolyline(opts)
+                }
             }
         }
 
         fun setupClusters() {
             viewModelScope.launch {
-                if (_mapScreenUiState.value.clinics.isNotEmpty()) {
-                    val features =
-                        _mapScreenUiState.value.clinics
-                            .getNearestClinics(
-                                userLat = _mapScreenUiState.value.location!!.latitude,
-                                userLng = _mapScreenUiState.value.location!!.longitude,
-                                count = 12,
-                            ).map { clinic ->
-                                JsonObject().apply {
-                                    addProperty("type", "Feature")
-                                    addProperty("id", clinic.id)
-                                    add(
-                                        "properties",
-                                        JsonObject().apply {
-                                            addProperty("name", clinic.name)
-                                            addProperty("address", clinic.address)
-                                            addProperty("phone", clinic.phone)
-                                            addProperty("website", clinic.website)
-                                        },
-                                    )
-                                    add(
-                                        "geometry",
-                                        JsonObject().apply {
-                                            addProperty("type", "Point")
-                                            add(
-                                                "coordinates",
-                                                JsonArray().apply {
-                                                    add(clinic.lng)
-                                                    add(clinic.lat)
-                                                },
-                                            )
-                                        },
-                                    )
-                                }
-                            }
+                val state = _mapScreenUiState.value
+                val location = state.location ?: return@launch
+                val style = mapController.style ?: return@launch
 
-                    val featureCollection =
-                        JsonObject().apply {
-                            addProperty("type", "FeatureCollection")
-                            add("features", JsonArray().also { arr -> features.forEach { arr.add(it) } })
-                        }
-                    val style = mapController.style ?: return@launch
-                    style.addSource(
-                        MTGeoJSONSource(
-                            identifier = "clinics",
-                            jsonString = featureCollection.toString(),
-                        ),
-                    )
-                } else {
-                    _mapScreenUiState.update { currentState ->
-                        currentState.copy(clinicsLoadError = "fail on clinics fetch ")
-                    }
+                if (state.clinics.isEmpty()) {
+                    _mapScreenUiState.update { it.copy(clinicsLoadError = "Failed to load clinics") }
+                    return@launch
                 }
-            }
-        }
 
-        fun onSearchBarInputChange(newValue: String) {
-            _mapScreenUiState.update { currentState ->
-                currentState.copy(searchBarText = newValue)
-            }
-        }
+                val nearbyClinics =
+                    state.clinics.getNearestClinics(
+                        userLat = location.latitude,
+                        userLng = location.longitude,
+                        count = CLUSTER_COUNT,
+                    )
 
-        fun onClinicSelectedChange(newClinic: Clinic) {
-            _mapScreenUiState.update { currentState ->
-                currentState.copy(selectedClinic = newClinic, routeDistance = null, routeTime = null)
+                val featureCollection = buildFeatureCollection(nearbyClinics)
+                style.addSource(
+                    MTGeoJSONSource(
+                        identifier = "clinics",
+                        jsonString = featureCollection.toString(),
+                    ),
+                )
             }
         }
 
         fun centerCameraOn(
             target: LngLat,
-            zoom: Double = 15.0,
+            zoom: Double = DEFAULT_MAP_ZOOM,
         ) {
             mapController.easeTo(
                 cameraOptions =
                     MTCameraOptions(
                         zoom = zoom,
-                        center =
-                            LngLat(
-                                lng = target.lng,
-                                lat = target.lat,
-                            ),
+                        center = LngLat(lng = target.lng, lat = target.lat),
                     ),
             )
         }
 
-        data class LocationUiSate(
-            val location: Location? = null,
-            val showMap: Boolean = false,
-            val isLoadingClinics: Boolean = true,
-            val isLoadingPermission: Boolean = true,
-            val permissionGranted: Boolean = false,
-            val clinicsLoadSuccess: Boolean = false,
-            val clinicsLoadError: String? = null,
-            val clinics: List<Clinic> = emptyList(),
-            val clinicsNear: List<Clinic> = emptyList(),
-            val selectedClinic: Clinic? = null,
-            val searchBarText: String = "",
-            val routeDistance: Double? = null,
-            val routeTime: String? = null,
-            val mapInitialized: Boolean = false,
-        ) {
-            val filteredClinics: List<Clinic>
-                get() =
-                    clinics.filter {
+        // ------------------------------------------------------------------
+        // Private helpers
+        // ------------------------------------------------------------------
 
-                        it.name.contains(searchBarText, ignoreCase = true) &&
-                            searchBarText.isNotEmpty()
+        private fun loadClinics() {
+            viewModelScope.launch {
+                getClinicsStoredUseCase()
+                    .catch { e ->
+                        _mapScreenUiState.update {
+                            it.copy(
+                                isLoadingClinics = false,
+                                clinicsLoadSuccess = false,
+                                clinicsLoadError = e.message ?: "Unknown error",
+                            )
+                        }
+                    }.collect { allClinics ->
+                        _mapScreenUiState.update {
+                            it.copy(
+                                clinics = allClinics,
+                                isLoadingClinics = false,
+                                clinicsLoadSuccess = true,
+                            )
+                        }
                     }
+            }
+        }
+
+        private fun loadLastSavedClinic() {
+            viewModelScope.launch {
+                getLastDestinationClinicIdUseCase().collect { lastClinicId ->
+                    _mapScreenUiState.update { it.copy(lastSavedClinicId = lastClinicId) }
+                }
+            }
+        }
+
+        private fun buildClinicFeature(clinic: Clinic): JsonObject =
+            JsonObject().apply {
+                addProperty("type", "Feature")
+                addProperty("id", clinic.id)
+                add(
+                    "properties",
+                    JsonObject().apply {
+                        addProperty("name", clinic.name)
+                        addProperty("address", clinic.address)
+                        addProperty("phone", clinic.phone)
+                        addProperty("website", clinic.website)
+                    },
+                )
+                add(
+                    "geometry",
+                    JsonObject().apply {
+                        addProperty("type", "Point")
+                        add(
+                            "coordinates",
+                            JsonArray().apply {
+                                add(clinic.lng)
+                                add(clinic.lat)
+                            },
+                        )
+                    },
+                )
+            }
+
+        private fun buildFeatureCollection(clinics: List<Clinic>): JsonObject =
+            JsonObject().apply {
+                addProperty("type", "FeatureCollection")
+                add(
+                    "features",
+                    JsonArray().apply {
+                        clinics.forEach { add(buildClinicFeature(it)) }
+                    },
+                )
+            }
+
+        private fun formatTravelTime(timeInMillis: Long): String {
+            val minutes = (timeInMillis / 60000).toInt()
+            return if (minutes < 60) "$minutes min" else "${minutes / 60}h ${minutes % 60}min"
         }
     }

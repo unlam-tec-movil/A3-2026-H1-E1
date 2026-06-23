@@ -22,8 +22,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardHide
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.SwipeDownAlt
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.Directions
 import androidx.compose.material.icons.outlined.LocalHospital
@@ -359,7 +361,7 @@ fun BottomSheetCard(
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
                     onClick = onCloseClick,
                 ) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = "button to hide card")
+                    Icon(imageVector = Icons.Default.SwipeDownAlt, contentDescription = "button to hide card")
                 }
             }
         }
