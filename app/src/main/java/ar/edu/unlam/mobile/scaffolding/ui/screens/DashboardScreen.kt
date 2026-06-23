@@ -7,7 +7,9 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -32,6 +34,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,7 +48,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,12 +63,14 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.StepCounterService
+import ar.edu.unlam.mobile.scaffolding.domain.model.Achievement
 import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.ui.theme.AmberWarning
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
@@ -77,6 +86,8 @@ const val DASHBOARD_SCREEN_ROUTE = "dashboard"
 @Composable
 fun DashboardScreen(
     onNavigateToRoutineList: () -> Unit,
+    onNavigateToProgress: () -> Unit,
+    onNavigateToAchievements: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
@@ -193,6 +204,7 @@ fun DashboardScreen(
                 RomProgressCard(
                     maxRom = uiState.maxRom,
                     targetRom = uiState.targetRom,
+                    onClick = onNavigateToProgress,
                     modifier =
                         Modifier.graphicsLayer {
                             val progress = ((entranceProgress - 0.15f) / 0.6f).coerceIn(0f, 1f)
@@ -215,9 +227,24 @@ fun DashboardScreen(
                         },
                 )
 
-                // Card 3: Last Active Session Card
+                // Card 3: Achievements Card
+                AchievementsCard(
+                    unlockedCount = uiState.unlockedAchievementsCount,
+                    totalCount = 3,
+                    onClick = onNavigateToAchievements,
+                    modifier =
+                        Modifier.graphicsLayer {
+                            val progress = ((entranceProgress - 0.38f) / 0.6f).coerceIn(0f, 1f)
+                            val easedProgress = FastOutSlowInEasing.transform(progress)
+                            alpha = easedProgress
+                            translationY = yOffsetPx * (1f - easedProgress)
+                        },
+                )
+
+                // Card 4: Last Active Session Card
                 LastSessionCard(
                     lastSession = uiState.lastSession,
+                    onClick = onNavigateToProgress,
                     modifier =
                         Modifier.graphicsLayer {
                             val progress = ((entranceProgress - 0.45f) / 0.55f).coerceIn(0f, 1f)
@@ -229,6 +256,14 @@ fun DashboardScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
+        }
+
+        // Celebratory Dialog for Newly Unlocked Achievement
+        uiState.newlyUnlockedAchievement?.let { achievement ->
+            AchievementUnlockedDialog(
+                achievement = achievement,
+                onDismiss = { viewModel.dismissUnlockPopup() },
+            )
         }
     }
 }
@@ -288,10 +323,14 @@ fun DashboardHeader(
 fun RomProgressCard(
     maxRom: Float,
     targetRom: Float,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable { onClick() },
         shape = RoundedCornerShape(24.dp),
         colors =
             CardDefaults.cardColors(
@@ -606,10 +645,14 @@ fun StatInfoItem(
 @Composable
 fun LastSessionCard(
     lastSession: Session?,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable { onClick() },
         shape = RoundedCornerShape(24.dp),
         colors =
             CardDefaults.cardColors(
@@ -872,4 +915,221 @@ fun ActiveRoutineBanner(
             }
         }
     }
+}
+
+@Composable
+fun AchievementsCard(
+    unlockedCount: Int,
+    totalCount: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable { onClick() },
+        shape = RoundedCornerShape(24.dp),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column {
+                    Text(
+                        text = "Tus Logros y Medallas 🏆",
+                        style =
+                            MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            ),
+                    )
+                    Text(
+                        text = "Gamificación y progreso del tratamiento",
+                        style =
+                            MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            ),
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column {
+                    Text(
+                        text = "$unlockedCount / $totalCount",
+                        style =
+                            MaterialTheme.typography.headlineLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = ElectricIndigo,
+                            ),
+                    )
+                    Text(
+                        text = "Desbloqueados",
+                        style =
+                            MaterialTheme.typography.labelSmall.copy(
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            ),
+                    )
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    MiniMedalBadge(emoji = "🏃‍♂️", isUnlocked = unlockedCount >= 1, color = Color(0xFFF59E0B))
+                    MiniMedalBadge(emoji = "🏋️", isUnlocked = unlockedCount >= 2, color = Color(0xFF059669))
+                    MiniMedalBadge(emoji = "🔥", isUnlocked = unlockedCount >= 3, color = Color(0xFF7C3AED))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MiniMedalBadge(
+    emoji: String,
+    isUnlocked: Boolean,
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier =
+            modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(
+                    if (isUnlocked) color.copy(alpha = 0.15f) else Color.LightGray.copy(alpha = 0.2f),
+                ).border(
+                    width = 1.5.dp,
+                    color = if (isUnlocked) color else Color.LightGray.copy(alpha = 0.4f),
+                    shape = CircleShape,
+                ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = emoji,
+            fontSize = 18.sp,
+            modifier =
+                Modifier.graphicsLayer {
+                    if (!isUnlocked) alpha = 0.4f
+                },
+        )
+    }
+}
+
+@Composable
+fun AchievementUnlockedDialog(
+    achievement: Achievement,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = ElectricIndigo),
+            ) {
+                Text("¡Genial!", color = Color.White)
+            }
+        },
+        title = {
+            Text(
+                text = "¡Logro Desbloqueado! 🎉",
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
+        text = {
+            var animateScale by remember { mutableStateOf(false) }
+            LaunchedEffect(Unit) {
+                animateScale = true
+            }
+            val scale by animateFloatAsState(
+                targetValue = if (animateScale) 1.2f else 0f,
+                animationSpec =
+                    spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMediumLow,
+                    ),
+                label = "PopupMedalScale",
+            )
+
+            val emoji =
+                when (achievement.id) {
+                    "10k_steps" -> "🏃‍♂️"
+                    "first_session" -> "🏋️"
+                    "master_rom" -> "🔥"
+                    else -> "🏆"
+                }
+
+            val badgeColor =
+                when (achievement.id) {
+                    "10k_steps" -> Color(0xFFF59E0B)
+                    "first_session" -> Color(0xFF059669)
+                    "master_rom" -> Color(0xFF7C3AED)
+                    else -> ElectricIndigo
+                }
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Box(
+                    modifier =
+                        Modifier
+                            .size(100.dp)
+                            .graphicsLayer {
+                                scaleX = scale
+                                scaleY = scale
+                            }.clip(CircleShape)
+                            .background(badgeColor.copy(alpha = 0.15f))
+                            .border(3.dp, badgeColor, CircleShape),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(text = emoji, fontSize = 48.sp)
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = achievement.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center,
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = achievement.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center,
+                )
+            }
+        },
+        shape = RoundedCornerShape(28.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
+    )
 }

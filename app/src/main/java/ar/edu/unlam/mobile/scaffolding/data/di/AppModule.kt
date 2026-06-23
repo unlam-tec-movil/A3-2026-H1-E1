@@ -16,6 +16,7 @@ import ar.edu.unlam.mobile.scaffolding.application.service.local.remote.routing.
 import ar.edu.unlam.mobile.scaffolding.application.service.remote.routing.GetRouteInteractor
 import ar.edu.unlam.mobile.scaffolding.data.datasources.camera.CameraXSessionAdapter
 import ar.edu.unlam.mobile.scaffolding.data.datasources.device.health.HealthConnectDataSource
+import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.AchievementDao
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.ClinicsDao
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.ExerciseDao
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.SessionDao
@@ -30,12 +31,14 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.network.routing.BuildCon
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.AccelerometerDataSource
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.LightSensorDataSource
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.StepCounterDataSource
+import ar.edu.unlam.mobile.scaffolding.data.repositories.AchievementRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repositories.ClinicsRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repositories.MapPrefsRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repositories.RehabRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repositories.RoutingRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repositories.UserRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.domain.ports.camera.CameraSessionPort
+import ar.edu.unlam.mobile.scaffolding.domain.repository.AchievementRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import com.google.firebase.FirebaseApp
@@ -205,4 +208,13 @@ object AppModule {
         sessionDao: SessionDao,
         exerciseDao: ExerciseDao,
     ): RehabRepository = RehabRepositoryImpl(sessionDao = sessionDao, exerciseDao = exerciseDao)
+
+    @Provides
+    @Singleton
+    fun providesAchievementDao(db: AppDatabase): AchievementDao = db.achievementDao()
+
+    @Provides
+    @Singleton
+    fun providesAchievementRepository(achievementDao: AchievementDao): AchievementRepository =
+        AchievementRepositoryImpl(achievementDao = achievementDao)
 }

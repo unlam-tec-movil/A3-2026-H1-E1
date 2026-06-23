@@ -43,6 +43,8 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.ProfileScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.RegisterScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.SplashScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.UserScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.AchievementsView
+import ar.edu.unlam.mobile.scaffolding.ui.screens.progress.ProgressScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.EnvironmentCheckScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.PostSessionScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
@@ -57,6 +59,8 @@ private val routesWithoutChrome =
         Screen.EnvironmentCheck.route,
         Screen.RehabSession.route,
         Screen.PostSession.route,
+        Screen.Progress.route,
+        Screen.Achievements.route,
     )
 
 @Composable
@@ -207,7 +211,16 @@ fun MainScreen() {
             composable(Screen.Dashboard.route) {
                 DashboardScreen(
                     onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
+                    onNavigateToProgress = { controller.navigate(Screen.Progress.route) },
+                    onNavigateToAchievements = { controller.navigate(Screen.Achievements.route) },
                     modifier = Modifier.padding(paddingValues),
+                )
+            }
+
+            // Achievements
+            composable(Screen.Achievements.route) {
+                AchievementsView(
+                    onNavigateBack = { controller.popBackStack() },
                 )
             }
 
@@ -216,6 +229,13 @@ fun MainScreen() {
                 RoutineListScreen(
                     controller = controller,
                     modifier = Modifier.padding(paddingValues),
+                )
+            }
+
+            // Progress
+            composable(Screen.Progress.route) {
+                ProgressScreen(
+                    onNavigateBack = { controller.popBackStack() },
                 )
             }
 
