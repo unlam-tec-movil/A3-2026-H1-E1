@@ -3,6 +3,7 @@ package ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.StepCounterDataSource
 import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.domain.model.User
+import ar.edu.unlam.mobile.scaffolding.domain.repository.AchievementRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.DashboardViewModel
@@ -27,6 +28,7 @@ class DashboardViewModelTest {
     private val userRepository = mockk<UserRepository>(relaxed = true)
     private val rehabRepository = mockk<RehabRepository>(relaxed = true)
     private val stepCounterDataSource = mockk<StepCounterDataSource>(relaxed = true)
+    private val achievementRepository = mockk<AchievementRepository>(relaxed = true)
 
     private val testDispatcher = StandardTestDispatcher()
 
@@ -70,10 +72,11 @@ class DashboardViewModelTest {
             coEvery { userRepository.getUser() } returns flowOf(mockUser)
             coEvery { rehabRepository.getSessions("user_imanol") } returns flowOf(mockSessions)
             coEvery { stepCounterDataSource.getStepsFlow() } returns flowOf(5000)
+            coEvery { achievementRepository.getAchievements() } returns flowOf(emptyList())
 
             // Instantiate ViewModel
             val viewModel =
-                DashboardViewModel(userRepository, rehabRepository, stepCounterDataSource)
+                DashboardViewModel(userRepository, rehabRepository, stepCounterDataSource, achievementRepository)
 
             // Advance dispatcher to run init block coroutines
             advanceUntilIdle()
