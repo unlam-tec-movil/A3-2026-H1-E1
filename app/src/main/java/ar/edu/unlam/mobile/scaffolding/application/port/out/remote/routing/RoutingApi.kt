@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile.scaffolding.data.datasources.network.apiRouting
+package ar.edu.unlam.mobile.scaffolding.application.port.out.remote.routing
 
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.RouteRequest
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.RouteResponse

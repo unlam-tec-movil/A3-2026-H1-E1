@@ -23,7 +23,7 @@ data class UserEntity(
 // )
 @Entity(tableName = "clinics")
 data class AppClinicEntity(
-    @PrimaryKey val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
     val address: String,
     val phone: String,

@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile.scaffolding.domain.ports.location
+package ar.edu.unlam.mobile.scaffolding.application.port.out.local.location
 
 import android.location.Location
 import kotlinx.coroutines.flow.Flow

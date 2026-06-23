@@ -5,6 +5,7 @@ import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.domain.model.User
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
+import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.DashboardViewModel
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -71,7 +72,8 @@ class DashboardViewModelTest {
             coEvery { stepCounterDataSource.getStepsFlow() } returns flowOf(5000)
 
             // Instantiate ViewModel
-            val viewModel = DashboardViewModel(userRepository, rehabRepository, stepCounterDataSource)
+            val viewModel =
+                DashboardViewModel(userRepository, rehabRepository, stepCounterDataSource)
 
             // Advance dispatcher to run init block coroutines
             advanceUntilIdle()

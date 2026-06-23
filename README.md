@@ -214,7 +214,7 @@ Archivos a mover:
 | `adapters/device/sensor/StepCounterDataSource.kt` | `datasources/sensor/` |
 | `adapters/device/sensor/StepCounterService.kt` | `datasources/sensor/` |
 | `adapters/sensor/LightSensorDataSource.kt` | ⚠️ duplicado — revisar y eliminar |
-| `adapters/location/LocationDataSource.kt` | `datasources/location/` |
+| `adapters/location/LocationServicePortImpl.kt` | `datasources/location/` |
 | `adapters/location/DataBaseRepositoryImpl.kt` | `repositories/` |
 | `persistance/daos/` | `datasources/local/dao/` |
 | `persistance/db/` | `datasources/local/database/` |

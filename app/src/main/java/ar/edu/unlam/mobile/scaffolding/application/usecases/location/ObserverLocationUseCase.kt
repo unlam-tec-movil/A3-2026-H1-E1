@@ -1,7 +1,7 @@
 package ar.edu.unlam.mobile.scaffolding.application.usecases.location
 
 import android.location.Location
-import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
+import ar.edu.unlam.mobile.scaffolding.application.port.out.local.location.LocationServicePort
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

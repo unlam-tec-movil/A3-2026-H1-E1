@@ -1,3 +1,4 @@
+
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -11,6 +12,7 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
     id("com.google.gms.google-services")
 }
 
@@ -28,15 +30,20 @@ val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
     localPropertiesFile.inputStream().use { localProperties.load(it) }
 }
-val apiKey: String = (localProperties.getProperty("API_KEY") ?: "").trim { it == '"' }
+val mapApiKey: String = (localProperties.getProperty("API_KEY") ?: "").trim { it == '"' }
 val graphHopperApiKey: String = (localProperties.getProperty("GRAPH_HOPPER_API_KEY") ?: "").trim { it == '"' }
 android {
 
+    packaging {
+        resources {
+            excludes += "META-INF/native-image/**"
+        }
+    }
     namespace = "ar.edu.unlam.mobile.scaffolding"
     compileSdk = 36
 
     defaultConfig {
-        buildConfigField("String", "API_KEY", "\"${apiKey}\"")
+        buildConfigField("String", "API_KEY", "\"${mapApiKey}\"")
         buildConfigField("String", "GRAPH_HOPPER_API_KEY", "\"${graphHopperApiKey}\"")
         applicationId = "ar.edu.unlam.mobile.scaffolding"
         minSdk = 26
@@ -146,7 +153,7 @@ android {
         testImplementation(libs.google.dagger.hilt.android.testing)
 
         // Navigation Compose
-        implementation("androidx.navigation:navigation-compose:2.7.7")
+        implementation(libs.navigation.compose)
 
         // Room (Persistencia Local)
 
@@ -166,9 +173,8 @@ android {
         implementation("androidx.camera:camera-view:1.3.1")
         implementation("com.google.mlkit:pose-detection:18.0.0-beta3")
 
-        // Play Services Location & Google Maps (Dev 3)
+        // Play Services Location (Dev 3)
         implementation(libs.play.services.location)
-        implementation(libs.maps.compose)
 
         // Health Connect Client (Dev 4)
         implementation("androidx.health.connect:connect-client:1.1.0-alpha07")
@@ -208,8 +214,12 @@ android {
 
         // Coroutine test support
         testImplementation(libs.kotlinx.coroutines.test)
+        // KotlinSerialization
+        implementation(libs.kotlinx.serialization.json)
+
+        implementation(libs.androidx.compose.animation)
     }
 }
 dependencies {
-    implementation(libs.androidx.compose.animation)
+    implementation(libs.play.services.maps)
 }

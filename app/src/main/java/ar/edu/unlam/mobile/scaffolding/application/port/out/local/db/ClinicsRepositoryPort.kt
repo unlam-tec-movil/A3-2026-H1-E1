@@ -1,9 +1,9 @@
-package ar.edu.unlam.mobile.scaffolding.domain.ports.location
+package ar.edu.unlam.mobile.scaffolding.application.port.out.local.db
 
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import kotlinx.coroutines.flow.Flow
 
-interface DataBaseLocationRepositoryPort {
+interface ClinicsRepositoryPort {
     fun getClinics(): Flow<List<Clinic>>
 
     suspend fun saveClinic(clinic: Clinic)

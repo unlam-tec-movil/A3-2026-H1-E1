@@ -38,7 +38,7 @@ class GraphHopperModelsTest {
     @Test
     fun `Path and RouteResponse should maintain data integrity`() {
         val points = Points(type = "LineString", coordinates = listOf(listOf(0.0, 0.0)))
-        val path = Path(points = points, distance = 1234.56)
+        val path = Path(points = points, distance = 1234.56, time = 0L)
         val response = RouteResponse(paths = listOf(path))
 
         assertEquals(1, response.paths.size)

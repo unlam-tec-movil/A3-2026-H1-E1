@@ -1,10 +1,10 @@
 package ar.edu.unlam.mobile.scaffolding.application
 
+import ar.edu.unlam.mobile.scaffolding.application.port.out.local.db.ClinicsRepositoryPort
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsFromAssetsUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsStoredUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.PopulateClinicsDbUseCase
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
-import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseLocationRepositoryPort
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -26,7 +26,7 @@ class LocationStateManagementTest {
     private lateinit var getClinicsFromAssetsUseCase: GetClinicsFromAssetsUseCase
     private lateinit var populateClinicsDbUseCase: PopulateClinicsDbUseCase
     private lateinit var getStoredClinicsUseCase: GetClinicsStoredUseCase
-    private val mockRepository: DataBaseLocationRepositoryPort = mockk()
+    private val mockRepository: ClinicsRepositoryPort = mockk()
 
     @Before
     fun setUp() {

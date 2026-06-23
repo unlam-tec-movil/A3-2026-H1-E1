@@ -17,6 +17,7 @@ data class Points(
 data class Path(
     val points: Points,
     val distance: Double,
+    val time: Long,
 )
 
 data class RouteResponse(

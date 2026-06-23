@@ -3,10 +3,16 @@ package ar.edu.unlam.mobile.scaffolding.data.di
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
-import ar.edu.unlam.mobile.scaffolding.application.port.inn.routing.GetRouteUseCase
-import ar.edu.unlam.mobile.scaffolding.application.port.out.routing.RoutingApiKeyProvider
-import ar.edu.unlam.mobile.scaffolding.application.port.out.routing.RoutingRepository
-import ar.edu.unlam.mobile.scaffolding.application.service.routing.GetRouteInteractor
+import ar.edu.unlam.mobile.scaffolding.application.port.out.local.db.ClinicsRepositoryPort
+import ar.edu.unlam.mobile.scaffolding.application.port.out.local.db.HasStoredClinicsUseCase
+import ar.edu.unlam.mobile.scaffolding.application.port.out.local.location.LocationServicePort
+import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.map.ApiKeyProvider
+import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.routing.RoutingApi
+import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.routing.RoutingApiKeyProvider
+import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.routing.RoutingRepository
+import ar.edu.unlam.mobile.scaffolding.application.service.local.db.HasStoredClinicsInteractor
+import ar.edu.unlam.mobile.scaffolding.application.service.local.remote.routing.GetRouteUseCase
+import ar.edu.unlam.mobile.scaffolding.application.service.remote.routing.GetRouteInteractor
 import ar.edu.unlam.mobile.scaffolding.data.datasources.camera.CameraXSessionAdapter
 import ar.edu.unlam.mobile.scaffolding.data.datasources.device.health.HealthConnectDataSource
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.ClinicsDao
@@ -16,21 +22,17 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.local.dao.UserDao
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.database.AppDatabase
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.data.datasources.location.BuildConfigApiKeyProviderImpl
-import ar.edu.unlam.mobile.scaffolding.data.datasources.location.LocationDataSource
-import ar.edu.unlam.mobile.scaffolding.data.datasources.network.apiRouting.BuildConfigRoutingApiKeyProviderImpl
-import ar.edu.unlam.mobile.scaffolding.data.datasources.network.apiRouting.RoutingApi
+import ar.edu.unlam.mobile.scaffolding.data.datasources.location.LocationServicePortImpl
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.Constants
+import ar.edu.unlam.mobile.scaffolding.data.datasources.network.routing.BuildConfigRoutingApiKeyProviderImpl
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.AccelerometerDataSource
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.LightSensorDataSource
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.StepCounterDataSource
-import ar.edu.unlam.mobile.scaffolding.data.repositories.DataBaseLocationRepositoryImpl
+import ar.edu.unlam.mobile.scaffolding.data.repositories.ClinicsRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repositories.RehabRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repositories.RoutingRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repositories.UserRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.domain.ports.camera.CameraSessionPort
-import ar.edu.unlam.mobile.scaffolding.domain.ports.location.ApiKeyProvider
-import ar.edu.unlam.mobile.scaffolding.domain.ports.location.DataBaseLocationRepositoryPort
-import ar.edu.unlam.mobile.scaffolding.domain.ports.location.LocationServicePort
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import com.google.firebase.FirebaseApp
@@ -48,6 +50,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @Provides
+    @Singleton
+    fun providesHasStoredClinicsUseCase(repository: ClinicsRepositoryPort): HasStoredClinicsUseCase =
+        HasStoredClinicsInteractor(repository)
+
     @Provides
     @Singleton
     fun providesRoutingRepository(
@@ -126,7 +133,7 @@ object AppModule {
     @Provides
     @Singleton
     fun providesLocationServicePortImpl(context: Application): LocationServicePort =
-        LocationDataSource(context = context)
+        LocationServicePortImpl(context = context)
 
     @Provides
     @Singleton
@@ -145,7 +152,7 @@ object AppModule {
     fun providesDataBaseRepository(
         dao: ClinicsDao,
         @ApplicationContext context: Context,
-    ): DataBaseLocationRepositoryPort = DataBaseLocationRepositoryImpl(clinicsDao = dao, context)
+    ): ClinicsRepositoryPort = ClinicsRepositoryImpl(clinicsDao = dao, context)
 
     @Provides
     @Singleton
@@ -155,7 +162,8 @@ object AppModule {
                 context = context,
                 klass = AppDatabase::class.java,
                 name = "app_database",
-            ).fallbackToDestructiveMigration()
+            ).createFromAsset("databases/prepopulated.db")
+            .fallbackToDestructiveMigration()
             .build()
 
     @Provides

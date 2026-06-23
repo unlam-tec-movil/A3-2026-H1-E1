@@ -1,7 +1,7 @@
 package ar.edu.unlam.mobile.scaffolding.data.repositories
 
-import ar.edu.unlam.mobile.scaffolding.application.port.out.routing.RoutingApiKeyProvider
-import ar.edu.unlam.mobile.scaffolding.data.datasources.network.apiRouting.RoutingApi
+import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.routing.RoutingApi
+import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.routing.RoutingApiKeyProvider
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.RouteRequest
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.RouteResponse
 import com.google.android.gms.maps.model.LatLng
