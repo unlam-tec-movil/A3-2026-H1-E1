@@ -77,6 +77,7 @@ const val DASHBOARD_SCREEN_ROUTE = "dashboard"
 @Composable
 fun DashboardScreen(
     onNavigateToRoutineList: () -> Unit,
+    onNavigateToProgress: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
@@ -193,6 +194,7 @@ fun DashboardScreen(
                 RomProgressCard(
                     maxRom = uiState.maxRom,
                     targetRom = uiState.targetRom,
+                    onClick = onNavigateToProgress,
                     modifier =
                         Modifier.graphicsLayer {
                             val progress = ((entranceProgress - 0.15f) / 0.6f).coerceIn(0f, 1f)
@@ -218,6 +220,7 @@ fun DashboardScreen(
                 // Card 3: Last Active Session Card
                 LastSessionCard(
                     lastSession = uiState.lastSession,
+                    onClick = onNavigateToProgress,
                     modifier =
                         Modifier.graphicsLayer {
                             val progress = ((entranceProgress - 0.45f) / 0.55f).coerceIn(0f, 1f)
@@ -288,10 +291,14 @@ fun DashboardHeader(
 fun RomProgressCard(
     maxRom: Float,
     targetRom: Float,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable { onClick() },
         shape = RoundedCornerShape(24.dp),
         colors =
             CardDefaults.cardColors(
@@ -606,10 +613,14 @@ fun StatInfoItem(
 @Composable
 fun LastSessionCard(
     lastSession: Session?,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable { onClick() },
         shape = RoundedCornerShape(24.dp),
         colors =
             CardDefaults.cardColors(
