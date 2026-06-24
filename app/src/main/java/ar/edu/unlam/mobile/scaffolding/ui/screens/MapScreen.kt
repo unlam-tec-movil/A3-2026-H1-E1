@@ -44,10 +44,10 @@ import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.outlined.LocalHospital
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.SearchOff
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -79,6 +79,7 @@ import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import ar.edu.unlam.mobile.scaffolding.toHex
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomSheetCard
 import ar.edu.unlam.mobile.scaffolding.ui.components.FABShortCut
+import ar.edu.unlam.mobile.scaffolding.ui.components.LottieAnimation
 import ar.edu.unlam.mobile.scaffolding.ui.components.PulseRingUserLocationMarker
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.MapScreenViewModel
 import com.maptiler.maptilersdk.annotations.MTCustomAnnotationView
@@ -97,20 +98,21 @@ enum class DragState { LEFT, RIGHT, CENTER }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
-    // context
+fun MapScreen(
+    vm: MapScreenViewModel = hiltViewModel(),
+    onLoadedStateChange: (Boolean) -> Unit,
+) {
+    // region State & setup
     val context = LocalContext.current
-
     val uiState by vm.mapScreenUiState.collectAsStateWithLifecycle()
     var searchBarState by remember { mutableStateOf<Boolean>(false) }
     var showBottomSheetCard by remember { mutableStateOf<Boolean>(false) }
-    var showFabReposition by remember { mutableStateOf<Boolean>(true) }
+    var showFabReposition by remember { mutableStateOf<Boolean>(false) }
 
-    // map
     val controller = vm.mapController
     val routeColor = MaterialTheme.colorScheme.primary.toHex()
 
-    // location management
+    // Location permission
     val locationPermissionLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
@@ -121,7 +123,8 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                 Toast.makeText(context, "Location permission denied", Toast.LENGTH_SHORT).show()
             }
         }
-    // animations
+
+    // Drag animation anchors for the bottom sheet card
     val density = LocalDensity.current
     val anchorDistance = with(density) { 75.dp.toPx() }
     val dragState =
@@ -136,6 +139,17 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                     },
             )
         }
+
+    val isLoading =
+        uiState.isLoadingClinics ||
+            uiState.isLoadingPermission ||
+            (uiState.permissionGranted && !uiState.mapInitialized)
+
+    LaunchedEffect(isLoading) {
+        onLoadedStateChange(isLoading)
+        showFabReposition = !isLoading
+    }
+    // Keep the last selected clinic alive while the card animates out
     var clinicToDisplay by remember { mutableStateOf<Clinic?>(null) }
     LaunchedEffect(uiState.selectedClinic) {
         if (uiState.selectedClinic != null) {
@@ -143,19 +157,14 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
         }
     }
 
+    // Swipe left = dismiss card, swipe right = call
     LaunchedEffect(dragState.settledValue) {
         when (dragState.settledValue) {
             DragState.LEFT -> {
                 dragState.animateTo(DragState.CENTER)
                 uiState.location?.let { location ->
-                    vm.centerCameraOn(
-                        LngLat(
-                            lng = location.longitude,
-                            lat = location.latitude,
-                        ),
-                    )
+                    vm.centerCameraOn(LngLat(lng = location.longitude, lat = location.latitude))
                 }
-
                 showBottomSheetCard = false
                 showFabReposition = true
                 vm.onHideCardSheetAndRemoveRouteLayer()
@@ -169,6 +178,8 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
             DragState.CENTER -> {}
         }
     }
+
+    // Check permission on first composition
     LaunchedEffect(Unit) {
         if (ContextCompat.checkSelfPermission(
                 context,
@@ -180,51 +191,53 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
             vm.onPermissionCheckComplete(granted = false)
         }
     }
+    // end region
 
-    Scaffold(floatingActionButton = {
-        Column(
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(bottom = 90.dp),
-        ) {
+    Scaffold(
+        floatingActionButtonPosition = FabPosition.End,
+        floatingActionButton = {
             AnimatedVisibility(
-                visible = (uiState.lastSavedClinicId != null || uiState.selectedClinic != null) && !showBottomSheetCard,
+                visible =
+                    (uiState.lastSavedClinicId != null || uiState.selectedClinic != null) && !showBottomSheetCard,
                 enter = scaleIn(),
                 exit = scaleOut(),
             ) {
-                FABShortCut(
-                    onClick = {
-                        showBottomSheetCard = true
-                        showFabReposition = false
-                        vm.onRestoreLastRouteClick(routeColor)
-                    },
-                    icon = Icons.Default.Update,
-                )
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(bottom = 90.dp),
+                ) {
+                    if (showFabReposition) {
+                        FABShortCut(
+                            onClick = {
+                                showBottomSheetCard = true
+                                showFabReposition = false
+                                vm.onRestoreLastRouteClick(routeColor)
+                            },
+                            icon = Icons.Default.Update,
+                        )
+                        FABShortCut(
+                            modifier = Modifier,
+                            onClick = {
+                                uiState.location?.let { location ->
+                                    vm.centerCameraOn(LngLat(lng = location.longitude, lat = location.latitude))
+                                }
+                            },
+                            icon = Icons.Default.MyLocation,
+                        )
+                    }
+                }
             }
-            if (showFabReposition) {
-                FABShortCut(
-                    modifier = Modifier,
-                    onClick = {
-                        uiState.location?.let { location ->
-                            vm.centerCameraOn(
-                                LngLat(
-                                    lng = location.longitude,
-                                    lat = location.latitude,
-                                ),
-                            )
-                        }
-                    },
-                    icon = Icons.Default.MyLocation,
-                )
-            }
-        }
-    }, floatingActionButtonPosition = FabPosition.End) { paddingValues ->
+        },
+    ) { paddingValues ->
 
+        // region Map content
         if (uiState.permissionGranted && uiState.showMap && uiState.location != null) {
             Box(
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
             ) {
                 MTMapView(
                     referenceStyle = MTMapReferenceStyle.BASIC,
@@ -241,8 +254,9 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                         ),
                     controller = controller,
                     modifier = Modifier.fillMaxSize(),
-                    styleVariant = MTMapStyleVariant.LITE,
+                    styleVariant = MTMapStyleVariant.LIGHT,
                 )
+
                 DockedSearchBar(
                     shape = RoundedCornerShape(8.dp),
                     modifier =
@@ -303,9 +317,7 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                                 )
-
                                 HorizontalDivider()
-
                                 uiState.filteredClinics.forEach { clinic ->
                                     ListItem(
                                         headlineContent = {
@@ -360,9 +372,7 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                                                 vm.onClinicSelectedChange(clinic)
                                                 showBottomSheetCard = true
                                                 showFabReposition = false
-
                                                 vm.centerCameraOn(LngLat(lng = clinic.lng, lat = clinic.lat))
-
                                                 searchBarState = false
                                             },
                                     )
@@ -396,6 +406,7 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                     }
                 }
 
+                // User location marker
                 MTCustomAnnotationView(
                     controller = controller,
                     coordinates =
@@ -412,27 +423,20 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                     )
                 }
 
+                // Clinic markers — include selected clinic even if outside the near list
                 val markersToShow =
                     remember(uiState.clinicsNear, uiState.selectedClinic) {
                         val list = uiState.clinicsNear.toMutableList()
                         uiState.selectedClinic?.let { selected ->
-
-                            if (list.none { it.id == selected.id }) {
-                                list.add(selected)
-                            }
+                            if (list.none { it.id == selected.id }) list.add(selected)
                         }
                         list
                     }
 
                 markersToShow.forEach { clinic ->
-
                     MTCustomAnnotationView(
                         controller = controller,
-                        coordinates =
-                            LngLat(
-                                lng = clinic.lng,
-                                lat = clinic.lat,
-                            ),
+                        coordinates = LngLat(lng = clinic.lng, lat = clinic.lat),
                         modifier = Modifier,
                     ) {
                         PulseRingUserLocationMarker(
@@ -450,6 +454,8 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                         )
                     }
                 }
+
+                // Bottom sheet card with swipe-to-dismiss / swipe-to-call
                 Column(
                     modifier =
                         Modifier
@@ -464,7 +470,6 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                         exit = scaleOut() + shrinkVertically(),
                     ) {
                         clinicToDisplay?.let { clinicSelected ->
-
                             Box(
                                 contentAlignment = Alignment.CenterStart,
                                 modifier =
@@ -473,6 +478,7 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                                         shape = MaterialTheme.shapes.large,
                                     ),
                             ) {
+                                // Hint icons shown behind the draggable card
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -514,7 +520,6 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                                         val userLng = uiState.location!!.longitude
                                         val clinicLat = clinicSelected.lat
                                         val clinicLng = clinicSelected.lng
-
                                         val bounds =
                                             MTBounds(
                                                 west = minOf(userLng, clinicLng),
@@ -536,7 +541,6 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                                                     duration = 1000.0,
                                                 ),
                                         )
-
                                         vm.onCreateRouteClick(hexColor = routeColor)
                                     },
                                 )
@@ -546,6 +550,9 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                 }
             }
         }
+        // endregion
+
+        // region Overlays (loading / error / permission)
         if (uiState.isLoadingClinics ||
             uiState.isLoadingPermission ||
             (uiState.permissionGranted && !uiState.mapInitialized)
@@ -557,7 +564,7 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                         .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center,
             ) {
-                CircularProgressIndicator()
+                LottieAnimation(Modifier.fillMaxSize())
             }
         } else if (!uiState.clinicsLoadSuccess && uiState.clinicsLoadError != null) {
             Box(
@@ -590,5 +597,6 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                 }
             }
         }
+        // endregion
     }
 }

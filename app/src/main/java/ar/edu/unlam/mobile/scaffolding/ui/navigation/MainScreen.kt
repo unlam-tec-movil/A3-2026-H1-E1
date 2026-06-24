@@ -69,7 +69,10 @@ fun MainScreen() {
     val snackBarHostState = remember { SnackbarHostState() }
     val currentBackStack by controller.currentBackStackEntryAsState()
     val currentRoute = currentBackStack?.destination?.route
-    val showChrome = currentRoute !in routesWithoutChrome
+    var isMapLoading by remember { mutableStateOf(false) }
+    val showChrome =
+        currentRoute !in routesWithoutChrome &&
+            !(currentRoute == Screen.MapScreen.route && isMapLoading)
     var showFab by remember { mutableStateOf(true) }
 
     showFab = currentRoute != Screen.MapScreen.route
@@ -312,7 +315,7 @@ fun MainScreen() {
                 enterTransition = { slideInHorizontally(animationSpec = tween(500, easing = FastOutSlowInEasing)) },
                 exitTransition = { slideOutHorizontally(animationSpec = tween(500, easing = FastOutSlowInEasing)) },
             ) {
-                MapScreen()
+                MapScreen(onLoadedStateChange = { newStateFromMapScreen -> isMapLoading = newStateFromMapScreen })
             }
 
             // User

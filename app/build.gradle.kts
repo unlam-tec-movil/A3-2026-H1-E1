@@ -216,8 +216,10 @@ android {
         testImplementation(libs.kotlinx.coroutines.test)
         // KotlinSerialization
         implementation(libs.kotlinx.serialization.json)
-
         implementation(libs.androidx.compose.animation)
+
+        // Lootie
+        implementation("com.airbnb.android:lottie-compose:6.7.1")
     }
 }
 dependencies {

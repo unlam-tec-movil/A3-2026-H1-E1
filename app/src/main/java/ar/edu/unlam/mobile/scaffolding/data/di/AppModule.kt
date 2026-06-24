@@ -7,6 +7,7 @@ import ar.edu.unlam.mobile.scaffolding.application.port.out.local.db.ClinicsRepo
 import ar.edu.unlam.mobile.scaffolding.application.port.out.local.db.HasStoredClinicsUseCase
 import ar.edu.unlam.mobile.scaffolding.application.port.out.local.location.LocationServicePort
 import ar.edu.unlam.mobile.scaffolding.application.port.out.local.prefs.MapPrefsRepositoryPort
+import ar.edu.unlam.mobile.scaffolding.application.port.out.local.sensor.MeasurableSensorPort
 import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.map.ApiKeyProvider
 import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.routing.RoutingApi
 import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.routing.RoutingApiKeyProvider
@@ -29,6 +30,7 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.location.LocationService
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.Constants
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.routing.BuildConfigRoutingApiKeyProviderImpl
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.AccelerometerDataSource
+import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.LightSensor
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.LightSensorDataSource
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.StepCounterDataSource
 import ar.edu.unlam.mobile.scaffolding.data.repositories.AchievementRepositoryImpl
@@ -49,6 +51,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -56,6 +60,18 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    // Inside AppModule object
+    @Provides
+    @Singleton
+    @ApplicationScope
+    fun providesApplicationScope(): CoroutineScope = CoroutineScope(SupervisorJob())
+
+    @Provides
+    @Singleton
+    fun providesLightSensor(
+        @ApplicationContext context: Context,
+    ): MeasurableSensorPort = LightSensor(context = context)
+
     @Provides
     @Singleton
     fun providesHasStoredClinicsUseCase(repository: ClinicsRepositoryPort): HasStoredClinicsUseCase =
