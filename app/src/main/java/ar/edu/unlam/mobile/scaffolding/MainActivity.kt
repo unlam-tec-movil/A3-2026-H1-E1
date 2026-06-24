@@ -3,16 +3,16 @@ package ar.edu.unlam.mobile.scaffolding
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.activity.SystemBarStyle
-import androidx.compose.runtime.LaunchedEffect
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.ui.navigation.MainScreen
@@ -38,21 +38,31 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(isDarkMode) {
                 enableEdgeToEdge(
-                    statusBarStyle = SystemBarStyle.auto(
-                        android.graphics.Color.TRANSPARENT,
-                        android.graphics.Color.TRANSPARENT,
-                        detectDarkMode = { isDarkMode }
-                    ),
-                    navigationBarStyle = SystemBarStyle.auto(
-                        android.graphics.Color.TRANSPARENT,
-                        android.graphics.Color.TRANSPARENT,
-                        detectDarkMode = { isDarkMode }
-                    )
+                    statusBarStyle =
+                        SystemBarStyle.auto(
+                            android.graphics.Color.TRANSPARENT,
+                            android.graphics.Color.TRANSPARENT,
+                            detectDarkMode = { isDarkMode },
+                        ),
+                    navigationBarStyle =
+                        SystemBarStyle.auto(
+                            android.graphics.Color.TRANSPARENT,
+                            android.graphics.Color.TRANSPARENT,
+                            detectDarkMode = { isDarkMode },
+                        ),
                 )
 
-                val windowInsetsController = androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
-                windowInsetsController.systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                windowInsetsController.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+                val windowInsetsController =
+                    androidx.core.view.WindowCompat.getInsetsController(
+                        window,
+                        window.decorView,
+                    )
+                windowInsetsController.systemBarsBehavior =
+                    androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                windowInsetsController.hide(
+                    androidx.core.view.WindowInsetsCompat.Type
+                        .systemBars(),
+                )
             }
 
             GambAppTheme(darkTheme = isDarkMode) {
