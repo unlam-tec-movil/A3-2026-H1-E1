@@ -160,7 +160,8 @@ class ProgressViewModel
                                 exerciseName = exerciseName,
                             )
                         } else {
-                            // Generate a realistic mock session for the day to keep the 7-day chart continuous and beautiful
+                            // Generate a realistic mock session for the day to keep
+                            // the 7-day chart continuous and beautiful
                             val mockRom = 70f + (index * 6f) + (Math.sin(index.toDouble()) * 4).toFloat()
                             val mockDuration = 600L + (index * 80L)
                             val mockReps = 8 + (index * 2)

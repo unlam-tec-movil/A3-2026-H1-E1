@@ -8,8 +8,6 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -20,9 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
@@ -32,10 +28,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
-import ar.edu.unlam.mobile.scaffolding.ui.components.FABShortCut
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
 import ar.edu.unlam.mobile.scaffolding.ui.screens.DashboardScreen
-import ar.edu.unlam.mobile.scaffolding.ui.screens.FormScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.LoginScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.MapScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.OnboardingScreen
@@ -59,7 +53,6 @@ private val routesWithoutChrome =
         Screen.EnvironmentCheck.route,
         Screen.RehabSession.route,
         Screen.PostSession.route,
-        Screen.Progress.route,
         Screen.Achievements.route,
     )
 
@@ -70,20 +63,8 @@ fun MainScreen() {
     val currentBackStack by controller.currentBackStackEntryAsState()
     val currentRoute = currentBackStack?.destination?.route
     val showChrome = currentRoute !in routesWithoutChrome
-    var showFab by remember { mutableStateOf(true) }
-
-    showFab = currentRoute != Screen.MapScreen.route
 
     Scaffold(
-        floatingActionButton = {
-            if (showFab) {
-                FABShortCut(
-                    modifier = Modifier,
-                    onClick = { controller.navigate(Screen.MapScreen.route) },
-                    icon = Icons.Default.Map,
-                )
-            }
-        },
         bottomBar = { if (showChrome) BottomBar(controller = controller) },
         snackbarHost = {
             SnackbarHost(snackBarHostState) { data ->
@@ -298,15 +279,7 @@ fun MainScreen() {
                 )
             }
 
-            // Form
-            composable(Screen.Form.route) {
-                FormScreen(
-                    modifier = Modifier.padding(paddingValues),
-                    snackbarHostState = snackBarHostState,
-                )
-            }
-
-            // Playground
+            // Playground (Map)
             composable(
                 route = Screen.MapScreen.route,
                 enterTransition = { slideInHorizontally(animationSpec = tween(500, easing = FastOutSlowInEasing)) },
