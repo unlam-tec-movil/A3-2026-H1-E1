@@ -20,7 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
@@ -64,7 +66,7 @@ fun MainScreen() {
     val currentRoute = currentBackStack?.destination?.route
     var isMapLoading by remember { mutableStateOf(false) }
     val showChrome =
-        currentRoute !in routesWithoutChrome &&
+        currentRoute !in bottomNavRoutes &&
             !(currentRoute == Screen.MapScreen.route && isMapLoading)
     var showFab by remember { mutableStateOf(true) }
 
