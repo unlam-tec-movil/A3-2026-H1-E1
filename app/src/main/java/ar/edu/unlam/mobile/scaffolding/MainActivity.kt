@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import ar.edu.unlam.mobile.scaffolding.application.service.local.ThemeSensorManager
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.ui.navigation.MainScreen
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
@@ -22,6 +23,19 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var sessionPreferences: SessionPreferences
+
+    @Inject
+    lateinit var themeSensorManager: ThemeSensorManager
+
+    override fun onStart() {
+        super.onStart()
+        themeSensorManager.startListening()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        themeSensorManager.stopListening()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()

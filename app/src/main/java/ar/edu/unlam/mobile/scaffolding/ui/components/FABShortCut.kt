@@ -19,6 +19,7 @@ fun FABShortCut(
     icon: ImageVector,
 ) {
     FloatingActionButton(
+        containerColor = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(30.dp),
         onClick = {
             onClick()
