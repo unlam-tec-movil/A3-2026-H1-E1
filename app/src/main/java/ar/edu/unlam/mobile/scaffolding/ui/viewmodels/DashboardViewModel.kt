@@ -10,6 +10,7 @@ import ar.edu.unlam.mobile.scaffolding.domain.repository.AchievementRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,6 +46,8 @@ class DashboardViewModel
         private val _uiState = MutableStateFlow(DashboardUiState())
         val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
+        private var dataJob: Job? = null
+
         init {
             loadDashboardData()
         }
@@ -55,51 +58,52 @@ class DashboardViewModel
                 prepareMockDataIfNeeded()
 
                 // Observe user changes
-                val userFlow = userRepository.getUser()
+                userRepository.getUser().collect { user ->
+                    dataJob?.cancel()
+                    val userId = user?.id ?: "user_imanol"
 
-                // We use a default user id if none is found, but we will seed it
-                val userId = "user_imanol"
+                    dataJob =
+                        viewModelScope.launch {
+                            combine(
+                                rehabRepository.getSessions(userId),
+                                stepCounterDataSource.getStepsFlow(),
+                                achievementRepository.getAchievements(),
+                            ) { sessions, steps, achievements ->
+                                val userName = user?.name ?: "Imanol"
+                                val maxRom = sessions.maxOfOrNull { it.averageRom } ?: 0f
+                                val lastSession = sessions.maxByOrNull { it.dateTimestamp }
 
-                // Observe sessions changes
-                val sessionsFlow = rehabRepository.getSessions(userId)
+                                // Seed mock achievements if not already present
+                                seedAchievementsIfNeeded(achievements)
 
-                // Observe achievements changes
-                val achievementsFlow = achievementRepository.getAchievements()
+                                // Check and unlock achievements dynamically
+                                checkAndUnlockAchievements(steps, sessions, achievements)
 
-                combine(
-                    userFlow,
-                    sessionsFlow,
-                    stepCounterDataSource.getStepsFlow(),
-                    achievementsFlow,
-                ) { user, sessions, steps, achievements ->
-                    val userName = user?.name ?: "Imanol"
-                    val maxRom = sessions.maxOfOrNull { it.averageRom } ?: 0f
-                    val lastSession = sessions.maxByOrNull { it.dateTimestamp }
+                                val unlockedCount = achievements.count { it.isUnlocked }
 
-                    // Seed mock achievements if not already present
-                    seedAchievementsIfNeeded(achievements)
-
-                    // Check and unlock achievements dynamically
-                    checkAndUnlockAchievements(steps, sessions, achievements)
-
-                    val unlockedCount = achievements.count { it.isUnlocked }
-
-                    DashboardUiState(
-                        userName = userName,
-                        maxRom = maxRom,
-                        targetRom = 120f, // Target ROM is 120 degrees
-                        currentSteps = steps,
-                        targetSteps = 10000,
-                        lastSession = lastSession,
-                        unlockedAchievementsCount = unlockedCount,
-                        newlyUnlockedAchievement = _uiState.value.newlyUnlockedAchievement,
-                        isLoading = false,
-                        error = null,
-                    )
-                }.catch { e ->
-                    _uiState.update { it.copy(isLoading = false, error = e.localizedMessage ?: "Unknown error") }
-                }.collect { state ->
-                    _uiState.value = state
+                                DashboardUiState(
+                                    userName = userName,
+                                    maxRom = maxRom,
+                                    targetRom = 120f, // Target ROM is 120 degrees
+                                    currentSteps = steps,
+                                    targetSteps = 10000,
+                                    lastSession = lastSession,
+                                    unlockedAchievementsCount = unlockedCount,
+                                    newlyUnlockedAchievement = _uiState.value.newlyUnlockedAchievement,
+                                    isLoading = false,
+                                    error = null,
+                                )
+                            }.catch { e ->
+                                _uiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        error = e.localizedMessage ?: "Unknown error",
+                                    )
+                                }
+                            }.collect { state ->
+                                _uiState.value = state
+                            }
+                        }
                 }
             }
         }

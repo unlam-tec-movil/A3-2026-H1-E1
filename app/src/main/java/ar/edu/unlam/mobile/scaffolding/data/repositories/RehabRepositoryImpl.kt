@@ -28,6 +28,10 @@ class RehabRepositoryImpl
             sessionDao.insertSession(session.toEntity())
         }
 
+        override suspend fun clearSessionsByUser(userId: String) {
+            sessionDao.deleteSessionsByUser(userId)
+        }
+
         override fun getExercises(): Flow<List<Exercise>> =
             exerciseDao.getAllExercises().map { entities ->
                 entities.map { it.toDomain() }

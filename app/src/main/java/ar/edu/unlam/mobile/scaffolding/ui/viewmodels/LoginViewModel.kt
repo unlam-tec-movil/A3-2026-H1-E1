@@ -94,6 +94,19 @@ class LoginViewModel
             }
         }
 
+        fun onLoginWithMockUser(email: String) {
+            viewModelScope.launch {
+                _uiState.value = LoginUiState.Loading
+                _uiState.value =
+                    runCatching {
+                        loginUseCase.loginWithMock(email)
+                        LoginUiState.Success
+                    }.getOrElse { e ->
+                        LoginUiState.Error(e.message ?: "Error desconocido")
+                    }
+            }
+        }
+
         fun onErrorConsumed() {
             _uiState.value = LoginUiState.Idle
         }
