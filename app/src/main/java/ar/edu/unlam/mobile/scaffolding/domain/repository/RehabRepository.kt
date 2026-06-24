@@ -9,6 +9,8 @@ interface RehabRepository {
 
     suspend fun saveSession(session: Session)
 
+    suspend fun clearSessionsByUser(userId: String)
+
     fun getExercises(): Flow<List<Exercise>>
 
     fun getExerciseById(id: String): Flow<Exercise?>

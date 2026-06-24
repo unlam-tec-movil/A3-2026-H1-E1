@@ -148,7 +148,8 @@ class RehabSessionViewModel
                         successfulReps = _repetitionCount.value,
                     )
                 // Note: The card mentions saving when "Guardar" is pressed.
-                // We'll keep this save here as a "draft" or final, but PostSessionScreen will handle the final interaction.
+                // We'll keep this save here as a "draft" or final, but
+                // PostSessionScreen will handle the final interaction.
                 rehabRepository.saveSession(session)
             }
         }

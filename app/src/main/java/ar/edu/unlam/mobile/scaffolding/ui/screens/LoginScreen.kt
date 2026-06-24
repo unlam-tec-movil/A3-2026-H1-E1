@@ -1,24 +1,35 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,6 +64,39 @@ import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.LoginFormState
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.LoginUiState
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.LoginViewModel
 
+private data class MockUserUi(
+    val name: String,
+    val email: String,
+    val level: String,
+    val description: String,
+    val color: Color,
+)
+
+private val mockUsersList =
+    listOf(
+        MockUserUi(
+            name = "Juan Pérez",
+            email = "juan.perez@gambapp.com",
+            level = "Principiante",
+            description = "3 ses. · ROM 72° · 1.5K pasos",
+            color = Color(0xFF0EA5E9), // Sky Blue
+        ),
+        MockUserUi(
+            name = "María Rodríguez",
+            email = "maria.rodriguez@gambapp.com",
+            level = "Intermedio",
+            description = "5 ses. · ROM 102° · 5.5K pasos",
+            color = Color(0xFF0D9488), // Teal
+        ),
+        MockUserUi(
+            name = "Carlos Gómez",
+            email = "carlos.gomez@gambapp.com",
+            level = "Avanzado",
+            description = "10 ses. · ROM 122° · 12.5K pasos",
+            color = Color(0xFF8B5CF6), // Violet/Purple
+        ),
+    )
+
 // LoginScreen
 @Composable
 fun LoginScreen(
@@ -76,6 +120,7 @@ fun LoginScreen(
         onPasswordChange = viewModel::onPasswordChange,
         onTogglePasswordVisibility = viewModel::onTogglePasswordVisibility,
         onLogin = viewModel::onLogin,
+        onLoginWithMockUser = viewModel::onLoginWithMockUser,
         onNavigateToRegister = onNavigateToRegister,
     )
 }
@@ -89,6 +134,7 @@ internal fun LoginContent(
     onPasswordChange: (String) -> Unit,
     onTogglePasswordVisibility: () -> Unit,
     onLogin: () -> Unit,
+    onLoginWithMockUser: (String) -> Unit,
     onNavigateToRegister: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -105,7 +151,8 @@ internal fun LoginContent(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 32.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -255,6 +302,105 @@ internal fun LoginContent(
                     fontSize = 14.sp,
                 )
             }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            HorizontalDivider(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f),
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Acceso Rápido (Usuarios Mock)",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start,
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            mockUsersList.forEach { mockUser ->
+                Card(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .clickable(enabled = !isLoading) { onLoginWithMockUser(mockUser.email) },
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
+                        ),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        // Avatar Circle
+                        Box(
+                            modifier =
+                                Modifier
+                                    .size(36.dp)
+                                    .background(color = mockUser.color, shape = CircleShape),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text =
+                                    mockUser.name
+                                        .split(" ")
+                                        .map { it.first() }
+                                        .joinToString(""),
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = mockUser.name,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 13.sp,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = mockUser.email,
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = mockUser.level,
+                                color = mockUser.color,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 10.sp,
+                                modifier =
+                                    Modifier
+                                        .background(
+                                            mockUser.color.copy(alpha = 0.12f),
+                                            shape = RoundedCornerShape(4.dp),
+                                        ).padding(horizontal = 6.dp, vertical = 2.dp),
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = mockUser.description,
+                                fontSize = 9.sp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -272,6 +418,7 @@ private fun PreviewLoginIdleLight() {
                 onPasswordChange = {},
                 onTogglePasswordVisibility = {},
                 onLogin = {},
+                onLoginWithMockUser = {},
                 onNavigateToRegister = {},
             )
         }
@@ -290,6 +437,7 @@ private fun PreviewLoginErrorLight() {
                 onPasswordChange = {},
                 onTogglePasswordVisibility = {},
                 onLogin = {},
+                onLoginWithMockUser = {},
                 onNavigateToRegister = {},
             )
         }
@@ -308,6 +456,7 @@ private fun PreviewLoginLoadingLight() {
                 onPasswordChange = {},
                 onTogglePasswordVisibility = {},
                 onLogin = {},
+                onLoginWithMockUser = {},
                 onNavigateToRegister = {},
             )
         }
@@ -326,6 +475,7 @@ private fun PreviewLoginIdleDark() {
                 onPasswordChange = {},
                 onTogglePasswordVisibility = {},
                 onLogin = {},
+                onLoginWithMockUser = {},
                 onNavigateToRegister = {},
             )
         }
