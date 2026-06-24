@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -71,6 +72,7 @@ fun ProfileScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToMap: () -> Unit,
     modifier: Modifier = Modifier,
+    paddingValues: PaddingValues = PaddingValues(),
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -94,6 +96,7 @@ fun ProfileScreen(
         onSignOutConfirm = viewModel::onSignOutConfirm,
         onNavigateToMap = onNavigateToMap,
         modifier = modifier,
+        paddingValues = paddingValues,
     )
 }
 
@@ -111,6 +114,7 @@ internal fun ProfileContent(
     onSignOutConfirm: () -> Unit,
     onNavigateToMap: () -> Unit,
     modifier: Modifier = Modifier,
+    paddingValues: PaddingValues = PaddingValues(),
 ) {
     if (uiState.isLoading) {
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -125,9 +129,11 @@ internal fun ProfileContent(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 16.dp),
+                .padding(horizontal = 20.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
+        Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding() + 16.dp))
+
         // Avatar + datos del usuario
         AvatarSection(
             initials = uiState.initials,
@@ -221,6 +227,8 @@ internal fun ProfileContent(
                 fontSize = 15.sp,
             )
         }
+
+        Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding() + 16.dp))
     }
 
     // Diálogo de confirmación de cierre de sesión

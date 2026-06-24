@@ -67,6 +67,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.StepCounterService
@@ -89,6 +90,7 @@ fun DashboardScreen(
     onNavigateToProgress: () -> Unit,
     onNavigateToAchievements: () -> Unit,
     modifier: Modifier = Modifier,
+    paddingValues: PaddingValues = PaddingValues(),
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -151,8 +153,7 @@ fun DashboardScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(16.dp),
+                .background(MaterialTheme.colorScheme.background),
     ) {
         if (uiState.isLoading) {
             CircularProgressIndicator(
@@ -173,9 +174,12 @@ fun DashboardScreen(
                 modifier =
                     Modifier
                         .fillMaxSize()
+                        .padding(horizontal = 16.dp)
                         .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
+                Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding() + 16.dp))
+
                 // Header (Greeting & Avatar)
                 DashboardHeader(
                     userName = uiState.userName,
@@ -254,7 +258,7 @@ fun DashboardScreen(
                         },
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding() + 16.dp))
             }
         }
 

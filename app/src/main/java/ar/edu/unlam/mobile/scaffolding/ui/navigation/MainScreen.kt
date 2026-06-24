@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Map
@@ -203,7 +204,8 @@ fun MainScreen() {
                     onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
                     onNavigateToProgress = { controller.navigate(Screen.Progress.createRoute(fromDashboard = true)) },
                     onNavigateToAchievements = { controller.navigate(Screen.Achievements.route) },
-                    modifier = Modifier.padding(paddingValues),
+                    modifier = Modifier.fillMaxSize(),
+                    paddingValues = paddingValues,
                 )
             }
 
@@ -218,7 +220,8 @@ fun MainScreen() {
             composable(Screen.RoutineList.route) {
                 RoutineListScreen(
                     controller = controller,
-                    modifier = Modifier.padding(paddingValues),
+                    modifier = Modifier.fillMaxSize(),
+                    paddingValues = paddingValues,
                 )
             }
 
@@ -237,6 +240,8 @@ fun MainScreen() {
                 ProgressScreen(
                     onNavigateBack = { controller.popBackStack() },
                     showBackButton = fromDashboard,
+                    modifier = Modifier.fillMaxSize(),
+                    parentPaddingValues = paddingValues,
                 )
             }
 
@@ -298,7 +303,8 @@ fun MainScreen() {
                     onNavigateToMap = {
                         controller.navigate(Screen.MapScreen.route)
                     },
-                    modifier = Modifier.padding(paddingValues),
+                    modifier = Modifier.fillMaxSize(),
+                    paddingValues = paddingValues,
                 )
             }
 

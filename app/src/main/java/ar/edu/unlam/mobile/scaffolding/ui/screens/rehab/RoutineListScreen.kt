@@ -59,6 +59,7 @@ import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.RoutineListViewModel
 fun RoutineListScreen(
     controller: NavHostController,
     modifier: Modifier = Modifier,
+    paddingValues: PaddingValues = PaddingValues(),
     viewModel: RoutineListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -87,7 +88,7 @@ fun RoutineListScreen(
                         .fillMaxSize()
                         .padding(horizontal = 16.dp),
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding() + 16.dp))
 
                 // Beautiful Header with overall stats
                 RoutineHeader(
@@ -128,7 +129,7 @@ fun RoutineListScreen(
                     // LazyColumn for smooth, high-performance scrolling
                     LazyColumn(
                         modifier = Modifier.weight(1f),
-                        contentPadding = PaddingValues(bottom = 80.dp),
+                        contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         itemsIndexed(

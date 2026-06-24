@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -88,6 +89,7 @@ fun ProgressScreen(
     onNavigateBack: () -> Unit,
     showBackButton: Boolean = false,
     modifier: Modifier = Modifier,
+    parentPaddingValues: PaddingValues = PaddingValues(),
     viewModel: ProgressViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -203,7 +205,7 @@ fun ProgressScreen(
                         entranceProgress = entranceProgress,
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(parentPaddingValues.calculateBottomPadding() + 16.dp))
                 }
             }
         }
