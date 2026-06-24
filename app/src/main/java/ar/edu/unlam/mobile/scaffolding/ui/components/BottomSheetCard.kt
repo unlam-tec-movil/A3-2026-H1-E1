@@ -87,15 +87,20 @@ fun BottomSheetCard(
     }
 
     Card(
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    MaterialTheme.colorScheme.surface,
+            ),
         border =
             BorderStroke(
-                width = 1.dp,
+                width = 2.dp,
                 brush =
                     Brush.linearGradient(
                         colors =
                             listOf(
-                                MaterialTheme.colorScheme.primaryContainer,
                                 MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.primaryContainer,
                             ),
                     ),
             ),
@@ -112,7 +117,7 @@ fun BottomSheetCard(
                 Icon(
                     imageVector = Icons.Outlined.LocalHospital,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier =
                         Modifier
                             .size(100.dp)

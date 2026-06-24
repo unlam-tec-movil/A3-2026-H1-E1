@@ -21,7 +21,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
@@ -63,8 +65,13 @@ fun MainScreen() {
     val snackBarHostState = remember { SnackbarHostState() }
     val currentBackStack by controller.currentBackStackEntryAsState()
     val currentRoute = currentBackStack?.destination?.route
-    val showChrome = currentRoute in bottomNavRoutes
-    val showFab = showChrome && currentRoute != Screen.MapScreen.route
+    var isMapLoading by remember { mutableStateOf(false) }
+    val showChrome =
+        currentRoute !in bottomNavRoutes &&
+            !(currentRoute == Screen.MapScreen.route && isMapLoading)
+    var showFab by remember { mutableStateOf(true) }
+
+    showFab = currentRoute != Screen.MapScreen.route
 
     Scaffold(
         floatingActionButton = {
@@ -314,7 +321,7 @@ fun MainScreen() {
                 enterTransition = { slideInHorizontally(animationSpec = tween(500, easing = FastOutSlowInEasing)) },
                 exitTransition = { slideOutHorizontally(animationSpec = tween(500, easing = FastOutSlowInEasing)) },
             ) {
-                MapScreen()
+                MapScreen(onLoadedStateChange = { newStateFromMapScreen -> isMapLoading = newStateFromMapScreen })
             }
 
             // User
