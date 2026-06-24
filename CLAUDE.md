@@ -20,6 +20,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 # Coverage
 ./gradlew :app:koverXmlReportRelease    # Generate coverage report (min 60% required)
+
+# All-in-one PR Checks (Unified verification)
+./gradlew prCheck                       # Run all PR checks (formatting, tests, coverage, lint) in Gradle
+./pr-check.sh                           # Run all PR checks via shell script (colored console output)
 ```
 
 ## Architecture

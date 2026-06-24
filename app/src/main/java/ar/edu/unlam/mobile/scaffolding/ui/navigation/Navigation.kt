@@ -25,17 +25,15 @@ sealed class Screen(
 
     object PostSession : Screen("post_session")
 
-    object Map : Screen("map")
-
     object ClinicDetail : Screen("clinic_detail/{clinicId}") {
         fun createRoute(clinicId: String) = "clinic_detail/$clinicId"
     }
 
     object RoutineList : Screen("routine_list")
 
-    object Progress : Screen("progress")
-
-    object Form : Screen("form")
+    object Progress : Screen("progress?fromDashboard={fromDashboard}") {
+        fun createRoute(fromDashboard: Boolean) = "progress?fromDashboard=$fromDashboard"
+    }
 
     object User : Screen("user/{id}") {
         fun createRoute(id: String) = "user/$id"

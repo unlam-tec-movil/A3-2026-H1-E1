@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -26,6 +27,10 @@ import ar.edu.unlam.mobile.scaffolding.domain.model.Exercise
 import ar.edu.unlam.mobile.scaffolding.domain.model.PoseResult
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.JointPrecision
 import ar.edu.unlam.mobile.scaffolding.ui.components.SkeletonOverlay
+import ar.edu.unlam.mobile.scaffolding.ui.theme.AmberWarning
+import ar.edu.unlam.mobile.scaffolding.ui.theme.CoralDanger
+import ar.edu.unlam.mobile.scaffolding.ui.theme.DarkBg
+import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.RehabSessionViewModel
 
@@ -179,8 +184,8 @@ fun RehabSessionContent(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .background(Color.Black.copy(alpha = 0.5f))
-                            .padding(top = 8.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+                            .background(DarkBg.copy(alpha = 0.75f))
+                            .padding(top = 12.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Row(
@@ -188,11 +193,19 @@ fun RehabSessionContent(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        IconButton(onClick = onBackClick) {
+                        IconButton(
+                            onClick = onBackClick,
+                            modifier =
+                                Modifier
+                                    .background(
+                                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                                        shape = CircleShape,
+                                    ).size(40.dp),
+                        ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Volver",
-                                tint = Color.White,
+                                tint = MaterialTheme.colorScheme.onSurface,
                             )
                         }
 
@@ -203,19 +216,29 @@ fun RehabSessionContent(
                             fontWeight = FontWeight.Bold,
                         )
 
-                        IconButton(onClick = onNextClick) {
+                        IconButton(
+                            onClick = onNextClick,
+                            modifier =
+                                Modifier
+                                    .background(
+                                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                                        shape = CircleShape,
+                                    ).size(40.dp),
+                        ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                                 contentDescription = "Siguiente",
-                                tint = Color.White,
+                                tint = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                     }
 
+                    Spacer(modifier = Modifier.height(8.dp))
+
                     Text(
                         text = "Repeticiones: $reps / ${exercise?.repetitions ?: 0}",
                         style = MaterialTheme.typography.titleMedium,
-                        color = Color.White,
+                        color = Color.White.copy(alpha = 0.9f),
                     )
                 }
 
@@ -228,9 +251,9 @@ fun RehabSessionContent(
                             .background(
                                 color =
                                     when (precision) {
-                                        JointPrecision.IDEAL -> Color.Green.copy(alpha = 0.8f)
-                                        JointPrecision.WARNING -> Color.Yellow.copy(alpha = 0.8f)
-                                        JointPrecision.ERROR -> Color.Red.copy(alpha = 0.8f)
+                                        JointPrecision.IDEAL -> EmeraldIdeal.copy(alpha = 0.85f)
+                                        JointPrecision.WARNING -> AmberWarning.copy(alpha = 0.85f)
+                                        JointPrecision.ERROR -> CoralDanger.copy(alpha = 0.85f)
                                     },
                                 shape = RoundedCornerShape(16.dp),
                             ).padding(horizontal = 24.dp, vertical = 12.dp),
@@ -238,7 +261,7 @@ fun RehabSessionContent(
                     Text(
                         text = "${currentAngle.toInt()}°",
                         style = MaterialTheme.typography.headlineLarge.copy(fontSize = 48.sp),
-                        color = Color.Black,
+                        color = Color.White,
                         fontWeight = FontWeight.Black,
                     )
                 }

@@ -20,9 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
@@ -35,7 +33,6 @@ import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.FABShortCut
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
 import ar.edu.unlam.mobile.scaffolding.ui.screens.DashboardScreen
-import ar.edu.unlam.mobile.scaffolding.ui.screens.FormScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.LoginScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.MapScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.OnboardingScreen
@@ -50,17 +47,13 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.PostSessionScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RoutineListScreen
 
-private val routesWithoutChrome =
+private val bottomNavRoutes =
     setOf(
-        Screen.Splash.route,
-        Screen.Onboarding.route,
-        Screen.Login.route,
-        Screen.Register.route,
-        Screen.EnvironmentCheck.route,
-        Screen.RehabSession.route,
-        Screen.PostSession.route,
+        Screen.Dashboard.route,
         Screen.Progress.route,
-        Screen.Achievements.route,
+        Screen.RoutineList.route,
+        Screen.MapScreen.route,
+        Screen.Profile.route,
     )
 
 @Composable
@@ -81,7 +74,6 @@ fun MainScreen() {
         floatingActionButton = {
             if (showFab) {
                 FABShortCut(
-                    modifier = Modifier,
                     onClick = { controller.navigate(Screen.MapScreen.route) },
                     icon = Icons.Default.Map,
                 )
@@ -214,7 +206,7 @@ fun MainScreen() {
             composable(Screen.Dashboard.route) {
                 DashboardScreen(
                     onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
-                    onNavigateToProgress = { controller.navigate(Screen.Progress.route) },
+                    onNavigateToProgress = { controller.navigate(Screen.Progress.createRoute(fromDashboard = true)) },
                     onNavigateToAchievements = { controller.navigate(Screen.Achievements.route) },
                     modifier = Modifier.padding(paddingValues),
                 )
@@ -236,9 +228,20 @@ fun MainScreen() {
             }
 
             // Progress
-            composable(Screen.Progress.route) {
+            composable(
+                route = Screen.Progress.route,
+                arguments =
+                    listOf(
+                        navArgument("fromDashboard") {
+                            type = NavType.BoolType
+                            defaultValue = false
+                        },
+                    ),
+            ) { backStackEntry ->
+                val fromDashboard = backStackEntry.arguments?.getBoolean("fromDashboard") ?: false
                 ProgressScreen(
                     onNavigateBack = { controller.popBackStack() },
+                    showBackButton = fromDashboard,
                 )
             }
 
@@ -297,19 +300,14 @@ fun MainScreen() {
                             popUpTo(0) { inclusive = true }
                         }
                     },
+                    onNavigateToMap = {
+                        controller.navigate(Screen.MapScreen.route)
+                    },
                     modifier = Modifier.padding(paddingValues),
                 )
             }
 
-            // Form
-            composable(Screen.Form.route) {
-                FormScreen(
-                    modifier = Modifier.padding(paddingValues),
-                    snackbarHostState = snackBarHostState,
-                )
-            }
-
-            // Playground
+            // Playground (Map)
             composable(
                 route = Screen.MapScreen.route,
                 enterTransition = { slideInHorizontally(animationSpec = tween(500, easing = FastOutSlowInEasing)) },

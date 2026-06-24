@@ -1,6 +1,9 @@
 package ar.edu.unlam.mobile.scaffolding.application.usecases.user
 
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
+import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.StepCounterDataSource
+import ar.edu.unlam.mobile.scaffolding.domain.repository.AchievementRepository
+import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
@@ -19,6 +22,9 @@ class LoginUseCaseTest {
     private val firebaseAuth = mockk<FirebaseAuth>()
     private val userRepository = mockk<UserRepository>(relaxed = true)
     private val sessionPreferences = mockk<SessionPreferences>(relaxed = true)
+    private val rehabRepository = mockk<RehabRepository>(relaxed = true)
+    private val achievementRepository = mockk<AchievementRepository>(relaxed = true)
+    private val stepCounterDataSource = mockk<StepCounterDataSource>(relaxed = true)
 
     private lateinit var useCase: LoginUseCase
 
@@ -36,6 +42,9 @@ class LoginUseCaseTest {
                 firebaseAuth = firebaseAuth,
                 userRepository = userRepository,
                 sessionPreferences = sessionPreferences,
+                rehabRepository = rehabRepository,
+                achievementRepository = achievementRepository,
+                stepCounterDataSource = stepCounterDataSource,
             )
 
         // Encadenado completo: auth → user → token
@@ -166,5 +175,71 @@ class LoginUseCaseTest {
             runCatching { useCase("user@test.com", "wrong_password") }
 
             coVerify(exactly = 0) { sessionPreferences.saveSessionToken(any()) }
+        }
+
+    @Test
+    fun `loginWithMock should save correct user, sessions, achievements and steps for Juan`() =
+        runTest {
+            val email = "juan.perez@gambapp.com"
+            useCase.loginWithMock(email)
+
+            coVerify(exactly = 1) {
+                userRepository.saveUser(
+                    match { user ->
+                        user.id == "user_juan" &&
+                            user.name == "Juan Pérez" &&
+                            user.email == email
+                    },
+                )
+            }
+            coVerify(exactly = 1) { sessionPreferences.saveSessionToken("mock_token_juan.perez") }
+            coVerify(exactly = 1) { stepCounterDataSource.saveStepsToday(1500) }
+            coVerify(exactly = 1) { rehabRepository.clearSessionsByUser("user_juan") }
+            coVerify(exactly = 3) { rehabRepository.saveSession(any()) }
+            coVerify(exactly = 1) { achievementRepository.insertAchievements(any()) }
+        }
+
+    @Test
+    fun `loginWithMock should save correct user, sessions, achievements and steps for Maria`() =
+        runTest {
+            val email = "maria.rodriguez@gambapp.com"
+            useCase.loginWithMock(email)
+
+            coVerify(exactly = 1) {
+                userRepository.saveUser(
+                    match { user ->
+                        user.id == "user_maria" &&
+                            user.name == "María Rodríguez" &&
+                            user.email == email
+                    },
+                )
+            }
+            coVerify(exactly = 1) { sessionPreferences.saveSessionToken("mock_token_maria.rodriguez") }
+            coVerify(exactly = 1) { stepCounterDataSource.saveStepsToday(5500) }
+            coVerify(exactly = 1) { rehabRepository.clearSessionsByUser("user_maria") }
+            coVerify(exactly = 5) { rehabRepository.saveSession(any()) }
+            coVerify(exactly = 1) { achievementRepository.insertAchievements(any()) }
+        }
+
+    @Test
+    fun `loginWithMock should save correct user, sessions, achievements and steps for Carlos`() =
+        runTest {
+            val email = "carlos.gomez@gambapp.com"
+            useCase.loginWithMock(email)
+
+            coVerify(exactly = 1) {
+                userRepository.saveUser(
+                    match { user ->
+                        user.id == "user_carlos" &&
+                            user.name == "Carlos Gómez" &&
+                            user.email == email
+                    },
+                )
+            }
+            coVerify(exactly = 1) { sessionPreferences.saveSessionToken("mock_token_carlos.gomez") }
+            coVerify(exactly = 1) { stepCounterDataSource.saveStepsToday(12500) }
+            coVerify(exactly = 1) { rehabRepository.clearSessionsByUser("user_carlos") }
+            coVerify(exactly = 10) { rehabRepository.saveSession(any()) }
+            coVerify(exactly = 1) { achievementRepository.insertAchievements(any()) }
         }
 }

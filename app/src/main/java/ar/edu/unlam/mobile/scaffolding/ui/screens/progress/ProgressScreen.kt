@@ -76,6 +76,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ar.edu.unlam.mobile.scaffolding.ui.theme.CoralDanger
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
@@ -85,6 +86,7 @@ import kotlin.math.roundToInt
 @Composable
 fun ProgressScreen(
     onNavigateBack: () -> Unit,
+    showBackButton: Boolean = false,
     modifier: Modifier = Modifier,
     viewModel: ProgressViewModel = hiltViewModel(),
 ) {
@@ -123,12 +125,14 @@ fun ProgressScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = MaterialTheme.colorScheme.onBackground,
-                        )
+                    if (showBackButton) {
+                        IconButton(onClick = onNavigateBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Volver",
+                                tint = MaterialTheme.colorScheme.onBackground,
+                            )
+                        }
                     }
                 },
                 colors =
@@ -236,8 +240,8 @@ fun StatsSummaryRow(
             value = "${avgHr.roundToInt()} lpm",
             subtitle = "En ejercicio",
             icon = Icons.Default.Favorite,
-            iconBg = Color.Red.copy(alpha = 0.1f),
-            iconTint = Color.Red,
+            iconBg = CoralDanger.copy(alpha = 0.1f),
+            iconTint = CoralDanger,
             modifier = Modifier.weight(1f),
         )
         StatBox(
@@ -706,7 +710,7 @@ fun HeartRateEvolutionCard(
                 Icon(
                     imageVector = Icons.Default.Favorite,
                     contentDescription = null,
-                    tint = Color.Red.copy(alpha = 0.3f),
+                    tint = CoralDanger.copy(alpha = 0.3f),
                     modifier = Modifier.size(20.dp),
                 )
             }
@@ -862,7 +866,7 @@ fun InteractiveBarChart(
                 val brush =
                     if (isSelected) {
                         Brush.verticalGradient(
-                            colors = listOf(Color.Red, Color.Red.copy(alpha = 0.6f)),
+                            colors = listOf(CoralDanger, CoralDanger.copy(alpha = 0.6f)),
                         )
                     } else {
                         Brush.verticalGradient(
@@ -906,7 +910,7 @@ fun InteractiveBarChart(
                         .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
                         .border(
                             width = 1.dp,
-                            color = Color.Red.copy(alpha = 0.2f),
+                            color = CoralDanger.copy(alpha = 0.2f),
                             shape = RoundedCornerShape(12.dp),
                         ).padding(8.dp),
             ) {
@@ -929,7 +933,7 @@ fun InteractiveBarChart(
                         Text(
                             text = "${session.averageHeartRate.roundToInt()} bpm",
                             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                            color = Color.Red,
+                            color = CoralDanger,
                         )
                         Text(
                             text = "Intensidad: ${(session.averageHeartRate / 1.5).roundToInt()}%",
