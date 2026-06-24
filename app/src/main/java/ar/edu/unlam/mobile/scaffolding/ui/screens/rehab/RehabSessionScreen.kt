@@ -26,6 +26,9 @@ import ar.edu.unlam.mobile.scaffolding.domain.model.Exercise
 import ar.edu.unlam.mobile.scaffolding.domain.model.PoseResult
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.JointPrecision
 import ar.edu.unlam.mobile.scaffolding.ui.components.SkeletonOverlay
+import ar.edu.unlam.mobile.scaffolding.ui.theme.AmberWarning
+import ar.edu.unlam.mobile.scaffolding.ui.theme.CoralDanger
+import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.RehabSessionViewModel
 
@@ -228,9 +231,9 @@ fun RehabSessionContent(
                             .background(
                                 color =
                                     when (precision) {
-                                        JointPrecision.IDEAL -> Color.Green.copy(alpha = 0.8f)
-                                        JointPrecision.WARNING -> Color.Yellow.copy(alpha = 0.8f)
-                                        JointPrecision.ERROR -> Color.Red.copy(alpha = 0.8f)
+                                        JointPrecision.IDEAL -> EmeraldIdeal.copy(alpha = 0.85f)
+                                        JointPrecision.WARNING -> AmberWarning.copy(alpha = 0.85f)
+                                        JointPrecision.ERROR -> CoralDanger.copy(alpha = 0.85f)
                                     },
                                 shape = RoundedCornerShape(16.dp),
                             ).padding(horizontal = 24.dp, vertical = 12.dp),

@@ -11,6 +11,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import ar.edu.unlam.mobile.scaffolding.domain.model.PoseResult
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.JointPrecision
+import ar.edu.unlam.mobile.scaffolding.ui.theme.AmberWarning
+import ar.edu.unlam.mobile.scaffolding.ui.theme.CoralDanger
+import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
 import com.google.mlkit.vision.pose.PoseLandmark
 import kotlin.math.max
 
@@ -25,9 +28,9 @@ fun SkeletonOverlay(
     val pose = poseResult.pose
     val targetColor =
         when (precision) {
-            JointPrecision.IDEAL -> Color.Green
-            JointPrecision.WARNING -> Color.Yellow
-            JointPrecision.ERROR -> Color.Red
+            JointPrecision.IDEAL -> EmeraldIdeal
+            JointPrecision.WARNING -> AmberWarning
+            JointPrecision.ERROR -> CoralDanger
         }
 
     val colorFeedback by animateColorAsState(targetValue = targetColor, label = "colorFeedback")

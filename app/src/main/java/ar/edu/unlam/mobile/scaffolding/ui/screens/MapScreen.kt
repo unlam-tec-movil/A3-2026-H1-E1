@@ -63,7 +63,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -78,6 +77,7 @@ import ar.edu.unlam.mobile.scaffolding.toHex
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomSheetCard
 import ar.edu.unlam.mobile.scaffolding.ui.components.FABShortCut
 import ar.edu.unlam.mobile.scaffolding.ui.components.PulseRingUserLocationMarker
+import ar.edu.unlam.mobile.scaffolding.ui.theme.CoralDanger
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.MapScreenViewModel
 import com.maptiler.maptilersdk.annotations.MTCustomAnnotationView
 import com.maptiler.maptilersdk.map.LngLat
@@ -116,7 +116,7 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
             if (permissionGranted) {
                 vm.onLocationPermissionGranted()
             } else {
-                Toast.makeText(context, "Location permission denied", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show()
             }
         }
     // animations
@@ -255,7 +255,7 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                             onQueryChange = { vm.onSearchBarInputChange(newValue = it) },
                             onSearch = { searchBarState = false },
                             expanded = searchBarState,
-                            placeholder = { Text("Search clinics...") },
+                            placeholder = { Text("Buscar clínicas...") },
                             onExpandedChange = { searchBarState = it },
                             leadingIcon = {
                                 Icon(Icons.Default.Search, contentDescription = null)
@@ -263,7 +263,7 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                             trailingIcon = {
                                 if (uiState.searchBarText.isNotEmpty()) {
                                     IconButton(onClick = { vm.onSearchBarInputChange("") }) {
-                                        Icon(Icons.Default.Close, contentDescription = "Clear search")
+                                        Icon(Icons.Default.Close, contentDescription = "Limpiar búsqueda")
                                     }
                                 }
                             },
@@ -279,7 +279,7 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                                         .verticalScroll(rememberScrollState()),
                             ) {
                                 Text(
-                                    text = "${uiState.filteredClinics.size} clinic(s) found",
+                                    text = "Se encontraron ${uiState.filteredClinics.size} clínica(s)",
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -368,7 +368,7 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                                 Text(
-                                    text = "No clinics match \"${uiState.searchBarText}\"",
+                                    text = "No hay clínicas que coincidan con \"${uiState.searchBarText}\"",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -388,7 +388,7 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                 ) {
                     PulseRingUserLocationMarker(
                         iconRes = R.drawable.gambapp_logo_opt3_round,
-                        ringColor = Color(0xFF2196F3).copy(alpha = 0.5f),
+                        ringColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
                         onRingClicked = {},
                     )
                 }
@@ -419,9 +419,9 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                         PulseRingUserLocationMarker(
                             ringColor =
                                 if (clinic.id == uiState.selectedClinic?.id) {
-                                    Color(0xFF2196F3).copy(alpha = 0.5f)
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                                 } else {
-                                    Color(0xFFF32133).copy(alpha = 0.5f)
+                                    CoralDanger.copy(alpha = 0.5f)
                                 },
                             onRingClicked = {
                                 showBottomSheetCard = true
@@ -450,7 +450,7 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                                 contentAlignment = Alignment.CenterStart,
                                 modifier =
                                     Modifier.background(
-                                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
                                         shape = MaterialTheme.shapes.large,
                                     ),
                             ) {
@@ -460,13 +460,13 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                                 ) {
                                     Icon(
                                         Icons.Default.Phone,
-                                        contentDescription = "call clinic",
+                                        contentDescription = "Llamar clínica",
                                         modifier = Modifier.padding(start = 15.dp),
                                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                     )
                                     Icon(
                                         Icons.Default.DeleteSweep,
-                                        contentDescription = "create rute",
+                                        contentDescription = "Crear ruta",
                                         modifier = Modifier.padding(end = 18.dp),
                                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                     )
@@ -556,26 +556,29 @@ fun MapScreen(vm: MapScreenViewModel = hiltViewModel()) {
                         .padding(paddingValues),
             ) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "Error loading clinics: ${uiState.clinicsLoadError}")
+                    Text(text = "Error al cargar clínicas: ${uiState.clinicsLoadError}")
                 }
             }
         } else if (!uiState.permissionGranted) {
-            when {
-                ActivityCompat.shouldShowRequestPermissionRationale(
-                    context as Activity,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                ) -> {
-                    Toast
-                        .makeText(
-                            context,
-                            "Location permission is required to see clinics on the map",
-                            Toast.LENGTH_SHORT,
-                        ).show()
-                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                }
+            val activity = context as? Activity
+            if (activity != null) {
+                when {
+                    ActivityCompat.shouldShowRequestPermissionRationale(
+                        activity,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                    ) -> {
+                        Toast
+                            .makeText(
+                                context,
+                                "Se requiere permiso de ubicación para ver las clínicas en el mapa",
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    }
 
-                else -> {
-                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    else -> {
+                        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    }
                 }
             }
         }

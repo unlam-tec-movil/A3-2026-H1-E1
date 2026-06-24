@@ -25,8 +25,6 @@ sealed class Screen(
 
     object PostSession : Screen("post_session")
 
-    object Map : Screen("map")
-
     object ClinicDetail : Screen("clinic_detail/{clinicId}") {
         fun createRoute(clinicId: String) = "clinic_detail/$clinicId"
     }
@@ -34,8 +32,6 @@ sealed class Screen(
     object RoutineList : Screen("routine_list")
 
     object Progress : Screen("progress")
-
-    object Form : Screen("form")
 
     object User : Screen("user/{id}") {
         fun createRoute(id: String) = "user/$id"
