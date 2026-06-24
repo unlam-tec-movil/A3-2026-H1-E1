@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.kover) apply false
-    alias(libs.plugins.ktlint) apply false
+    alias(libs.plugins.ktlint)
     id("com.google.gms.google-services") version "4.4.2" apply false
 }
 
@@ -16,7 +16,7 @@ tasks.register("prCheck") {
     group = "verification"
     description = "Ejecuta verificaciones locales de PR (formateo, tests, cobertura y lint)."
 
-    dependsOn(":app:ktlintFormat")
+    dependsOn("ktlintFormat")
     dependsOn(":app:test")
     dependsOn(":app:koverXmlReportRelease")
     dependsOn(":app:lint")

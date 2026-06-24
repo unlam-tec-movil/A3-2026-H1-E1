@@ -13,7 +13,7 @@ echo -e "${BLUE}===================================================${NC}"
 
 # 1. Formatear código
 echo -e "\n${YELLOW}🎨 [1/4] Formateando código con ktlint...${NC}"
-./gradlew :app:ktlintFormat
+./gradlew ktlintFormat
 if [ $? -ne 0 ]; then
     echo -e "${RED}❌ Error al formatear el código. Verifique los errores mostrados arriba.${NC}"
     exit 1
