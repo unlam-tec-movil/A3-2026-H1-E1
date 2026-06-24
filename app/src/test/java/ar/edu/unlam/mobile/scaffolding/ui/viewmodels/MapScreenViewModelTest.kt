@@ -8,6 +8,8 @@ import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsF
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsStoredUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.ObserverLocationUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.PopulateClinicsDbUseCase
+import ar.edu.unlam.mobile.scaffolding.application.usecases.mapprefs.GetLastDestinationClinicIdUseCase
+import ar.edu.unlam.mobile.scaffolding.application.usecases.mapprefs.SaveLastDestinationClinicIdUseCase
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.Path
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.Points
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.RouteResponse
@@ -48,6 +50,8 @@ class MapScreenViewModelTest {
     private val populateClinicsDbUseCase = mockk<PopulateClinicsDbUseCase>(relaxed = true)
     private val getClinicsStoredUseCase = mockk<GetClinicsStoredUseCase>(relaxed = true)
     private val getRouteUseCase = mockk<GetRouteUseCase>(relaxed = true)
+    private val saveLastDestinationClinicIdUseCase = mockk<SaveLastDestinationClinicIdUseCase>(relaxed = true)
+    private val getLastDestinationClinicIdUseCase = mockk<GetLastDestinationClinicIdUseCase>(relaxed = true)
 
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var viewModel: MapScreenViewModel
@@ -76,6 +80,8 @@ class MapScreenViewModelTest {
                 observerLocationUseCase = observerLocationUseCase,
                 getClinicsStoredUseCase = getClinicsStoredUseCase,
                 getRouteUseCase = getRouteUseCase,
+                saveLastDestinationClinicIdUseCase = saveLastDestinationClinicIdUseCase,
+                getLastDestinationClinicIdUseCase = getLastDestinationClinicIdUseCase,
             )
     }
 
@@ -320,7 +326,7 @@ class MapScreenViewModelTest {
             // 1. Arrange: Clinics AND Location
             val clinics = listOf(Clinic(1, "Test", "Addr", "123", "web", 0.0, 0.0))
             val mockLocation =
-                mockk<android.location.Location>(relaxed = true) {
+                mockk<Location>(relaxed = true) {
                     every { latitude } returns -34.0
                     every { longitude } returns -58.0
                 }
