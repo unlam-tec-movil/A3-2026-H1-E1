@@ -67,7 +67,7 @@ fun MainScreen() {
     val currentRoute = currentBackStack?.destination?.route
     var isMapLoading by remember { mutableStateOf(false) }
     val showChrome =
-        currentRoute !in bottomNavRoutes &&
+        currentRoute in bottomNavRoutes &&
             !(currentRoute == Screen.MapScreen.route && isMapLoading)
     var showFab by remember { mutableStateOf(true) }
 
