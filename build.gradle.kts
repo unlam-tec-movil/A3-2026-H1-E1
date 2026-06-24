@@ -14,8 +14,8 @@ evaluationDependsOn(":app")
 
 tasks.register("prCheck") {
     group = "verification"
-    description = "Ejecuta todas las verificaciones locales necesarias para un PR (formateo, tests, reporte de cobertura y lint)."
-    
+    description = "Ejecuta verificaciones locales de PR (formateo, tests, cobertura y lint)."
+
     dependsOn(":app:ktlintFormat")
     dependsOn(":app:test")
     dependsOn(":app:koverXmlReportRelease")
@@ -31,4 +31,3 @@ val koverTask = project(":app").tasks.named("koverXmlReportRelease")
 testTask.configure { mustRunAfter(ktlintFormatTask) }
 lintTask.configure { mustRunAfter(ktlintFormatTask) }
 koverTask.configure { mustRunAfter(testTask) }
-
