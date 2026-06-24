@@ -1,6 +1,7 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
@@ -53,6 +55,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CoralDanger
+import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
@@ -66,6 +69,7 @@ import java.util.Locale
 @Composable
 fun ProfileScreen(
     onNavigateToLogin: () -> Unit,
+    onNavigateToMap: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
@@ -88,6 +92,7 @@ fun ProfileScreen(
         onSignOutRequest = viewModel::onSignOutRequest,
         onSignOutDismiss = viewModel::onSignOutDismiss,
         onSignOutConfirm = viewModel::onSignOutConfirm,
+        onNavigateToMap = onNavigateToMap,
         modifier = modifier,
     )
 }
@@ -104,6 +109,7 @@ internal fun ProfileContent(
     onSignOutRequest: () -> Unit,
     onSignOutDismiss: () -> Unit,
     onSignOutConfirm: () -> Unit,
+    onNavigateToMap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (uiState.isLoading) {
@@ -142,6 +148,59 @@ internal fun ProfileContent(
             isDarkMode = uiState.isDarkMode,
             onToggle = onToggleDarkMode,
         )
+
+        // Buscar Clínicas Cercanas Card
+        Card(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { onNavigateToMap() },
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(2.dp),
+        ) {
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(CyanWave.copy(alpha = 0.12f)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(text = "📍", fontSize = 20.sp)
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column {
+                        Text(
+                            text = "Buscar Clínicas Cercanas",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            text = "Ver clínicas en el mapa",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                        )
+                    }
+                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        }
 
         // Historial de sesiones
         SessionHistoryCard(sessions = uiState.recentSessions)
@@ -452,6 +511,7 @@ private fun PreviewProfileLight() {
                 onSignOutRequest = {},
                 onSignOutDismiss = {},
                 onSignOutConfirm = {},
+                onNavigateToMap = {},
             )
         }
     }
@@ -481,6 +541,7 @@ private fun PreviewProfileEditingLight() {
                 onSignOutRequest = {},
                 onSignOutDismiss = {},
                 onSignOutConfirm = {},
+                onNavigateToMap = {},
             )
         }
     }
@@ -510,6 +571,7 @@ private fun PreviewProfileDark() {
                 onSignOutRequest = {},
                 onSignOutDismiss = {},
                 onSignOutConfirm = {},
+                onNavigateToMap = {},
             )
         }
     }

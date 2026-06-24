@@ -8,6 +8,8 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -28,6 +30,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
+import ar.edu.unlam.mobile.scaffolding.ui.components.FABShortCut
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
 import ar.edu.unlam.mobile.scaffolding.ui.screens.DashboardScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.LoginScreen
@@ -44,16 +47,13 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.PostSessionScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RehabSessionScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.RoutineListScreen
 
-private val routesWithoutChrome =
+private val bottomNavRoutes =
     setOf(
-        Screen.Splash.route,
-        Screen.Onboarding.route,
-        Screen.Login.route,
-        Screen.Register.route,
-        Screen.EnvironmentCheck.route,
-        Screen.RehabSession.route,
-        Screen.PostSession.route,
-        Screen.Achievements.route,
+        Screen.Dashboard.route,
+        Screen.Progress.route,
+        Screen.RoutineList.route,
+        Screen.MapScreen.route,
+        Screen.Profile.route,
     )
 
 @Composable
@@ -62,9 +62,18 @@ fun MainScreen() {
     val snackBarHostState = remember { SnackbarHostState() }
     val currentBackStack by controller.currentBackStackEntryAsState()
     val currentRoute = currentBackStack?.destination?.route
-    val showChrome = currentRoute !in routesWithoutChrome
+    val showChrome = currentRoute in bottomNavRoutes
+    val showFab = showChrome && currentRoute != Screen.MapScreen.route
 
     Scaffold(
+        floatingActionButton = {
+            if (showFab) {
+                FABShortCut(
+                    onClick = { controller.navigate(Screen.MapScreen.route) },
+                    icon = Icons.Default.Map,
+                )
+            }
+        },
         bottomBar = { if (showChrome) BottomBar(controller = controller) },
         snackbarHost = {
             SnackbarHost(snackBarHostState) { data ->
@@ -192,7 +201,7 @@ fun MainScreen() {
             composable(Screen.Dashboard.route) {
                 DashboardScreen(
                     onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
-                    onNavigateToProgress = { controller.navigate(Screen.Progress.route) },
+                    onNavigateToProgress = { controller.navigate(Screen.Progress.createRoute(fromDashboard = true)) },
                     onNavigateToAchievements = { controller.navigate(Screen.Achievements.route) },
                     modifier = Modifier.padding(paddingValues),
                 )
@@ -214,9 +223,20 @@ fun MainScreen() {
             }
 
             // Progress
-            composable(Screen.Progress.route) {
+            composable(
+                route = Screen.Progress.route,
+                arguments =
+                    listOf(
+                        navArgument("fromDashboard") {
+                            type = NavType.BoolType
+                            defaultValue = false
+                        },
+                    ),
+            ) { backStackEntry ->
+                val fromDashboard = backStackEntry.arguments?.getBoolean("fromDashboard") ?: false
                 ProgressScreen(
                     onNavigateBack = { controller.popBackStack() },
+                    showBackButton = fromDashboard,
                 )
             }
 
@@ -274,6 +294,9 @@ fun MainScreen() {
                         controller.navigate(Screen.Login.route) {
                             popUpTo(0) { inclusive = true }
                         }
+                    },
+                    onNavigateToMap = {
+                        controller.navigate(Screen.MapScreen.route)
                     },
                     modifier = Modifier.padding(paddingValues),
                 )
