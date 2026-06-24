@@ -31,7 +31,9 @@ sealed class Screen(
 
     object RoutineList : Screen("routine_list")
 
-    object Progress : Screen("progress")
+    object Progress : Screen("progress?fromDashboard={fromDashboard}") {
+        fun createRoute(fromDashboard: Boolean) = "progress?fromDashboard=$fromDashboard"
+    }
 
     object User : Screen("user/{id}") {
         fun createRoute(id: String) = "user/$id"

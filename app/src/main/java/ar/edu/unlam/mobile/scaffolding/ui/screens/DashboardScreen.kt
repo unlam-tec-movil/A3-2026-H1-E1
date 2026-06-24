@@ -426,6 +426,8 @@ fun RomProgressRing(
         label = "RomProgressAnimation",
     )
 
+    val trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier.aspectRatio(1f),
@@ -437,7 +439,7 @@ fun RomProgressRing(
 
             // Draw background track
             drawCircle(
-                color = Color.LightGray.copy(alpha = 0.25f),
+                color = trackColor,
                 radius = innerRadius,
                 center = center,
                 style = Stroke(width = strokeWidth),
