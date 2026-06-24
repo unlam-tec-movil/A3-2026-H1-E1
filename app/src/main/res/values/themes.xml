@@ -2,8 +2,10 @@
 <resources>
     <!-- Base theme applied to all applications -->
     <style name="Theme.GambApp" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/light_bg</item>
     </style>
 
     <!-- Splash Screen Theme (core-splashscreen) -->

@@ -18,6 +18,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -89,6 +90,7 @@ fun DashboardScreen(
     onNavigateToProgress: () -> Unit,
     onNavigateToAchievements: () -> Unit,
     modifier: Modifier = Modifier,
+    paddingValues: PaddingValues = PaddingValues(),
     viewModel: DashboardViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -151,8 +153,7 @@ fun DashboardScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(16.dp),
+                .background(MaterialTheme.colorScheme.background),
     ) {
         if (uiState.isLoading) {
             CircularProgressIndicator(
@@ -173,9 +174,12 @@ fun DashboardScreen(
                 modifier =
                     Modifier
                         .fillMaxSize()
+                        .padding(horizontal = 16.dp)
                         .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
+                Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding() + 16.dp))
+
                 // Header (Greeting & Avatar)
                 DashboardHeader(
                     userName = uiState.userName,
@@ -254,7 +258,7 @@ fun DashboardScreen(
                         },
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding() + 16.dp))
             }
         }
 

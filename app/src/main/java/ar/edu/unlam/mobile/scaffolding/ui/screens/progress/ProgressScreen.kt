@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -88,6 +89,7 @@ fun ProgressScreen(
     onNavigateBack: () -> Unit,
     showBackButton: Boolean = false,
     modifier: Modifier = Modifier,
+    parentPaddingValues: PaddingValues = PaddingValues(),
     viewModel: ProgressViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -203,7 +205,7 @@ fun ProgressScreen(
                         entranceProgress = entranceProgress,
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(parentPaddingValues.calculateBottomPadding() + 16.dp))
                 }
             }
         }
