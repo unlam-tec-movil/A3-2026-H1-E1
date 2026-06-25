@@ -32,7 +32,9 @@ sealed class Screen(
     object RoutineList : Screen("routine_list")
 
     object Progress : Screen("progress") {
+        @Suppress("ktlint:standard:property-naming")
         const val routePattern = "progress?fromDashboard={fromDashboard}"
+
         fun createRoute(fromDashboard: Boolean) = "progress?fromDashboard=$fromDashboard"
     }
 
