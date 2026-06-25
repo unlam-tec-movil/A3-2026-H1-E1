@@ -302,24 +302,6 @@ fun DashboardHeader(
                     ),
             )
         }
-
-        // Profile Avatar
-        Box(
-            modifier =
-                Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(ElectricIndigo.copy(alpha = 0.15f))
-                    .border(2.dp, ElectricIndigo, CircleShape),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Perfil",
-                tint = ElectricIndigo,
-                modifier = Modifier.size(24.dp),
-            )
-        }
     }
 }
 
