@@ -72,7 +72,7 @@ fun BottomBar(controller: NavHostController) {
             ),
             NavigationItem(
                 label = "Progreso",
-                route = Screen.Progress.route,
+                route = "progress",
                 icon = Icons.AutoMirrored.Filled.TrendingUp,
             ),
         )
@@ -105,13 +105,14 @@ fun BottomBar(controller: NavHostController) {
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 32.dp),
         contentAlignment = Alignment.BottomCenter,
     ) {
         // Main bottom bar card
         Box(
             modifier =
                 Modifier
+                    .padding(bottom = 4.dp)
                     .fillMaxWidth()
                     .height(66.dp)
                     .shadow(
@@ -124,10 +125,22 @@ fun BottomBar(controller: NavHostController) {
                         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
                         shape = RoundedCornerShape(24.dp),
                     ).border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f),
                         shape = RoundedCornerShape(24.dp),
+                        width = 2.dp,
+                        brush =
+                            Brush.linearGradient(
+                                colors =
+                                    listOf(
+                                        MaterialTheme.colorScheme.primary,
+                                        MaterialTheme.colorScheme.primaryContainer,
+                                    ),
+                            ),
                     ),
+//            ).border(
+//                        width = 1.dp,
+//                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f),
+//                        shape = RoundedCornerShape(24.dp),
+//                    ),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(),
@@ -145,9 +158,13 @@ fun BottomBar(controller: NavHostController) {
                                 controller.navigate(item.route) {
                                     launchSingleTop = true
                                     popUpTo(Screen.Dashboard.route) {
-                                        saveState = true
+                                        saveState =
+                                            item.route != Screen.MapScreen.route &&
+                                            currentDestination?.route != Screen.MapScreen.route
                                     }
-                                    restoreState = true
+                                    restoreState =
+                                        item.route != Screen.MapScreen.route &&
+                                        currentDestination?.route != Screen.MapScreen.route
                                 }
                             }
                         },
@@ -169,9 +186,13 @@ fun BottomBar(controller: NavHostController) {
                                 controller.navigate(item.route) {
                                     launchSingleTop = true
                                     popUpTo(Screen.Dashboard.route) {
-                                        saveState = true
+                                        saveState =
+                                            item.route != Screen.MapScreen.route &&
+                                            currentDestination?.route != Screen.MapScreen.route
                                     }
-                                    restoreState = true
+                                    restoreState =
+                                        item.route != Screen.MapScreen.route &&
+                                        currentDestination?.route != Screen.MapScreen.route
                                 }
                             }
                         },
@@ -208,7 +229,7 @@ fun BottomBar(controller: NavHostController) {
                                 controller.navigate(centerRoute) {
                                     launchSingleTop = true
                                     popUpTo(Screen.Dashboard.route) {
-                                        saveState = true
+                                        saveState = currentDestination?.route != Screen.MapScreen.route
                                     }
                                     restoreState = true
                                 }

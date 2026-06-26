@@ -69,15 +69,21 @@ fun MainScreen() {
     val showChrome =
         currentRoute in bottomNavRoutes &&
             !(currentRoute == Screen.MapScreen.route && isMapLoading)
-    var showFab by remember { mutableStateOf(true) }
-
-    showFab = currentRoute != Screen.MapScreen.route
+    val showFab = currentRoute != Screen.MapScreen.route
 
     Scaffold(
         floatingActionButton = {
             if (showFab) {
                 FABShortCut(
-                    onClick = { controller.navigate(Screen.MapScreen.route) },
+                    onClick = {
+                        controller.navigate(Screen.MapScreen.route) {
+                            launchSingleTop = true
+                            popUpTo(Screen.Dashboard.route) {
+                                saveState = currentRoute != Screen.MapScreen.route
+                            }
+                            restoreState = false
+                        }
+                    },
                     icon = Icons.Default.Map,
                 )
             }
@@ -234,7 +240,7 @@ fun MainScreen() {
 
             // Progress
             composable(
-                route = Screen.Progress.route,
+                route = Screen.Progress.routePattern,
                 arguments =
                     listOf(
                         navArgument("fromDashboard") {
@@ -308,7 +314,13 @@ fun MainScreen() {
                         }
                     },
                     onNavigateToMap = {
-                        controller.navigate(Screen.MapScreen.route)
+                        controller.navigate(Screen.MapScreen.route) {
+                            launchSingleTop = true
+                            popUpTo(Screen.Dashboard.route) {
+                                saveState = true
+                            }
+                            restoreState = false
+                        }
                     },
                     modifier = Modifier.fillMaxSize(),
                     paddingValues = paddingValues,
