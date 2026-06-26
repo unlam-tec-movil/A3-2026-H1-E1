@@ -166,6 +166,86 @@ fun AchievementsView(
     }
 }
 
+// Versión embeddable de la vitrina de medallas.
+@Composable
+fun AchievementsSection(
+    modifier: Modifier = Modifier,
+    viewModel: AchievementsViewModel = hiltViewModel(),
+) {
+    val achievements by viewModel.achievements.collectAsState()
+    val unlockedCount = achievements.count { it.isUnlocked }
+
+    androidx.compose.material3.Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors =
+            CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+        ) {
+            // Header
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Vitrina de Medallas 🏆",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "$unlockedCount de ${achievements.size} desbloqueados",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (achievements.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator(color = ElectricIndigo, modifier = Modifier.size(32.dp))
+                }
+            } else {
+                // Grid 2 columns using a simple column of rows approach (embeddable, no lazy)
+                val rows = achievements.chunked(2)
+                rows.forEach { rowItems ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        rowItems.forEachIndexed { colIndex, achievement ->
+                            val globalIndex = rows.indexOf(rowItems) * 2 + colIndex
+                            AchievementMedalCard(
+                                achievement = achievement,
+                                index = globalIndex,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                        // Fill empty slot when odd number of achievements
+                        if (rowItems.size == 1) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun AchievementMedalCard(
     achievement: Achievement,
