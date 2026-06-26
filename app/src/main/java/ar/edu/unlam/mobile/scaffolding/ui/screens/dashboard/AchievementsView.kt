@@ -183,9 +183,10 @@ fun AchievementsSection(
         elevation = CardDefaults.cardElevation(2.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
         ) {
             // Header
             Row(
