@@ -329,4 +329,140 @@ class ProfileViewModelTest {
 
             assertEquals("Error al guardar", vm.uiState.value.editNameError)
         }
+
+    // Cobertura adicional
+
+    @Test
+    fun `onToggleDarkMode should call setDarkMode false when isDarkMode is currently true`() =
+        runTest(testDispatcher) {
+            every { sessionPreferences.isDarkMode } returns flowOf(true)
+            val vm = buildViewModel()
+            advanceUntilIdle()
+
+            vm.onToggleDarkMode()
+            advanceUntilIdle()
+
+            coVerify { sessionPreferences.setDarkMode(false) }
+        }
+
+    @Test
+    fun `onSaveName should set isSavingName true during save then false on success`() =
+        runTest(testDispatcher) {
+            val vm = buildViewModel()
+            advanceUntilIdle()
+            vm.onStartEditName()
+            vm.onEditNameChange("Juan Pablo")
+
+            vm.onSaveName()
+            advanceUntilIdle()
+
+            // After completion isSavingName should be false
+            assertFalse(vm.uiState.value.isSavingName)
+        }
+
+    @Test
+    fun `onSaveName should set isSavingName false on failure`() =
+        runTest(testDispatcher) {
+            coEvery { updateUserUseCase(any()) } throws Exception("DB error")
+            val vm = buildViewModel()
+            advanceUntilIdle()
+            vm.onStartEditName()
+            vm.onEditNameChange("Juan Pablo")
+
+            vm.onSaveName()
+            advanceUntilIdle()
+
+            assertFalse(vm.uiState.value.isSavingName)
+        }
+
+    @Test
+    fun `onSaveName should set editNameError when name is blank`() =
+        runTest(testDispatcher) {
+            val vm = buildViewModel()
+            advanceUntilIdle()
+            vm.onStartEditName()
+            vm.onEditNameChange("") // blank after clearing
+
+            vm.onSaveName()
+            advanceUntilIdle()
+
+            assertEquals("El nombre no puede estar vacío", vm.uiState.value.editNameError)
+            coVerify(exactly = 0) { updateUserUseCase(any()) }
+        }
+
+    @Test
+    fun `onCancelEditName should also clear editNameError`() =
+        runTest(testDispatcher) {
+            val vm = buildViewModel()
+            advanceUntilIdle()
+            vm.onStartEditName()
+            vm.onEditNameChange("J") // triggers an error
+
+            vm.onCancelEditName()
+
+            assertFalse(vm.uiState.value.isEditingName)
+            assertEquals(null, vm.uiState.value.editNameError)
+        }
+
+    @Test
+    fun `onEditNameChange should clear editNameError when valid name is entered after error`() =
+        runTest(testDispatcher) {
+            val vm = buildViewModel()
+            advanceUntilIdle()
+            vm.onStartEditName()
+            vm.onEditNameChange("J") // sets error
+            assertEquals("El nombre debe tener al menos 2 caracteres", vm.uiState.value.editNameError)
+
+            vm.onEditNameChange("Juan") // valid — clears error
+
+            assertEquals(null, vm.uiState.value.editNameError)
+        }
+
+    @Test
+    fun `onSignOutConfirm should still set navigateToLogin true even when SignOutUseCase throws`() =
+        runTest(testDispatcher) {
+            coEvery { signOutUseCase() } throws Exception("Firebase error")
+            val vm = buildViewModel()
+            advanceUntilIdle()
+
+            vm.onSignOutConfirm()
+            advanceUntilIdle()
+
+            assertTrue(vm.uiState.value.navigateToLogin)
+        }
+
+    @Test
+    fun `onSignOutConfirm should close the dialog before navigating`() =
+        runTest(testDispatcher) {
+            val vm = buildViewModel()
+            advanceUntilIdle()
+            vm.onSignOutRequest()
+            assertTrue(vm.uiState.value.showSignOutDialog)
+
+            vm.onSignOutConfirm()
+            advanceUntilIdle()
+
+            assertFalse(vm.uiState.value.showSignOutDialog)
+            assertTrue(vm.uiState.value.navigateToLogin)
+        }
+
+    @Test
+    fun `uiState should reflect isDarkMode true when SessionPreferences emits true`() =
+        runTest(testDispatcher) {
+            every { sessionPreferences.isDarkMode } returns flowOf(true)
+            val vm = buildViewModel()
+            advanceUntilIdle()
+
+            assertTrue(vm.uiState.value.isDarkMode)
+        }
+
+    @Test
+    fun `uiState should use question mark as initials when user name is empty`() =
+        runTest(testDispatcher) {
+            every { userRepository.getUser() } returns flowOf(mockUser.copy(name = ""))
+            val vm = buildViewModel()
+            advanceUntilIdle()
+
+            assertEquals("?", vm.uiState.value.initials)
+        }
 }
