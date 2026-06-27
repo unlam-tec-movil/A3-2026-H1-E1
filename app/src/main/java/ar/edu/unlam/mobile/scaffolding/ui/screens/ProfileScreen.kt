@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ar.edu.unlam.mobile.scaffolding.domain.model.Session
+import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.AchievementsSection
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CoralDanger
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
@@ -210,6 +211,9 @@ internal fun ProfileContent(
 
         // Historial de sesiones
         SessionHistoryCard(sessions = uiState.recentSessions)
+
+        // Vitrina de medallas (embeddable, sin ruta propia)
+        AchievementsSection()
 
         // Cerrar sesión
         OutlinedButton(
