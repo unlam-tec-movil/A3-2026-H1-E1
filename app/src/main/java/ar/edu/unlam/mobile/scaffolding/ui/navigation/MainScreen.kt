@@ -215,16 +215,13 @@ fun MainScreen() {
                 DashboardScreen(
                     onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
                     onNavigateToProgress = { controller.navigate(Screen.Progress.createRoute(fromDashboard = true)) },
-                    onNavigateToAchievements = { controller.navigate(Screen.Achievements.route) },
+                    onNavigateToAchievements = {
+                        controller.navigate(Screen.Profile.route) {
+                            launchSingleTop = true
+                        }
+                    },
                     modifier = Modifier.fillMaxSize(),
                     paddingValues = paddingValues,
-                )
-            }
-
-            // Achievements
-            composable(Screen.Achievements.route) {
-                AchievementsView(
-                    onNavigateBack = { controller.popBackStack() },
                 )
             }
 
