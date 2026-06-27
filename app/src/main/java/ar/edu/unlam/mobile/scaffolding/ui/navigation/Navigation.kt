@@ -43,6 +43,4 @@ sealed class Screen(
     }
 
     object MapScreen : Screen("MapScreen")
-
-    object Achievements : Screen("achievements")
 }

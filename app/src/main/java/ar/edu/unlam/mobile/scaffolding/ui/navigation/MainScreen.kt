@@ -40,7 +40,6 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.ProfileScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.RegisterScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.SplashScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.UserScreen
-import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.AchievementsView
 import ar.edu.unlam.mobile.scaffolding.ui.screens.progress.ProgressScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.EnvironmentCheckScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.PostSessionScreen
@@ -197,16 +196,13 @@ fun MainScreen() {
                 DashboardScreen(
                     onNavigateToRoutineList = { controller.navigate(Screen.RoutineList.route) },
                     onNavigateToProgress = { controller.navigate(Screen.Progress.createRoute(fromDashboard = true)) },
-                    onNavigateToAchievements = { controller.navigate(Screen.Achievements.route) },
+                    onNavigateToAchievements = {
+                        controller.navigate(Screen.Profile.route) {
+                            launchSingleTop = true
+                        }
+                    },
                     modifier = Modifier.fillMaxSize(),
                     paddingValues = paddingValues,
-                )
-            }
-
-            // Achievements
-            composable(Screen.Achievements.route) {
-                AchievementsView(
-                    onNavigateBack = { controller.popBackStack() },
                 )
             }
 
