@@ -33,7 +33,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -300,24 +299,6 @@ fun DashboardHeader(
                     MaterialTheme.typography.bodyLarge.copy(
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                     ),
-            )
-        }
-
-        // Profile Avatar
-        Box(
-            modifier =
-                Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(ElectricIndigo.copy(alpha = 0.15f))
-                    .border(2.dp, ElectricIndigo, CircleShape),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Perfil",
-                tint = ElectricIndigo,
-                modifier = Modifier.size(24.dp),
             )
         }
     }
