@@ -67,9 +67,9 @@ fun BottomSheetCard(
     val context = LocalContext.current
     val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
-    val addresssInteractionSource = remember { MutableInteractionSource() }
+    val addressInteractionSource = remember { MutableInteractionSource() }
     val phoneNumberInteractionSource = remember { MutableInteractionSource() }
-    val isAddressPressed by addresssInteractionSource.collectIsPressedAsState()
+    val isAddressPressed by addressInteractionSource.collectIsPressedAsState()
     val isPNPressed by phoneNumberInteractionSource.collectIsPressedAsState()
 
     var isPNLongPressTriggered by remember { mutableStateOf(false) }
@@ -162,7 +162,7 @@ fun BottomSheetCard(
                                     ),
                                     shape = RoundedCornerShape(16.dp),
                                 ).combinedClickable(
-                                    interactionSource = addresssInteractionSource,
+                                    interactionSource = addressInteractionSource,
                                     onClick = {
                                         Toast
                                             .makeText(

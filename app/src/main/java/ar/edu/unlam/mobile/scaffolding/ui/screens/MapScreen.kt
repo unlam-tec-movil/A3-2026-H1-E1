@@ -178,6 +178,17 @@ fun MapScreen(
             DragState.CENTER -> {}
         }
     }
+    LaunchedEffect(uiState.location) {
+        if (uiState.showRoute && uiState.location != null && uiState.selectedClinic != null) {
+            vm.onCreateRouteClick(routeColor)
+        }
+    }
+
+    LaunchedEffect(uiState.routeError) {
+        uiState.routeError?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     // Check permission on first composition
     LaunchedEffect(Unit) {
@@ -461,7 +472,7 @@ fun MapScreen(
                         Modifier
                             .align(Alignment.BottomCenter)
                             .padding(horizontal = 16.dp)
-                            .padding(bottom = 90.dp),
+                            .padding(bottom = 120.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     AnimatedVisibility(
