@@ -79,14 +79,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CoralDanger
+import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
+import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
+import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
-import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
-import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
-import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
