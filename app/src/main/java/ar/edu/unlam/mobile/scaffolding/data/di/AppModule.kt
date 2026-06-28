@@ -58,7 +58,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    // Inside AppModule object
     @Provides
     @Singleton
     @ApplicationScope
@@ -173,7 +172,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesDataBaseRepository(
+    fun providesClinicsInDataBaseRepository(
         dao: ClinicsDao,
         @ApplicationContext context: Context,
     ): ClinicsRepositoryPort = ClinicsRepositoryImpl(clinicsDao = dao, context)
@@ -187,7 +186,7 @@ object AppModule {
                 klass = AppDatabase::class.java,
                 name = "app_database",
             ).createFromAsset("databases/prepopulated.db")
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration(true)
             .build()
 
     @Provides
