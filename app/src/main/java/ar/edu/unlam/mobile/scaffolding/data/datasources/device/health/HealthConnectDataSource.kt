@@ -27,12 +27,9 @@ class HealthConnectDataSource(
             HealthPermission.getReadPermission(OxygenSaturationRecord::class),
         )
 
-    fun isHealthConnectAvailable(): Boolean =
-        try {
-            HealthConnectClient.getSdkStatus(context) == HealthConnectClient.SDK_AVAILABLE
-        } catch (e: Exception) {
-            false
-        }
+    fun getSdkStatus(): Int = HealthConnectClient.getSdkStatus(context)
+
+    fun isHealthConnectAvailable(): Boolean = getSdkStatus() == HealthConnectClient.SDK_AVAILABLE
 
     private fun getClient(): HealthConnectClient? =
         if (isHealthConnectAvailable()) {
