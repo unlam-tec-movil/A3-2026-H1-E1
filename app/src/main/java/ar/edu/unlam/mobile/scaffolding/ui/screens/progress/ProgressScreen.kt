@@ -77,7 +77,13 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CoralDanger
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
@@ -172,38 +178,43 @@ fun ProgressScreen(
                             .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp),
                 ) {
-                    // Summary cards row
-                    StatsSummaryRow(
-                        sessions = uiState.sessionsData,
-                        entranceProgress = entranceProgress,
-                    )
+                    if (uiState.sessionsData.isEmpty()) {
+                        // Empty state — no sessions recorded yet
+                        ProgressEmptyState()
+                    } else {
+                        // Summary cards row
+                        StatsSummaryRow(
+                            sessions = uiState.sessionsData,
+                            entranceProgress = entranceProgress,
+                        )
 
-                    // ROM Evolution Line Chart
-                    RomEvolutionCard(
-                        sessions = uiState.sessionsData,
-                        entranceProgress = entranceProgress,
-                    )
+                        // ROM Evolution Line Chart
+                        RomEvolutionCard(
+                            sessions = uiState.sessionsData,
+                            entranceProgress = entranceProgress,
+                        )
 
-                    // Heart Rate Evolution Bar Chart
-                    HeartRateEvolutionCard(
-                        sessions = uiState.sessionsData,
-                        entranceProgress = entranceProgress,
-                    )
+                        // Heart Rate Evolution Bar Chart
+                        HeartRateEvolutionCard(
+                            sessions = uiState.sessionsData,
+                            entranceProgress = entranceProgress,
+                        )
 
-                    // Health Connect Banner
-                    HealthConnectSyncCard(
-                        isLinked = uiState.isHealthConnectLinked,
-                        onLinkClick = {
-                            launcher.launch(
-                                arrayOf(
-                                    "androidx.health.permission.HeartRate.read",
-                                    "androidx.health.permission.ActiveCaloriesBurned.read",
-                                    "androidx.health.permission.OxygenSaturation.read",
-                                ),
-                            )
-                        },
-                        entranceProgress = entranceProgress,
-                    )
+                        // Health Connect Banner
+                        HealthConnectSyncCard(
+                            isLinked = uiState.isHealthConnectLinked,
+                            onLinkClick = {
+                                launcher.launch(
+                                    arrayOf(
+                                        "androidx.health.permission.HeartRate.read",
+                                        "androidx.health.permission.ActiveCaloriesBurned.read",
+                                        "androidx.health.permission.OxygenSaturation.read",
+                                    ),
+                                )
+                            },
+                            entranceProgress = entranceProgress,
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(parentPaddingValues.calculateBottomPadding() + 16.dp))
                 }
@@ -1036,5 +1047,50 @@ fun HealthConnectSyncCard(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ProgressEmptyState(modifier: Modifier = Modifier) {
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.progress_empty),
+    )
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true,
+        speed = 0.8f,
+    )
+
+    Column(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        LottieAnimation(
+            composition = composition,
+            progress = { progress },
+            modifier = Modifier.size(180.dp),
+        )
+
+        Text(
+            text = "Todavía no hay sesiones registradas",
+            style =
+                MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                ),
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
+
+        Text(
+            text = "Completá tu primera sesión de rehabilitación\ny aquí verás tu progreso.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.55f),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
     }
 }

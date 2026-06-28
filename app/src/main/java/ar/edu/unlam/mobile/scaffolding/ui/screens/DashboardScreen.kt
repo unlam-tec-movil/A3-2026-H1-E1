@@ -73,6 +73,11 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.StepCounterServic
 import ar.edu.unlam.mobile.scaffolding.domain.model.Achievement
 import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.ui.theme.AmberWarning
+import ar.edu.unlam.mobile.scaffolding.R
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
@@ -1040,7 +1045,7 @@ fun AchievementUnlockedDialog(
         },
         title = {
             Text(
-                text = "¡Logro Desbloqueado! 🎉",
+                text = "¡Logro Desbloqueado!",
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
@@ -1093,9 +1098,21 @@ fun AchievementUnlockedDialog(
                             .border(3.dp, badgeColor, CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(text = emoji, fontSize = 48.sp)
+                    val achievementComposition by rememberLottieComposition(
+                        LottieCompositionSpec.RawRes(R.raw.achievement_unlocked),
+                    )
+                    val achievementProgress by animateLottieCompositionAsState(
+                        composition = achievementComposition,
+                        iterations = 1,
+                        isPlaying = true,
+                        speed = 1f,
+                    )
+                    LottieAnimation(
+                        composition = achievementComposition,
+                        progress = { achievementProgress },
+                        modifier = Modifier.size(80.dp),
+                    )
                 }
-
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
