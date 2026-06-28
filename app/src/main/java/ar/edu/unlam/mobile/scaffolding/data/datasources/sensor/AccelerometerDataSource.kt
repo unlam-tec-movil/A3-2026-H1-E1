@@ -22,7 +22,7 @@ class AccelerometerDataSource(
 
     companion object {
         // Umbral de magnitud (m/s²) a partir del cual se clasifica como caída / impacto brusco.
-        const val FALL_THRESHOLD_MS2: Float = 24.5f // ≈ 2.5 G
+        const val FALL_THRESHOLD_MS2: Float = 15.0f
     }
 
     fun getReadingsFlow(): Flow<SensorReading> =

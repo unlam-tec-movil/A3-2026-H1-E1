@@ -65,7 +65,7 @@ class RehabSessionViewModel
             sessionStartTime = System.currentTimeMillis()
             viewModelScope.launch {
                 poseDetectionDataSource.poseResult.collectLatest { result ->
-                    if (_isSessionFinished.value) return@collectLatest
+                    if (_isSessionFinished.value || _fallDetected.value) return@collectLatest
                     _poseResult.value = result
                     val exercise = _currentExercise.value ?: return@collectLatest
 
@@ -118,7 +118,7 @@ class RehabSessionViewModel
 
             viewModelScope.launch {
                 accelerometerDataSource.getReadingsFlow().collect { reading ->
-                    if (accelerometerDataSource.isFallDetected(reading)) {
+                    if (accelerometerDataSource.isFallDetected(reading) && !_fallDetected.value) {
                         _fallDetected.value = true
                     }
                 }

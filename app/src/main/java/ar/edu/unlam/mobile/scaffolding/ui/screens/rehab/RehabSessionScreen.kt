@@ -49,6 +49,7 @@ fun RehabSessionScreen(
     val currentExercise by viewModel.currentExercise.collectAsState()
     val repetitionCount by viewModel.repetitionCount.collectAsState()
     val isSessionFinished by viewModel.isSessionFinished.collectAsState()
+    val fallDetected by viewModel.fallDetected.collectAsState()
 
     var showExitDialog by remember { mutableStateOf(false) }
     var showNextDialog by remember { mutableStateOf(false) }
@@ -103,6 +104,25 @@ fun RehabSessionScreen(
             dismissButton = {
                 TextButton(onClick = { showNextDialog = false }) {
                     Text("Cancelar")
+                }
+            },
+        )
+    }
+
+    if (fallDetected) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissFallAlert() },
+            title = { Text("¡Movimiento brusco detectado!") },
+            text = {
+                Text(
+                    text = "Hemos pausado la sesión para tu seguridad. ¿Te encuentras bien?",
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { viewModel.dismissFallAlert() },
+                ) {
+                    Text("Estoy bien")
                 }
             },
         )
