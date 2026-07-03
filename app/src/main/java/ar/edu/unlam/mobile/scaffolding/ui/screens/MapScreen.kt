@@ -38,9 +38,10 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Update
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.LocalHospital
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.SearchOff
@@ -56,6 +57,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -72,6 +74,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
@@ -80,6 +85,7 @@ import ar.edu.unlam.mobile.scaffolding.ui.components.BottomSheetCard
 import ar.edu.unlam.mobile.scaffolding.ui.components.FABShortCut
 import ar.edu.unlam.mobile.scaffolding.ui.components.LottieAnimation
 import ar.edu.unlam.mobile.scaffolding.ui.components.PulseRingUserLocationMarker
+import ar.edu.unlam.mobile.scaffolding.ui.components.dashboard.LocationDeniedCard
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CoralDanger
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.MapScreenViewModel
 import com.maptiler.maptilersdk.annotations.MTCustomAnnotationView
@@ -94,7 +100,9 @@ import com.maptiler.maptilersdk.map.types.MTBounds
 import com.maptiler.maptilersdk.map.types.MTMapCorner
 import kotlin.math.roundToInt
 
-enum class DragState { LEFT, RIGHT, CENTER }
+enum class HorizontalDragState { LEFT, RIGHT, CENTER }
+
+enum class VerticalDragState { COLLAPSED, EXPANDED }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -108,6 +116,7 @@ fun MapScreen(
     var searchBarState by remember { mutableStateOf<Boolean>(false) }
     var showBottomSheetCard by remember { mutableStateOf<Boolean>(false) }
     var showFabReposition by remember { mutableStateOf<Boolean>(false) }
+    var allowGoToConfigFeature by remember { mutableStateOf(true) }
 
     val controller = vm.mapController
     val routeColor = MaterialTheme.colorScheme.primary.toHex()
@@ -126,16 +135,28 @@ fun MapScreen(
 
     // Drag animation anchors for the bottom sheet card
     val density = LocalDensity.current
-    val anchorDistance = with(density) { 75.dp.toPx() }
-    val dragState =
+    val verticalAnchorDistance = with(density) { 75.dp.toPx() }
+    val horizontalAnchorDistance = with(density) { 75.dp.toPx() }
+    val horizontalDragState =
         remember {
             AnchoredDraggableState(
-                initialValue = DragState.CENTER,
+                initialValue = HorizontalDragState.CENTER,
                 anchors =
                     DraggableAnchors {
-                        DragState.LEFT at -anchorDistance
-                        DragState.CENTER at 0f
-                        DragState.RIGHT at anchorDistance
+                        HorizontalDragState.LEFT at -horizontalAnchorDistance
+                        HorizontalDragState.CENTER at 0f
+                        HorizontalDragState.RIGHT at horizontalAnchorDistance
+                    },
+            )
+        }
+    val verticalDragState =
+        remember {
+            AnchoredDraggableState(
+                initialValue = VerticalDragState.EXPANDED,
+                anchors =
+                    DraggableAnchors {
+                        VerticalDragState.EXPANDED at 10f
+                        VerticalDragState.COLLAPSED at verticalAnchorDistance
                     },
             )
         }
@@ -149,7 +170,7 @@ fun MapScreen(
         onLoadedStateChange(isLoading)
         showFabReposition = !isLoading
     }
-    // Keep the last selected clinic alive while the card animates out
+
     var clinicToDisplay by remember { mutableStateOf<Clinic?>(null) }
     LaunchedEffect(uiState.selectedClinic) {
         if (uiState.selectedClinic != null) {
@@ -157,11 +178,10 @@ fun MapScreen(
         }
     }
 
-    // Swipe left = dismiss card, swipe right = call
-    LaunchedEffect(dragState.settledValue) {
-        when (dragState.settledValue) {
-            DragState.LEFT -> {
-                dragState.animateTo(DragState.CENTER)
+    LaunchedEffect(horizontalDragState.settledValue) {
+        when (horizontalDragState.settledValue) {
+            HorizontalDragState.LEFT -> {
+                horizontalDragState.animateTo(HorizontalDragState.CENTER)
                 uiState.location?.let { location ->
                     vm.centerCameraOn(LngLat(lng = location.longitude, lat = location.latitude))
                 }
@@ -170,12 +190,21 @@ fun MapScreen(
                 vm.onHideCardSheetAndRemoveRouteLayer()
             }
 
-            DragState.RIGHT -> {
+            HorizontalDragState.RIGHT -> {
                 vm.onCallTriggered()
-                dragState.animateTo(DragState.CENTER)
+                horizontalDragState.animateTo(HorizontalDragState.CENTER)
             }
 
-            DragState.CENTER -> {}
+            HorizontalDragState.CENTER -> {}
+        }
+    }
+    LaunchedEffect(verticalDragState.settledValue) {
+        if (verticalDragState.settledValue == VerticalDragState.COLLAPSED) {
+            verticalDragState.animateTo(VerticalDragState.EXPANDED)
+            if (allowGoToConfigFeature) {
+                vm.onGoToConfigClick()
+                allowGoToConfigFeature = false
+            }
         }
     }
     LaunchedEffect(uiState.location) {
@@ -184,13 +213,43 @@ fun MapScreen(
         }
     }
 
+    LaunchedEffect(uiState.mapInitialized, uiState.clinicsNear) {
+        if (uiState.mapInitialized && uiState.clinicsNear.isNotEmpty()) {
+            if (uiState.selectedClinic == null) {
+                vm.onClinicSelectedChange(uiState.clinicsNear.first())
+            }
+
+            uiState.location?.let { loc ->
+                vm.centerCameraOn(LngLat(lng = loc.longitude, lat = loc.latitude))
+            }
+        }
+    }
     LaunchedEffect(uiState.routeError) {
         uiState.routeError?.let {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
     }
+    // Check permission each time the app came back from for example settings
 
-    // Check permission on first composition
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    if (ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        vm.onLocationPermissionGranted()
+                    } else {
+                        vm.onPermissionCheckComplete(granted = false)
+                    }
+                }
+            }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
     LaunchedEffect(Unit) {
         if (ContextCompat.checkSelfPermission(
                 context,
@@ -225,7 +284,7 @@ fun MapScreen(
                                 showFabReposition = false
                                 vm.onRestoreLastRouteClick(routeColor)
                             },
-                            icon = Icons.Default.Update,
+                            icon = Icons.Default.NearMe,
                         )
                         FABShortCut(
                             modifier = Modifier,
@@ -247,8 +306,7 @@ fun MapScreen(
             Box(
                 modifier =
                     Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
+                        .fillMaxSize(),
             ) {
                 MTMapView(
                     referenceStyle = MTMapReferenceStyle.BASIC,
@@ -275,7 +333,7 @@ fun MapScreen(
                             .align(Alignment.TopCenter)
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
-                            .padding(top = 8.dp)
+                            .padding(top = 65.dp)
                             .border(
                                 shape = RoundedCornerShape(8.dp),
                                 border =
@@ -436,6 +494,7 @@ fun MapScreen(
 
                 // Clinic markers — include selected clinic even if outside the near list
                 val markersToShow =
+
                     remember(uiState.clinicsNear, uiState.selectedClinic) {
                         val list = uiState.clinicsNear.toMutableList()
                         uiState.selectedClinic?.let { selected ->
@@ -455,7 +514,7 @@ fun MapScreen(
                                 if (clinic.id == uiState.selectedClinic?.id) {
                                     MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                                 } else {
-                                    CoralDanger.copy(alpha = 0.5f)
+                                    CoralDanger.copy(alpha = 0.8f)
                                 },
                             onRingClicked = {
                                 showBottomSheetCard = true
@@ -485,7 +544,7 @@ fun MapScreen(
                                 contentAlignment = Alignment.CenterStart,
                                 modifier =
                                     Modifier.background(
-                                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f),
                                         shape = MaterialTheme.shapes.large,
                                     ),
                             ) {
@@ -511,11 +570,11 @@ fun MapScreen(
                                     modifier =
                                         Modifier
                                             .anchoredDraggable(
-                                                state = dragState,
+                                                state = horizontalDragState,
                                                 orientation = Orientation.Horizontal,
                                             ).offset {
                                                 IntOffset(
-                                                    x = dragState.requireOffset().roundToInt(),
+                                                    x = horizontalDragState.requireOffset().roundToInt(),
                                                     y = 0,
                                                 )
                                             },
@@ -560,10 +619,59 @@ fun MapScreen(
                     }
                 }
             }
+        } else {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 40.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Box(
+                    contentAlignment = Alignment.TopCenter,
+                    modifier =
+                        Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                                shape = MaterialTheme.shapes.large,
+                            ),
+                ) {
+                    // Hint icons shown behind the draggable card
+                    Row(
+                        modifier =
+                            Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = "ir a ajustes",
+                            modifier = Modifier.padding(top = 25.dp),
+                            tint = MaterialTheme.colorScheme.background,
+                        )
+                    }
+                    Box(
+                        modifier =
+                            Modifier
+                                .anchoredDraggable(
+                                    state = verticalDragState,
+                                    orientation = Orientation.Vertical,
+                                ).offset {
+                                    IntOffset(
+                                        y = verticalDragState.requireOffset().roundToInt(),
+                                        x = 0,
+                                    )
+                                },
+                    ) {
+                        LocationDeniedCard()
+                    }
+                }
+            }
         }
-        // endregion
 
-        // region Overlays (loading / error / permission)
+// endregion
+
+// region Overlays (loading / error / permission)
         if (uiState.isLoadingClinics ||
             uiState.isLoadingPermission ||
             (uiState.permissionGranted && !uiState.mapInitialized)
@@ -575,7 +683,7 @@ fun MapScreen(
                         .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center,
             ) {
-                LottieAnimation(Modifier.fillMaxSize())
+                LottieAnimation(Modifier.fillMaxSize(), resId = R.raw.hospital)
             }
         } else if (!uiState.clinicsLoadSuccess && uiState.clinicsLoadError != null) {
             Box(
@@ -596,21 +704,13 @@ fun MapScreen(
                         activity,
                         Manifest.permission.ACCESS_FINE_LOCATION,
                     ) -> {
-                        Toast
-                            .makeText(
-                                context,
-                                "Se requiere permiso de ubicación para ver las clínicas en el mapa",
-                                Toast.LENGTH_SHORT,
-                            ).show()
                         locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                     }
 
-                    else -> {
-                        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                    }
+                    else -> {}
                 }
             }
         }
-        // endregion
+// endregion
     }
 }
