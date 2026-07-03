@@ -133,7 +133,11 @@ fun StepsCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 StatInfoItem(emoji = "🔥", label = "Calorías", value = "$caloriesKcal kcal")
-                StatInfoItem(emoji = "🚶", label = "Distancia", value = String.format(Locale.getDefault(), "%.1f km", distanceKm))
+                StatInfoItem(
+                    emoji = "🚶",
+                    label = "Distancia",
+                    value = String.format(Locale.getDefault(), "%.1f km", distanceKm),
+                )
                 StatInfoItem(emoji = "⏱️", label = "Tiempo activo", value = "$activeMinutes min")
             }
         }
