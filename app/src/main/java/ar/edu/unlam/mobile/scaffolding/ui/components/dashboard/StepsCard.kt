@@ -31,6 +31,9 @@ import java.util.Locale
 fun StepsCard(
     currentSteps: Int,
     targetSteps: Int,
+    caloriesKcal: Int,
+    distanceKm: Float,
+    activeMinutes: Int,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -129,9 +132,9 @@ fun StepsCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                StatInfoItem(emoji = "🔥", label = "Calorías", value = "324 kcal")
-                StatInfoItem(emoji = "🚶", label = "Distancia", value = "5.2 km")
-                StatInfoItem(emoji = "⏱️", label = "Tiempo activo", value = "45 min")
+                StatInfoItem(emoji = "🔥", label = "Calorías", value = "$caloriesKcal kcal")
+                StatInfoItem(emoji = "🚶", label = "Distancia", value = String.format(Locale.getDefault(), "%.1f km", distanceKm))
+                StatInfoItem(emoji = "⏱️", label = "Tiempo activo", value = "$activeMinutes min")
             }
         }
     }

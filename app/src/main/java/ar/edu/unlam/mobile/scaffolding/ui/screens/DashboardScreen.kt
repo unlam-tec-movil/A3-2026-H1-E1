@@ -208,6 +208,9 @@ fun DashboardScreen(
                 StepsCard(
                     currentSteps = uiState.currentSteps,
                     targetSteps = uiState.targetSteps,
+                    caloriesKcal = uiState.caloriesKcal,
+                    distanceKm = uiState.distanceKm,
+                    activeMinutes = uiState.activeMinutes,
                     modifier =
                         Modifier.graphicsLayer {
                             val progress = ((entranceProgress - 0.3f) / 0.6f).coerceIn(0f, 1f)
