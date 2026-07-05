@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.net.Uri
-import android.provider.Settings
 import androidx.compose.ui.graphics.Color
 import ar.edu.unlam.mobile.scaffolding.application.service.local.remote.routing.GetRouteUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsFromAssetsUseCase
@@ -19,7 +18,6 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.RouteRespo
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import ar.edu.unlam.mobile.scaffolding.toHex
 import com.google.android.gms.maps.model.LatLng
-import com.maptiler.maptilersdk.helpers.MTPolylineLayerHelper
 import com.maptiler.maptilersdk.map.LngLat
 import com.maptiler.maptilersdk.map.MTMapViewController
 import com.maptiler.maptilersdk.map.style.MTStyle
