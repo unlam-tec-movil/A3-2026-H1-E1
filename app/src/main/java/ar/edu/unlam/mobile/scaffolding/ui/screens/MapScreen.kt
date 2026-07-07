@@ -7,6 +7,9 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseInOutQuad
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -98,6 +101,7 @@ import com.maptiler.maptilersdk.map.style.MTMapReferenceStyle
 import com.maptiler.maptilersdk.map.style.MTMapStyleVariant
 import com.maptiler.maptilersdk.map.types.MTBounds
 import com.maptiler.maptilersdk.map.types.MTMapCorner
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 enum class HorizontalDragState { LEFT, RIGHT, CENTER }
@@ -117,6 +121,7 @@ fun MapScreen(
     var showBottomSheetCard by remember { mutableStateOf<Boolean>(false) }
     var showFabReposition by remember { mutableStateOf<Boolean>(false) }
     var allowGoToConfigFeature by remember { mutableStateOf(true) }
+    val dragHintOffsetY = remember { Animatable(0f) }
 
     val controller = vm.mapController
     val routeColor = MaterialTheme.colorScheme.primary.toHex()
@@ -275,9 +280,9 @@ fun MapScreen(
                 Column(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.padding(bottom = 90.dp),
+                    modifier = Modifier.padding(bottom = 95.dp),
                 ) {
-                    if (showFabReposition) {
+                    if (showFabReposition && uiState.permissionGranted) {
                         FABShortCut(
                             onClick = {
                                 showBottomSheetCard = true
@@ -650,6 +655,20 @@ fun MapScreen(
                             tint = MaterialTheme.colorScheme.background,
                         )
                     }
+                    LaunchedEffect(Unit) {
+                        delay(2000)
+                        repeat(10) {
+                            dragHintOffsetY.animateTo(
+                                targetValue = verticalAnchorDistance * 0.1f,
+                                animationSpec = tween(durationMillis = 450, easing = EaseInOutQuad),
+                            )
+                            dragHintOffsetY.animateTo(
+                                targetValue = 0f,
+                                animationSpec = tween(durationMillis = 450, easing = EaseInOutQuad),
+                            )
+                            delay(2200)
+                        }
+                    }
                     Box(
                         modifier =
                             Modifier
@@ -658,7 +677,11 @@ fun MapScreen(
                                     orientation = Orientation.Vertical,
                                 ).offset {
                                     IntOffset(
-                                        y = verticalDragState.requireOffset().roundToInt(),
+                                        y =
+                                            (
+                                                verticalDragState.requireOffset() +
+                                                    dragHintOffsetY.value
+                                            ).roundToInt(),
                                         x = 0,
                                     )
                                 },
@@ -707,7 +730,9 @@ fun MapScreen(
                         locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                     }
 
-                    else -> {}
+                    else -> {
+                        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    }
                 }
             }
         }
