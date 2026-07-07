@@ -39,7 +39,6 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.OnboardingScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.ProfileScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.RegisterScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.SplashScreen
-import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.AchievementsView
 import ar.edu.unlam.mobile.scaffolding.ui.screens.progress.ProgressScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.EnvironmentCheckScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.PostSessionScreen
