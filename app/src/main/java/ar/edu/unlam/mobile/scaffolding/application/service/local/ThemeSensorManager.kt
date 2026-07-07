@@ -1,9 +1,10 @@
 package ar.edu.unlam.mobile.scaffolding.application.service.local
 
-import ar.edu.unlam.mobile.scaffolding.application.port.out.local.sensor.MeasurableSensorPort
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
+import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.LightSensorDataSource
 import ar.edu.unlam.mobile.scaffolding.data.di.ApplicationScope
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,23 +13,37 @@ import javax.inject.Singleton
 class ThemeSensorManager
     @Inject
     constructor(
-        private val lightSensor: MeasurableSensorPort,
+        private val lightSensor: LightSensorDataSource,
         private val sessionPreferences: SessionPreferences,
         @ApplicationScope private val scope: CoroutineScope,
     ) {
-        fun startListening() {
-            lightSensor.setOnSensorValueChangedListener { values ->
-                val lux = values.firstOrNull() ?: return@setOnSensorValueChangedListener
-                val isDark = lux < 40.0
+        private var job: Job? = null
 
+        fun startListening() {
+            if (job != null) {
+                return
+            }
+            job =
                 scope.launch {
+                    lightSensor.getLuxFlow().collect { lux ->
+                        val isDark = lux < 800
+                        sessionPreferences.setDarkMode(isDark)
+                    }
+                }
+        }
+
+        fun measureLight() {
+            scope.launch {
+                lightSensor.getLuxFlow().collect { lux ->
+
+                    val isDark = lux < 800f
                     sessionPreferences.setDarkMode(isDark)
                 }
             }
-            lightSensor.startListening()
         }
 
         fun stopListening() {
-            lightSensor.stopListening()
+            job?.cancel()
+            job = null
         }
     }
