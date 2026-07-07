@@ -24,6 +24,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # All-in-one PR Checks (Unified verification)
 ./gradlew prCheck                       # Run all PR checks (formatting, tests, coverage, lint) in Gradle
 ./pr-check.sh                           # Run all PR checks via shell script (colored console output)
+
+# Run Application (Auto-starts emulator if needed)
+./run-app.sh                            # Runs with default AVD (Medium_Phone_API_36)
+./run-app.sh Pixel_9_API_36             # Runs with a specified AVD
+EMULATOR_AVD=Pixel_8_API_35 ./run-app.sh # Runs via env variable override
 ```
 
 ## Architecture

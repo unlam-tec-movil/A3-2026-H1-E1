@@ -39,7 +39,6 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.OnboardingScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.ProfileScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.RegisterScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.SplashScreen
-import ar.edu.unlam.mobile.scaffolding.ui.screens.UserScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.progress.ProgressScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.EnvironmentCheckScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.PostSessionScreen
@@ -311,15 +310,6 @@ fun MainScreen() {
                 exitTransition = { slideOutHorizontally(animationSpec = tween(500, easing = FastOutSlowInEasing)) },
             ) {
                 MapScreen(onLoadedStateChange = { newStateFromMapScreen -> isMapLoading = newStateFromMapScreen })
-            }
-
-            // User
-            composable(
-                route = Screen.User.route,
-                arguments = listOf(navArgument("id") { type = NavType.StringType }),
-            ) { navBackStackEntry ->
-                val id = navBackStackEntry.arguments?.getString("id") ?: "1"
-                UserScreen(userId = id, modifier = Modifier.padding(paddingValues))
             }
         }
     }
