@@ -1,4 +1,8 @@
-# Mobile Scaffolding
+# GambApp — Rehabilitación Inteligente
+
+> Aplicación Android de rehabilitación física que combina visión por computadora (ML Kit Pose
+> Detection), sensores del dispositivo, mapas y sincronización con Health Connect para guiar y
+> monitorear sesiones de ejercicio terapéutico.
 
 ## Índice
 
@@ -9,23 +13,26 @@
   - [UI](#ui)
   - [Data](#data)
   - [Reglas de dependencia](#reglas-de-dependencia)
+- [Estructura de carpetas](#estructura-de-carpetas)
 - [Navegación](#navegación)
 - [Inyección de Dependencias](#inyección-de-dependencias)
+- [Tests](#tests)
 
-## Consideraciones previas
-
-Para este documento usaremos como ejemplo una aplicación de rehabilitación física. Los modelos de
-negocio centrales son: `Session`, `Exercise`, `User` y `Clinic`.
+---
 
 ## Configuración
 
-El proyecto ejecuta dos workflows de GitHub en cada PR:
+El proyecto ejecuta dos workflows de GitHub Actions en cada PR:
 
 1. Análisis estático con `ktlint` y `./gradlew lint`.
-2. Tests con cobertura mínima del 60% (Kover).
+2. Tests unitarios con cobertura mínima del 60% (Kover).
 
-Para configurar el proyecto en Android Studio, instalar el plugin
-de [ktlint](https://plugins.jetbrains.com/plugin/15057-ktlint).
+El archivo `google-services.json` **no se versiona**. Está provisto en CI/CD como secret
+`GOOGLE_SERVICES_JSON` codificado en Base64. Para desarrollo local, descargarlo desde
+[Firebase Console](https://console.firebase.google.com) y colocarlo en `app/`.
+
+Para configurar Android Studio, instalar el plugin de
+[ktlint](https://plugins.jetbrains.com/plugin/15057-ktlint).
 
 ---
 
@@ -37,154 +44,271 @@ El objetivo es aislar la lógica de negocio del framework, haciendo el core test
 ```
 ar.edu.unlam.mobile.scaffolding/
 │
-├── domain/                     # Núcleo de negocio — sin Android, sin frameworks
-│   ├── model/                  # Modelos de dominio puros (data classes Kotlin)
-│   └── service/                # Servicios de dominio: lógica pura sobre modelos
-│
-├── application/                # Orquestación y definición de puertos
-│   ├── port/
-│   │   ├── in/                 # Puertos de entrada: interfaces que llama UI
-│   │   └── out/                # Puertos de salida: interfaces que implementa Data
-│   └── service/                # Interactors: implementan port/in, usan port/out
-│
-├── ui/                         # Adaptador de entrada — Jetpack Compose, ViewModels
-│   ├── screens/
-│   │   └── <feature>/
-│   │       ├── <Feature>Screen.kt
-│   │       └── <Feature>ViewModel.kt
-│   ├── components/             # Composables reutilizables sin estado propio
-│   ├── navigation/             # Definición de rutas y NavHost
-│   └── theme/                  # Material Design 3 (Color, Type, Theme)
-│
-└── data/                       # Adaptador de salida — Room, Retrofit, sensores, cámara
-    ├── datasources/            # Fuentes de datos locales (Room) y remotas (Retrofit)
-    ├── repositories/           # Implementan application/port/out
-    ├── mappers/                # Conversión entity/DTO ↔ domain model
-    └── di/                     # Módulos Hilt
+├── domain/          # Núcleo de negocio — sin Android, sin frameworks
+├── application/     # Orquestación y definición de puertos (use cases)
+├── ui/              # Adaptador de entrada — Compose, ViewModels, Navigation
+└── data/            # Adaptador de salida — Room, Retrofit, Firebase, sensores
 ```
 
 ---
 
 ### Domain
 
-La capa más interna. Contiene el conocimiento de negocio puro, sin dependencias externas.
+La capa más interna. Sin dependencias externas: sólo Kotlin puro.
 
-**`model/`** — Modelos de dominio representados como `data class` de Kotlin. No tienen lógica de
-persistencia ni de presentación.
+**`model/`** — Modelos de dominio como `data class`:
+`Achievement`, `Clinic`, `Exercise`, `PoseResult`, `SensorReading`, `Session`, `User`
 
-**`service/`** — Servicios de dominio: funciones puras que operan sobre los modelos. No tienen
-estado, no hacen I/O, no importan Android ni frameworks.
+**`repository/`** — Interfaces de repositorio que la capa `application` usa y `data` implementa:
+`AchievementRepository`, `ClinicRepository`, `RehabRepository`, `UserRepository`
 
-Ejemplo de servicio de dominio:
+**`ports/camera/`** — Puerto de la sesión de cámara: `CameraSessionPort`
 
-```kotlin
-class AngleComparisonService @Inject constructor() {
-    fun compare(measured: Float, target: Float): Feedback { ... }
-}
-```
+**`usecase/`** — Servicios de dominio puros: `CalculateJointAngleUseCase`, `SyncMotorUseCase`
 
 ---
 
 ### Application
 
-Capa de orquestación. Define **qué** puede hacer el sistema (puertos) y **cómo** se coordina
-(interactors). No tiene dependencias de Android ni de data.
+Capa de orquestación. Define **qué** hace el sistema (puertos) y **cómo** se coordina
+(use cases / interactors). Sin dependencias de Android ni de data.
 
-**`port/in/`** — Interfaces de casos de uso que la capa de UI invoca. Cada interfaz
-representa una acción del usuario o del sistema:
+**`port/out/local/`** — Interfaces de salida hacia almacenamiento local: DB, location, prefs, sensor
 
-```kotlin
-interface LoginUseCase {
-    suspend operator fun invoke(email: String, password: String): String
-}
-```
+**`port/out/remote/`** — Interfaces de salida hacia servicios remotos: map API, routing API
 
-**`port/out/`** — Interfaces de repositorios y fuentes de datos que data implementa:
+**`service/`** — Interactors y servicios de aplicación:
+- `ThemeSensorManager` — auto dark-mode via sensor de luz ambiental
+- `HasStoredClinicsInteractor`, `NearClinicsHelper`
+- `GetRouteInteractor`
 
-```kotlin
-interface UserRepository {
-    suspend fun saveUser(user: User)
-    fun getUser(): Flow<User?>
-}
-```
+**`usecases/`** — Casos de uso concretos agrupados por dominio:
 
-**`service/`** — Interactors: implementan los puertos de entrada, llaman a los puertos de salida y
-orquestan servicios de dominio:
-
-```kotlin
-class LoginInteractor @Inject constructor(
-    private val userRepository: UserRepository,   // port/out
-    private val sessionSource: SessionSource,      // port/out
-) : LoginUseCase {
-    override suspend fun invoke(email: String, password: String): String { ... }
-}
-```
+| Carpeta | Casos de uso |
+|---|---|
+| `user/` | `LoginUseCase`, `CreateUserUseCase`, `UpdateUserUseCase`, `SignOutUseCase` |
+| `location/` | `GetClinicsStoredUseCase`, `SaveClinicUseCase`, `DeleteClinicUseCase`, `PopulateClinicsDbUseCase`, `ObserverLocationUseCase`, `GetClinicsFromAssetsUseCase`, `UpdateClinicUseCase` |
+| `mapprefs/` | `GetLastDestinationClinicIdUseCase`, `SaveLastDestinationClinicIdUseCase` |
 
 ---
 
 ### UI
 
-Adaptador de entrada. Contiene toda la UI de Android (Jetpack Compose, ViewModels, Navigation).
+Adaptador de entrada. Jetpack Compose con patrón contenedor/componente.
 
-- Los **ViewModels** inyectan interfaces de `application/port/in/` — nunca clases de data.
-- Las pantallas son composables **sin estado propio**; el estado viene del ViewModel via `StateFlow`.
-- Los componentes reutilizables viven en `ui/components/`.
-
-#### Paradigma Contenedor / Componente
-
-Los composables se organizan en dos tipos:
-
-- **Screen (contenedor)**: orquesta componentes, conecta con el ViewModel, maneja navegación.
-- **Component**: recibe estado y lambdas, no conoce el ViewModel ni la navegación.
-
-#### Navegación
-
-Single-activity con `NavHost` en `MainScreen`. Rutas como constantes de string; argumentos como
-segmentos de path:
-
-```kotlin
-NavHost(navController = controller, startDestination = "home") {
-    composable("home") { HomeScreen() }
-    composable(
-        route = "rehab/{sessionId}",
-        arguments = listOf(navArgument("sessionId") { type = NavType.StringType }),
-    ) { backStackEntry ->
-        val id = backStackEntry.arguments?.getString("sessionId") ?: ""
-        RehabSessionScreen(sessionId = id)
-    }
-}
-```
+- **ViewModels** inyectan use cases o repositorios; exponen estado vía `StateFlow`.
+- **Screens (contenedor)**: conectan ViewModel con composables, manejan navegación.
+- **Components**: reciben datos y lambdas, sin estado propio.
 
 ---
 
 ### Data
 
-Adaptador de salida. Implementa los puertos definidos en `application/port/out/` usando
-tecnologías concretas (Room, Retrofit, Firebase, sensores Android).
+Adaptador de salida. Implementa los puertos de `application/port/out/`.
 
-**`datasources/local/`** — Implementaciones Room (DAOs, Entities, Database).
+**`datasources/local/`** — Room: DAOs, Entities, AppDatabase, SessionPreferences (DataStore), MapScreenPreferences
 
-**`datasources/network/`** — Clientes Retrofit (API interfaces, DTOs).
+**`datasources/sensor/`** — Sensores Android: `LightSensorDataSource`, `AccelerometerDataSource`, `StepCounterDataSource`, `StepCounterService`, `MeasurableSensorImpl`, `LightSensor`
 
-**`mappers/`** — Conversión entre entity/DTO y domain model en ambas direcciones.
+**`datasources/camera/`** — CameraX: `CameraXSessionAdapter`
 
-**`repositories/`** — Implementan las interfaces `port/out` de application.
+**`datasources/device/`** — ML Kit (`PoseDetectionDataSource`), Health Connect (`HealthConnectDataSource`)
 
-**`di/`** — Módulos Hilt que ligan interfaces (`port/out`) con sus implementaciones.
+**`datasources/location/`** — Localización: `LocationServicePortImpl`, `BuildConfigApiKeyProviderImpl`
+
+**`datasources/network/`** — Retrofit: modelos GraphHopper, routing API key provider
+
+**`mappers/`** — Conversión entity/DTO ↔ domain: `UserMappers`, `SessionMappers`, `ClinicMappers`, `ExerciseMappers`, `AchievementMappers`
+
+**`repositories/`** — `UserRepositoryImpl`, `RehabRepositoryImpl`, `ClinicsRepositoryImpl`, `AchievementRepositoryImpl`, `MapPrefsRepositoryImpl`, `RoutingRepositoryImpl`
+
+**`di/`** — `AppModule` (Hilt singleton), `ScopeQualifiers`
 
 ---
 
 ### Reglas de dependencia
 
-| Capa          | Puede importar          | NO puede importar       |
-|---------------|-------------------------|-------------------------|
-| `domain`      | nada (Kotlin puro)      | application, ui, data   |
-| `application` | domain únicamente       | ui, data                |
-| `ui`          | application, domain     | data                    |
-| `data`        | application, domain     | ui                      |
+| Capa          | Puede importar      | NO puede importar |
+|---------------|---------------------|-------------------|
+| `domain`      | nada (Kotlin puro)  | application, ui, data |
+| `application` | domain únicamente   | ui, data |
+| `ui`          | application, domain | data |
+| `data`        | application, domain | ui |
 
-Estas reglas se deben verificar en code review. Una violación típica es inyectar una clase
-concreta de data (ej. `UserRepositoryImpl`) directamente en un interactor de application.
+---
+
+## Estructura de carpetas
+
+```
+app/src/main/java/ar/edu/unlam/mobile/scaffolding/
+│
+├── MainActivity.kt
+├── ScaffoldingApplication.kt
+│
+├── domain/
+│   ├── model/
+│   │   ├── Achievement.kt
+│   │   ├── Clinic.kt
+│   │   ├── Exercise.kt
+│   │   ├── PoseResult.kt
+│   │   ├── SensorReading.kt
+│   │   ├── Session.kt
+│   │   └── User.kt
+│   ├── ports/
+│   │   └── camera/CameraSessionPort.kt
+│   ├── repository/
+│   │   ├── AchievementRepository.kt
+│   │   ├── ClinicRepository.kt
+│   │   ├── RehabRepository.kt
+│   │   └── UserRepository.kt
+│   └── usecase/
+│       ├── CalculateJointAngleUseCase.kt
+│       └── SyncMotorUseCase.kt
+│
+├── application/
+│   ├── port/out/
+│   │   ├── local/  (db, location, prefs, sensor)
+│   │   └── remote/ (map, routing)
+│   ├── service/
+│   │   ├── local/  (ThemeSensorManager, HasStoredClinicsInteractor, NearClinicsHelper)
+│   │   └── remote/routing/ (GetRouteInteractor)
+│   └── usecases/
+│       ├── user/   (Login, CreateUser, UpdateUser, SignOut)
+│       ├── location/
+│       └── mapprefs/
+│
+├── data/
+│   ├── datasources/
+│   │   ├── camera/       CameraXSessionAdapter
+│   │   ├── device/
+│   │   │   ├── health/   HealthConnectDataSource
+│   │   │   └── mlkit/    PoseDetectionDataSource
+│   │   ├── local/
+│   │   │   ├── dao/      (UserDao, SessionDao, ExerciseDao, AchievementDao, ClinicsDao)
+│   │   │   ├── database/ AppDatabase
+│   │   │   ├── entities/ (AppEntities, AchievementEntity)
+│   │   │   └── preferences/ (SessionPreferences, MapScreenPreferences)
+│   │   ├── location/     (LocationServicePortImpl, BuildConfigApiKeyProviderImpl)
+│   │   ├── network/      (GraphHopperModels, Constants, BuildConfigRoutingApiKeyProviderImpl)
+│   │   └── sensor/       (LightSensorDataSource, AccelerometerDataSource, StepCounterDataSource,
+│   │                       StepCounterService, LightSensor, MeasurableSensorImpl)
+│   ├── mappers/          (User, Session, Clinic, Exercise, Achievement)
+│   ├── repositories/     (User, Rehab, Clinics, Achievement, MapPrefs, Routing)
+│   └── di/               (AppModule, ScopeQualifiers)
+│
+└── ui/
+    ├── navigation/
+    │   ├── Navigation.kt  ← definición de rutas (Screen sealed class)
+    │   └── MainScreen.kt  ← NavHost + Scaffold raíz
+    ├── screens/
+    │   ├── SplashScreen.kt
+    │   ├── OnboardingScreen.kt
+    │   ├── LoginScreen.kt
+    │   ├── RegisterScreen.kt
+    │   ├── DashboardScreen.kt
+    │   ├── ProfileScreen.kt
+    │   ├── MapScreen.kt
+    │   ├── dashboard/
+    │   │   └── AchievementsView.kt
+    │   ├── progress/
+    │   │   ├── ProgressScreen.kt
+    │   │   └── ProgressViewModel.kt
+    │   └── rehab/
+    │       ├── EnvironmentCheckScreen.kt
+    │       ├── RehabSessionScreen.kt
+    │       ├── RoutineListScreen.kt
+    │       ├── PostSessionScreen.kt
+    │       └── CameraPreviewComponent.kt
+    ├── components/
+    │   ├── BottomBar.kt
+    │   ├── FABShortCut.kt
+    │   ├── LottieAnimation.kt
+    │   ├── BottomSheetCard.kt
+    │   └── dashboard/
+    │       ├── RomProgressCard.kt   ← RomProgressRing incluida
+    │       ├── StepsCard.kt         ← StatInfoItem incluida
+    │       ├── LastSessionCard.kt   ← DashboardHorizontalDivider incluida
+    │       ├── AchievementsCard.kt  ← MiniMedalBadge incluida
+    │       └── ActiveRoutineBanner.kt
+    ├── viewmodels/
+    │   ├── SplashViewModel.kt
+    │   ├── OnboardingViewModel.kt
+    │   ├── LoginViewModel.kt
+    │   ├── RegisterViewModel.kt
+    │   ├── DashboardViewModel.kt
+    │   ├── ProfileViewModel.kt
+    │   ├── RehabSessionViewModel.kt
+    │   ├── RoutineListViewModel.kt
+    │   ├── EnvironmentCheckViewModel.kt
+    │   ├── PostSessionViewModel.kt
+    │   ├── AchievementsViewModel.kt
+    │   └── MapScreenViewModel.kt
+    └── theme/
+        ├── Color.kt
+        ├── Theme.kt
+        └── Type.kt
+```
+
+---
+
+## Navegación
+
+Single-activity con `NavHost` definido en `ui/navigation/MainScreen.kt`. Las rutas se declaran
+como objetos de la sealed class `Screen` en `Navigation.kt`.
+
+### Flujo de inicio de sesión
+
+```
+Splash
+  ├── onboarding_completed = false  →  Onboarding  →  Login
+  └── onboarding_completed = true   →  Login
+                                           ├── éxito        →  Dashboard
+                                           └── sin cuenta   →  Register  →  Login
+```
+
+### Rutas registradas en el NavHost
+
+| Ruta | Screen | Descripción |
+|---|---|---|
+| `splash` | `SplashScreen` | Lee preferencia de onboarding; decide redirigir |
+| `onboarding` | `OnboardingScreen` | 3 slides explicativos; guarda flag en DataStore |
+| `login` | `LoginScreen` | Firebase Auth; guarda token en DataStore + Room |
+| `register` | `RegisterScreen` | Firebase createUser; idem login |
+| `dashboard` | `DashboardScreen` | Inicio principal con métricas y accesos rápidos |
+| `routine_list` | `RoutineListScreen` | Lista de ejercicios de la sesión del día |
+| `environment_check/{exerciseId}` | `EnvironmentCheckScreen` | Verificación lumínica previa a la sesión |
+| `rehab_session/{exerciseId}` | `RehabSessionScreen` | Sesión con cámara, pose detection y acelerómetro |
+| `post_session` | `PostSessionScreen` | Resumen tras completar la sesión |
+| `progress` | `ProgressScreen` | Gráficos ROM y FC históricos; sincronización Health Connect |
+| `profile` | `ProfileScreen` | Perfil de usuario, historial de sesiones, logros, dark mode |
+| `MapScreen` | `MapScreen` | Mapa de clínicas con routing GraphHopper |
+
+### Bottom Navigation (rutas con chrome)
+
+Las siguientes rutas muestran `BottomBar` y el FAB de acceso rápido al mapa:
+
+```
+Dashboard · Rutinas · Progreso · Mapa · Perfil
+```
+
+Las rutas de Splash, Onboarding, Login y Register **no muestran** chrome (sin bottom bar).
+
+### Flujo de sesión de rehabilitación
+
+```
+RoutineList
+  └──  [Iniciar ejercicio]
+         └── EnvironmentCheck/{exerciseId}
+               ├── luz >= 100 lux  →  RehabSession/{exerciseId}  →  PostSession  →  Dashboard
+               └── luz < 100 lux   →  [Continuar igual] también lleva a RehabSession
+```
+
+### Back stack y popUpTo
+
+- Al completar Login/Register el back stack se limpia hasta Login (inclusive) para evitar
+  retroceder al formulario.
+- Al hacer Sign Out se limpia todo el back stack (`popUpTo(0)`) y se navega a Login.
+- La pantalla de Mapa usa `launchSingleTop = true` para evitar instancias duplicadas.
 
 ---
 
@@ -193,45 +317,66 @@ concreta de data (ej. `UserRepositoryImpl`) directamente en un interactor de app
 Dagger Hilt en toda la aplicación:
 
 - `ScaffoldingApplication` → `@HiltAndroidApp`
-- `MainActivity` → `@AndroidEntryPoint`
-- ViewModels → `@HiltViewModel` + `hiltViewModel()` en el composable
-- Los módulos Hilt (en `data/di/`) ligan cada interfaz `port/out` con su implementación
+- `MainActivity` → `@AndroidEntryPoint` (inyecta `SessionPreferences` para dark mode reactivo)
+- ViewModels → `@HiltViewModel` + `hiltViewModel()` en composables
+- Módulo principal: `data/di/AppModule` — registra todos los singletons
+
+### Principales bindings en AppModule
+
+| Interfaz | Implementación |
+|---|---|
+| `FirebaseAuth` | `FirebaseAuth.getInstance()` |
+| `LightSensorDataSource` | `LightSensorDataSource(context)` |
+| `AccelerometerDataSource` | `AccelerometerDataSource(context)` |
+| `StepCounterDataSource` | `StepCounterDataSource(context)` |
+| `SessionPreferences` | `SessionPreferences(context)` |
+| `CameraSessionPort` | `CameraXSessionAdapter(context)` |
+| `UserRepository` | `UserRepositoryImpl(userDao)` |
+| `RehabRepository` | `RehabRepositoryImpl(sessionDao, exerciseDao)` |
+| `AchievementRepository` | `AchievementRepositoryImpl(achievementDao)` |
+| `LocationServicePort` | `LocationServicePortImpl(context)` |
 
 ---
 
-## Migraciones pendientes
+## Tests
 
-### `infraestructure/` → `data/`
+### Cobertura mínima requerida: 60% (Kover)
 
-El código de la capa de datos actualmente vive en el paquete `infraestructure/` (typo intencional heredado). Debe migrarse al paquete `data/` para alinearse con la convención de Android y con los otros proyectos del equipo.
+Los tests unitarios se ubican en `app/src/test/` espejando la estructura de producción.
 
-Archivos a mover:
-
-| Origen (`infraestructure/`) | Destino (`data/`) |
+| Archivo de test | Qué cubre |
 |---|---|
-| `adapters/camera/CameraXSessionAdapter.kt` | `datasources/camera/` |
-| `adapters/device/sensor/LightSensorDataSource.kt` | `datasources/sensor/` |
-| `adapters/device/sensor/StepCounterDataSource.kt` | `datasources/sensor/` |
-| `adapters/device/sensor/StepCounterService.kt` | `datasources/sensor/` |
-| `adapters/sensor/LightSensorDataSource.kt` | ⚠️ duplicado — revisar y eliminar |
-| `adapters/location/LocationServicePortImpl.kt` | `datasources/location/` |
-| `adapters/location/DataBaseRepositoryImpl.kt` | `repositories/` |
-| `persistance/daos/` | `datasources/local/dao/` |
-| `persistance/db/` | `datasources/local/database/` |
-| `persistance/entities/` | `datasources/local/entities/` |
-| `persistance/mappers/` | `mappers/` |
-| `persistance/preferences/SessionPreferences.kt` | `datasources/local/preferences/` |
-| `persistance/repositories/RehabRepositoryImpl.kt` | `repositories/` |
-| `persistance/repositories/UserRepositoryImpl.kt` | `repositories/` |
-| `di/AppModule.kt` | `di/` |
+| `LoginUseCaseTest` | Firebase Auth → DataStore → Room; errores de credenciales |
+| `CreateUserUseCaseTest` | Firebase createUser; unicidad de email; trim de datos |
+| `UpdateUserUseCaseTest` | Validación de nombre; no hay usuario logueado |
+| `SignOutUseCaseTest` | Orden clearSession → clearUser → signOut; idempotencia |
+| `LoginViewModelTest` | Validación inline de email/password; estados Loading/Success/Error |
+| `RegisterViewModelTest` | Coincidencia de contraseñas; mín. 8 chars; email único |
+| `ProfileViewModelTest` | Edit name; toggle dark mode; sign out; sesiones recientes |
+| `DashboardViewModelTest` | Carga de usuario, sesiones y pasos; cálculo de ROM máximo |
+| `RehabSessionViewModelTest` | Detección de caídas; `setTargetAngle`; `dismissFallAlert` |
+| `EnvironmentCheckViewModelTest` | Clasificación de lux en GOOD/FAIR/POOR; sensor no disponible |
+| `AccelerometerDataSourceTest` | Umbral de caída 2.5 G; función `isFallDetected` pura |
 
-Al mover cada archivo actualizar el `package` declaration y todos los `import` que referencien `infraestructure`.
+### Ejecutar tests
+
+```bash
+./gradlew testDebugUnitTest
+```
+
+### Ejecutar tests con reporte de cobertura
+
+```bash
+./gradlew koverXmlReportDebug
+```
 
 ---
 
 ## Referencias
 
-[1]: https://martinfowler.com/bliki/DomainDrivenDesign.html
-[2]: https://developer.android.com/training/dependency-injection/hilt-android
-[3]: https://alistair.cockburn.us/hexagonal-architecture/
-
+- [Hexagonal Architecture — Alistair Cockburn](https://alistair.cockburn.us/hexagonal-architecture/)
+- [Domain-Driven Design — Martin Fowler](https://martinfowler.com/bliki/DomainDrivenDesign.html)
+- [Dagger Hilt — Android Docs](https://developer.android.com/training/dependency-injection/hilt-android)
+- [Jetpack Compose Navigation](https://developer.android.com/jetpack/compose/navigation)
+- [ML Kit Pose Detection](https://developers.google.com/ml-kit/vision/pose-detection/android)
+- [Health Connect](https://developer.android.com/health-and-fitness/guides/health-connect)
