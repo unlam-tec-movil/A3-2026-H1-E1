@@ -25,11 +25,17 @@ data class DashboardUiState(
     val userName: String = "Imanol",
     val maxRom: Float = 0f,
     val targetRom: Float = 120f,
-    val currentSteps: Int = 7428,
+    val currentSteps: Int = 0,
     val targetSteps: Int = 10000,
     val lastSession: Session? = null,
     val unlockedAchievementsCount: Int = 0,
     val newlyUnlockedAchievement: Achievement? = null,
+    // Estimated kilocalories burned today, derived from sessions duration (5 MET * 70 kg).
+    val caloriesKcal: Int = 0,
+    // Estimated distance in km, derived from step count (0.000762 km/step).
+    val distanceKm: Float = 0f,
+    // Total active minutes today, derived from sessions recorded today.
+    val activeMinutes: Int = 0,
     val isLoading: Boolean = true,
     val error: String? = null,
 )
@@ -81,15 +87,27 @@ class DashboardViewModel
 
                                 val unlockedCount = achievements.count { it.isUnlocked }
 
+                                // ── Real data derived from sessions + steps ────────────
+                                // Calories: MET 5 (moderate rehab) × 70 kg × duration in hours
+                                val totalActiveSeconds = sessions.sumOf { it.durationSeconds }
+                                val caloriesKcal = (5.0 * 70.0 * (totalActiveSeconds / 3600.0)).toInt()
+                                // Distance: average stride ~0.762 m (standard medical value)
+                                val distanceKm = steps * 0.000762f
+                                // Active minutes from all sessions
+                                val activeMinutes = (totalActiveSeconds / 60).toInt()
+
                                 DashboardUiState(
                                     userName = userName,
                                     maxRom = maxRom,
-                                    targetRom = 120f, // Target ROM is 120 degrees
+                                    targetRom = 120f,
                                     currentSteps = steps,
                                     targetSteps = 10000,
                                     lastSession = lastSession,
                                     unlockedAchievementsCount = unlockedCount,
                                     newlyUnlockedAchievement = _uiState.value.newlyUnlockedAchievement,
+                                    caloriesKcal = caloriesKcal,
+                                    distanceKm = distanceKm,
+                                    activeMinutes = activeMinutes,
                                     isLoading = false,
                                     error = null,
                                 )
