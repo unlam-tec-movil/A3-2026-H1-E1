@@ -24,10 +24,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.ui.theme.AmberWarning
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
@@ -67,7 +69,7 @@ fun LastSessionCard(
             ) {
                 Column {
                     Text(
-                        text = "Última Sesión Activa",
+                        text = stringResource(R.string.dashboard_last_session_title),
                         style =
                             MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold,
@@ -75,7 +77,7 @@ fun LastSessionCard(
                             ),
                     )
                     Text(
-                        text = "Resultados de tu último entrenamiento",
+                        text = stringResource(R.string.dashboard_last_session_subtitle),
                         style =
                             MaterialTheme.typography.bodyMedium.copy(
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -110,7 +112,7 @@ fun LastSessionCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "Fecha del entrenamiento",
+                        text = stringResource(R.string.dashboard_last_session_date_label),
                         style =
                             MaterialTheme.typography.bodyMedium.copy(
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
@@ -137,7 +139,7 @@ fun LastSessionCard(
                 ) {
                     Column {
                         Text(
-                            text = "Duración",
+                            text = stringResource(R.string.dashboard_last_session_duration),
                             style =
                                 MaterialTheme.typography.labelSmall.copy(
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
@@ -145,8 +147,18 @@ fun LastSessionCard(
                         )
                         val durationMin = lastSession.durationSeconds / 60
                         val durationSec = lastSession.durationSeconds % 60
+                        val durationText =
+                            if (durationSec > 0) {
+                                stringResource(
+                                    R.string.dashboard_last_session_duration_min_sec,
+                                    durationMin,
+                                    durationSec,
+                                )
+                            } else {
+                                stringResource(R.string.dashboard_last_session_duration_min, durationMin)
+                            }
                         Text(
-                            text = if (durationSec > 0) "${durationMin}m ${durationSec}s" else "$durationMin min",
+                            text = durationText,
                             style =
                                 MaterialTheme.typography.bodyLarge.copy(
                                     fontWeight = FontWeight.Bold,
@@ -157,7 +169,7 @@ fun LastSessionCard(
 
                     Column {
                         Text(
-                            text = "ROM Promedio",
+                            text = stringResource(R.string.dashboard_last_session_avg_rom),
                             style =
                                 MaterialTheme.typography.labelSmall.copy(
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
@@ -175,7 +187,7 @@ fun LastSessionCard(
 
                     Column {
                         Text(
-                            text = "Rep. Exitosas",
+                            text = stringResource(R.string.dashboard_last_session_successful_reps),
                             style =
                                 MaterialTheme.typography.labelSmall.copy(
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
@@ -211,7 +223,7 @@ fun LastSessionCard(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "No hay registros de sesiones de entrenamiento aún.",
+                        text = stringResource(R.string.dashboard_last_session_empty),
                         style =
                             MaterialTheme.typography.bodyMedium.copy(
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),

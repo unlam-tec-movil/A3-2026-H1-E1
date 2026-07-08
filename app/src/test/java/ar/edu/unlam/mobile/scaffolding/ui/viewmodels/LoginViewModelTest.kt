@@ -1,6 +1,8 @@
 package ar.edu.unlam.mobile.scaffolding.ui.viewmodels
 
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.application.usecases.user.LoginUseCase
+import ar.edu.unlam.mobile.scaffolding.ui.utils.UiText
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -59,7 +61,7 @@ class LoginViewModelTest {
     fun `onEmailChange should set emailError when format is invalid`() {
         viewModel.onEmailChange("not_an_email")
 
-        assertEquals("Formato de correo inválido", viewModel.formState.value.emailError)
+        assertEquals(UiText.StringResource(R.string.login_error_invalid_email), viewModel.formState.value.emailError)
     }
 
     @Test
@@ -115,7 +117,7 @@ class LoginViewModelTest {
             viewModel.onLogin()
             advanceUntilIdle()
 
-            assertEquals("El correo no puede estar vacío", viewModel.formState.value.emailError)
+            assertEquals(UiText.StringResource(R.string.login_error_empty_email), viewModel.formState.value.emailError)
             assertTrue(viewModel.uiState.value is LoginUiState.Idle)
             coVerify(exactly = 0) { loginUseCase(any(), any()) }
         }
@@ -127,7 +129,10 @@ class LoginViewModelTest {
             viewModel.onLogin()
             advanceUntilIdle()
 
-            assertEquals("La contraseña no puede estar vacía", viewModel.formState.value.passwordError)
+            assertEquals(
+                UiText.StringResource(R.string.login_error_empty_password),
+                viewModel.formState.value.passwordError,
+            )
             assertTrue(viewModel.uiState.value is LoginUiState.Idle)
             coVerify(exactly = 0) { loginUseCase(any(), any()) }
         }
@@ -140,7 +145,10 @@ class LoginViewModelTest {
             viewModel.onLogin()
             advanceUntilIdle()
 
-            assertEquals("Formato de correo inválido", viewModel.formState.value.emailError)
+            assertEquals(
+                UiText.StringResource(R.string.login_error_invalid_email),
+                viewModel.formState.value.emailError,
+            )
             assertTrue(viewModel.uiState.value is LoginUiState.Idle)
         }
 
@@ -182,7 +190,7 @@ class LoginViewModelTest {
 
             val state = viewModel.uiState.value
             assertTrue(state is LoginUiState.Error)
-            assertEquals("Credenciales incorrectas", (state as LoginUiState.Error).message)
+            assertEquals(UiText.DynamicString("Credenciales incorrectas"), (state as LoginUiState.Error).message)
         }
 
     @Test
@@ -197,7 +205,7 @@ class LoginViewModelTest {
 
             val state = viewModel.uiState.value
             assertTrue(state is LoginUiState.Error)
-            assertEquals("Error desconocido", (state as LoginUiState.Error).message)
+            assertEquals(UiText.StringResource(R.string.unknown_error), (state as LoginUiState.Error).message)
         }
 
     @Test

@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -62,7 +63,7 @@ fun LocationDeniedCard() {
                 modifier = Modifier.padding(8.dp),
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onPrimary,
-                text = "Gambapp necesita conocer tu ubicacion para poder recomendarte clinicas cercanas.",
+                text = stringResource(R.string.dashboard_location_denied_text),
             )
         }
     }

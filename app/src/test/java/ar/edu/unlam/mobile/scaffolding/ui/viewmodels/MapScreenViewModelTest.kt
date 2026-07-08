@@ -5,6 +5,7 @@ import android.content.Intent
 import android.location.Location
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.application.service.local.remote.routing.GetRouteUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsFromAssetsUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsStoredUseCase
@@ -17,6 +18,7 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.Points
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.RouteResponse
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 import ar.edu.unlam.mobile.scaffolding.toHex
+import ar.edu.unlam.mobile.scaffolding.ui.utils.UiText
 import com.google.android.gms.maps.model.LatLng
 import com.maptiler.maptilersdk.map.LngLat
 import com.maptiler.maptilersdk.map.MTMapViewController
@@ -219,7 +221,7 @@ class MapScreenViewModelTest {
             val state = viewModel.mapScreenUiState.value
             assertFalse(state.isLoadingClinics)
             assertFalse(state.clinicsLoadSuccess)
-            assertEquals(errorMessage, state.clinicsLoadError)
+            assertEquals(UiText.StringResource(R.string.map_clinics_load_error, errorMessage), state.clinicsLoadError)
         }
 
     @Test
@@ -600,11 +602,11 @@ class MapScreenViewModelTest {
             val method = MapScreenViewModel::class.java.getDeclaredMethod("formatTravelTime", Long::class.java)
             method.isAccessible = true
 
-            val result30Min = method.invoke(viewModel, 30 * 60000L) as String
-            assertEquals("30 min", result30Min)
+            val result30Min = method.invoke(viewModel, 30 * 60000L) as UiText
+            assertEquals(UiText.StringResource(R.string.map_travel_time_minutes, 30), result30Min)
 
-            val result1Min = method.invoke(viewModel, 1 * 60000L) as String
-            assertEquals("1 min", result1Min)
+            val result1Min = method.invoke(viewModel, 1 * 60000L) as UiText
+            assertEquals(UiText.StringResource(R.string.map_travel_time_minutes, 1), result1Min)
         }
 
     @Test
@@ -616,11 +618,11 @@ class MapScreenViewModelTest {
             val method = MapScreenViewModel::class.java.getDeclaredMethod("formatTravelTime", Long::class.java)
             method.isAccessible = true
 
-            val result1Hour30Min = method.invoke(viewModel, 90 * 60000L) as String
-            assertEquals("1h 30min", result1Hour30Min)
+            val result1Hour30Min = method.invoke(viewModel, 90 * 60000L) as UiText
+            assertEquals(UiText.StringResource(R.string.map_travel_time_hours_minutes, 1, 30), result1Hour30Min)
 
-            val result2Hours = method.invoke(viewModel, 120 * 60000L) as String
-            assertEquals("2h 0min", result2Hours)
+            val result2Hours = method.invoke(viewModel, 120 * 60000L) as UiText
+            assertEquals(UiText.StringResource(R.string.map_travel_time_hours_minutes, 2, 0), result2Hours)
         }
 
     @Test
@@ -700,7 +702,7 @@ class MapScreenViewModelTest {
 
             val state = viewModel.mapScreenUiState.value
             assertFalse(state.showRoute)
-            assertEquals("Could not load route. Please try again later.", state.routeError)
+            assertEquals(UiText.StringResource(R.string.map_route_error), state.routeError)
         }
 
     @Test
@@ -753,7 +755,10 @@ class MapScreenViewModelTest {
             advanceUntilIdle()
 
             // Assert
-            assertEquals("Failed to load clinics", viewModel.mapScreenUiState.value.clinicsLoadError)
+            assertEquals(
+                UiText.StringResource(R.string.map_load_clinics_error),
+                viewModel.mapScreenUiState.value.clinicsLoadError,
+            )
         }
 
     @Test

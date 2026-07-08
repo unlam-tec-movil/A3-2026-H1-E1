@@ -21,9 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
 import java.util.Locale
 
@@ -58,7 +60,7 @@ fun StepsCard(
             ) {
                 Column {
                     Text(
-                        text = "Pasos Diarios",
+                        text = stringResource(R.string.dashboard_steps_card_title),
                         style =
                             MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold,
@@ -66,7 +68,7 @@ fun StepsCard(
                             ),
                     )
                     Text(
-                        text = "Actividad física registrada hoy",
+                        text = stringResource(R.string.dashboard_steps_card_subtitle),
                         style =
                             MaterialTheme.typography.bodyMedium.copy(
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -102,7 +104,7 @@ fun StepsCard(
                         ),
                 )
                 Text(
-                    text = String.format(Locale.getDefault(), "Meta: %,d", targetSteps),
+                    text = stringResource(R.string.dashboard_steps_card_target, targetSteps),
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Medium,
@@ -132,13 +134,21 @@ fun StepsCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                StatInfoItem(emoji = "🔥", label = "Calorías", value = "$caloriesKcal kcal")
+                StatInfoItem(
+                    emoji = "🔥",
+                    label = stringResource(R.string.dashboard_steps_card_calories),
+                    value = stringResource(R.string.dashboard_steps_card_calories_val, caloriesKcal),
+                )
                 StatInfoItem(
                     emoji = "🚶",
-                    label = "Distancia",
-                    value = String.format(Locale.getDefault(), "%.1f km", distanceKm),
+                    label = stringResource(R.string.dashboard_steps_card_distance),
+                    value = stringResource(R.string.dashboard_steps_card_distance_val, distanceKm),
                 )
-                StatInfoItem(emoji = "⏱️", label = "Tiempo activo", value = "$activeMinutes min")
+                StatInfoItem(
+                    emoji = "⏱️",
+                    label = stringResource(R.string.dashboard_steps_card_active_time),
+                    value = stringResource(R.string.dashboard_steps_card_active_time_val, activeMinutes),
+                )
             }
         }
     }

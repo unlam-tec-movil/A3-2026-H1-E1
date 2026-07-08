@@ -40,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.health.connect.client.HealthConnectClient
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.OnboardingViewModel
@@ -54,39 +56,31 @@ import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.OnboardingViewModel
 // Modelo de datos de cada slide
 private data class OnboardingSlide(
     val emoji: String,
-    val title: String,
-    val description: String,
+    val titleRes: Int,
+    val descriptionRes: Int,
 )
 
 private val slides =
     listOf(
         OnboardingSlide(
             emoji = "🏋️",
-            title = "Bienvenido a GambApp",
-            description =
-                "Tu compañero de rehabilitación inteligente. Seguimos tu progreso en " +
-                    "tiempo real usando los sensores de tu teléfono para que cada sesión cuente.",
+            titleRes = R.string.onboarding_slide1_title,
+            descriptionRes = R.string.onboarding_slide1_desc,
         ),
         OnboardingSlide(
             emoji = "📡",
-            title = "¿Cómo funciona?",
-            description =
-                "La cámara y los sensores detectan tus movimientos. El sistema analiza " +
-                    "ángulos articulares y sincroniza ejercicios para guiarte hacia una recuperación más rápida.",
+            titleRes = R.string.onboarding_slide2_title,
+            descriptionRes = R.string.onboarding_slide2_desc,
         ),
         OnboardingSlide(
             emoji = "🔐",
-            title = "Permisos necesarios",
-            description =
-                "GambApp necesita acceso a cámara y ubicación para " +
-                    "funcionar correctamente. Tu privacidad siempre está protegida.",
+            titleRes = R.string.onboarding_slide3_title,
+            descriptionRes = R.string.onboarding_slide3_desc,
         ),
         OnboardingSlide(
             emoji = "💓",
-            title = "Health Connect",
-            description =
-                "Sincroniza tus datos de salud (ritmo cardíaco y calorías) para " +
-                    "un seguimiento clínico detallado de tu rehabilitación.",
+            titleRes = R.string.onboarding_slide4_title,
+            descriptionRes = R.string.onboarding_slide4_desc,
         ),
     )
 
@@ -153,7 +147,7 @@ fun OnboardingScreen(
             ) {
                 TextButton(onClick = viewModel::skipOnboarding) {
                     Text(
-                        text = "Saltar",
+                        text = stringResource(R.string.onboarding_skip),
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                         fontSize = 14.sp,
                     )
@@ -229,7 +223,12 @@ fun OnboardingScreen(
                     shape = MaterialTheme.shapes.medium,
                 ) {
                     Text(
-                        text = if (isLastPage) "Empezar" else "Siguiente",
+                        text =
+                            if (isLastPage) {
+                                stringResource(R.string.onboarding_start)
+                            } else {
+                                stringResource(R.string.onboarding_next)
+                            },
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White,
@@ -316,7 +315,7 @@ private fun SlideContent(slide: OnboardingSlide) {
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = slide.title,
+            text = stringResource(slide.titleRes),
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
@@ -326,7 +325,7 @@ private fun SlideContent(slide: OnboardingSlide) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = slide.description,
+            text = stringResource(slide.descriptionRes),
             fontSize = 15.sp,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
             textAlign = TextAlign.Center,

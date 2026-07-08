@@ -1,4 +1,4 @@
-﻿package ar.edu.unlam.mobile.scaffolding.ui.screens
+package ar.edu.unlam.mobile.scaffolding.ui.screens
 
 import android.Manifest
 import android.content.Intent
@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -276,7 +277,7 @@ fun DashboardHeader(
     ) {
         Column {
             Text(
-                text = "¡Hola, $userName! 👋",
+                text = stringResource(R.string.dashboard_greeting, userName),
                 style =
                     MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.Bold,
@@ -284,7 +285,7 @@ fun DashboardHeader(
                     ),
             )
             Text(
-                text = "Tu resumen de salud para hoy",
+                text = stringResource(R.string.dashboard_health_summary),
                 style =
                     MaterialTheme.typography.bodyLarge.copy(
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
@@ -306,12 +307,12 @@ fun AchievementUnlockedDialog(
                 onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(containerColor = ElectricIndigo),
             ) {
-                Text("¡Genial!", color = Color.White)
+                Text(stringResource(R.string.dashboard_cool), color = Color.White)
             }
         },
         title = {
             Text(
-                text = "¡Logro Desbloqueado!",
+                text = stringResource(R.string.dashboard_achievement_unlocked),
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),

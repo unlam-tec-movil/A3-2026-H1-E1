@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.domain.model.Exercise
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
+import ar.edu.unlam.mobile.scaffolding.ui.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,7 @@ import javax.inject.Inject
 data class RoutineListUiState(
     val exercises: List<Exercise> = emptyList(),
     val isLoading: Boolean = true,
-    val error: String? = null,
+    val error: UiText? = null,
 )
 
 @HiltViewModel
@@ -46,7 +47,9 @@ class RoutineListViewModel
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
-                                    error = e.localizedMessage ?: "Error desconocido",
+                                    error =
+                                        e.localizedMessage?.let { msg -> UiText.DynamicString(msg) }
+                                            ?: UiText.StringResource(R.string.unknown_error),
                                 )
                             }
                         }.collect { exercisesList ->
@@ -62,7 +65,9 @@ class RoutineListViewModel
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = e.localizedMessage ?: "Error desconocido",
+                            error =
+                                e.localizedMessage?.let { msg -> UiText.DynamicString(msg) }
+                                    ?: UiText.StringResource(R.string.unknown_error),
                         )
                     }
                 }

@@ -37,6 +37,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -52,6 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
+import ar.edu.unlam.mobile.scaffolding.ui.utils.UiText
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.RegisterFormState
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.RegisterUiState
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.RegisterViewModel
@@ -129,14 +131,14 @@ internal fun RegisterContent(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Crear cuenta",
+                text = stringResource(R.string.register_title),
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 color = ElectricIndigo,
             )
 
             Text(
-                text = "Empezá tu recuperación hoy",
+                text = stringResource(R.string.register_subtitle),
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                 textAlign = TextAlign.Center,
@@ -148,11 +150,11 @@ internal fun RegisterContent(
             OutlinedTextField(
                 value = formState.name,
                 onValueChange = onNameChange,
-                label = { Text("Nombre completo") },
+                label = { Text(stringResource(R.string.register_name_label)) },
                 isError = formState.nameError != null,
                 supportingText =
                     formState.nameError?.let {
-                        { Text(it, color = MaterialTheme.colorScheme.error) }
+                        { Text(it.asString(), color = MaterialTheme.colorScheme.error) }
                     },
                 singleLine = true,
                 keyboardOptions =
@@ -171,11 +173,11 @@ internal fun RegisterContent(
             OutlinedTextField(
                 value = formState.email,
                 onValueChange = onEmailChange,
-                label = { Text("Correo electrónico") },
+                label = { Text(stringResource(R.string.register_email_label)) },
                 isError = formState.emailError != null,
                 supportingText =
                     formState.emailError?.let {
-                        { Text(it, color = MaterialTheme.colorScheme.error) }
+                        { Text(it.asString(), color = MaterialTheme.colorScheme.error) }
                     },
                 singleLine = true,
                 keyboardOptions =
@@ -194,11 +196,11 @@ internal fun RegisterContent(
             OutlinedTextField(
                 value = formState.password,
                 onValueChange = onPasswordChange,
-                label = { Text("Contraseña") },
+                label = { Text(stringResource(R.string.register_password_label)) },
                 isError = formState.passwordError != null,
                 supportingText =
                     formState.passwordError?.let {
-                        { Text(it, color = MaterialTheme.colorScheme.error) }
+                        { Text(it.asString(), color = MaterialTheme.colorScheme.error) }
                     },
                 singleLine = true,
                 visualTransformation =
@@ -209,7 +211,11 @@ internal fun RegisterContent(
                             imageVector =
                                 if (formState.passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                             contentDescription =
-                                if (formState.passwordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                                if (formState.passwordVisible) {
+                                    stringResource(R.string.login_hide_password)
+                                } else {
+                                    stringResource(R.string.login_show_password)
+                                },
                         )
                     }
                 },
@@ -229,17 +235,22 @@ internal fun RegisterContent(
             OutlinedTextField(
                 value = formState.confirmPassword,
                 onValueChange = onConfirmPasswordChange,
-                label = { Text("Confirmar contraseña") },
+                label = { Text(stringResource(R.string.register_confirm_password_label)) },
                 isError = formState.confirmPasswordError != null || uiState is RegisterUiState.Error,
                 supportingText =
                     when {
                         formState.confirmPasswordError != null ->
                             {
-                                { Text(formState.confirmPasswordError, color = MaterialTheme.colorScheme.error) }
+                                {
+                                    Text(
+                                        formState.confirmPasswordError.asString(),
+                                        color = MaterialTheme.colorScheme.error,
+                                    )
+                                }
                             }
                         globalError != null ->
                             {
-                                { Text(globalError, color = MaterialTheme.colorScheme.error) }
+                                { Text(globalError.asString(), color = MaterialTheme.colorScheme.error) }
                             }
                         else -> null
                     },
@@ -256,7 +267,11 @@ internal fun RegisterContent(
                                     Icons.Filled.Visibility
                                 },
                             contentDescription =
-                                if (formState.confirmPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                                if (formState.confirmPasswordVisible) {
+                                    stringResource(R.string.login_hide_password)
+                                } else {
+                                    stringResource(R.string.login_show_password)
+                                },
                         )
                     }
                 },
@@ -297,7 +312,7 @@ internal fun RegisterContent(
                     )
                 } else {
                     Text(
-                        text = "Crear cuenta",
+                        text = stringResource(R.string.register_button),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White,
@@ -310,7 +325,7 @@ internal fun RegisterContent(
             // Link a login
             TextButton(onClick = onNavigateToLogin, enabled = !isLoading) {
                 Text(
-                    text = "¿Ya tenés cuenta? Iniciá sesión",
+                    text = stringResource(R.string.register_have_account),
                     color = ElectricIndigo,
                     fontSize = 14.sp,
                 )
@@ -357,7 +372,7 @@ private fun PreviewRegisterErrorLight() {
                         password = "password123",
                         confirmPassword = "password123",
                     ),
-                uiState = RegisterUiState.Error("El email ya está registrado"),
+                uiState = RegisterUiState.Error(UiText.DynamicString("El email ya está registrado")),
                 onNameChange = {},
                 onEmailChange = {},
                 onPasswordChange = {},
@@ -380,13 +395,13 @@ private fun PreviewRegisterValidationLight() {
                 formState =
                     RegisterFormState(
                         name = "J",
-                        nameError = "El nombre debe tener al menos 2 caracteres",
+                        nameError = UiText.DynamicString("El nombre debe tener al menos 2 caracteres"),
                         email = "bad_email",
-                        emailError = "Formato de correo inválido",
+                        emailError = UiText.DynamicString("Formato de correo inválido"),
                         password = "1234",
-                        passwordError = "La contraseña debe tener al menos 8 caracteres",
+                        passwordError = UiText.DynamicString("La contraseña debe tener al menos 8 caracteres"),
                         confirmPassword = "5678",
-                        confirmPasswordError = "Las contraseñas no coinciden",
+                        confirmPasswordError = UiText.DynamicString("Las contraseñas no coinciden"),
                     ),
                 uiState = RegisterUiState.Idle,
                 onNameChange = {},
