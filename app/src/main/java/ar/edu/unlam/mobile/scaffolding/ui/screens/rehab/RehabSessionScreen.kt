@@ -4,34 +4,54 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
+import androidx.camera.core.Preview.SurfaceProvider
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
-import java.util.Locale
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ar.edu.unlam.mobile.scaffolding.R
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.LifecycleOwner
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.domain.model.Exercise
 import ar.edu.unlam.mobile.scaffolding.domain.model.PoseResult
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.JointPrecision
@@ -42,6 +62,7 @@ import ar.edu.unlam.mobile.scaffolding.ui.theme.DarkBg
 import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.RehabSessionViewModel
+import java.util.Locale
 
 @Composable
 fun RehabSessionScreen(
@@ -100,7 +121,13 @@ fun RehabSessionScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = String.format(Locale.getDefault(), "%02d:%02d", fatigueRestTimer / 60, fatigueRestTimer % 60),
+                        text =
+                            String.format(
+                                Locale.getDefault(),
+                                "%02d:%02d",
+                                fatigueRestTimer / 60,
+                                fatigueRestTimer % 60,
+                            ),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
@@ -116,7 +143,7 @@ fun RehabSessionScreen(
                 }
             },
             shape = RoundedCornerShape(16.dp),
-            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
+            properties = DialogProperties(usePlatformDefaultWidth = false),
             modifier = Modifier.padding(32.dp),
         )
     }
@@ -239,7 +266,7 @@ fun RehabSessionContent(
     precision: JointPrecision,
     exercise: Exercise?,
     reps: Int,
-    onSurfaceReady: (androidx.lifecycle.LifecycleOwner, androidx.camera.core.Preview.SurfaceProvider) -> Unit,
+    onSurfaceReady: (LifecycleOwner, SurfaceProvider) -> Unit,
     onBackClick: () -> Unit,
     onNextClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -337,21 +364,10 @@ fun RehabSessionContent(
                                     .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(8.dp)),
                             contentAlignment = Alignment.Center,
                         ) {
-                            /*
-                            if (exercise?.illustrationRes != null) {
-                                Image(
-                                    painter = painterResource(id = exercise.illustrationRes),
-                                    contentDescription = null,
-                                    modifier = Modifier.fillMaxSize().padding(4.dp),
-                                    contentScale = ContentScale.Fit,
-                                )
-                            } else {
-                            */
-                                Text(
-                                    text = "💪",
-                                    fontSize = 24.sp,
-                                )
-                            // }
+                            Text(
+                                text = "💪",
+                                fontSize = 24.sp,
+                            )
                         }
                     }
                 }
