@@ -24,9 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 
 @Composable
@@ -61,7 +63,7 @@ fun AchievementsCard(
             ) {
                 Column {
                     Text(
-                        text = "Tus Logros y Medallas 🏆",
+                        text = stringResource(R.string.dashboard_achievements_title),
                         style =
                             MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold,
@@ -69,7 +71,7 @@ fun AchievementsCard(
                             ),
                     )
                     Text(
-                        text = "Gamificación y progreso del tratamiento",
+                        text = stringResource(R.string.dashboard_achievements_subtitle),
                         style =
                             MaterialTheme.typography.bodyMedium.copy(
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -87,7 +89,7 @@ fun AchievementsCard(
             ) {
                 Column {
                     Text(
-                        text = "$unlockedCount / $totalCount",
+                        text = stringResource(R.string.dashboard_achievements_ratio, unlockedCount, totalCount),
                         style =
                             MaterialTheme.typography.headlineLarge.copy(
                                 fontWeight = FontWeight.Bold,
@@ -95,7 +97,7 @@ fun AchievementsCard(
                             ),
                     )
                     Text(
-                        text = "Desbloqueados",
+                        text = stringResource(R.string.dashboard_achievements_unlocked),
                         style =
                             MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),

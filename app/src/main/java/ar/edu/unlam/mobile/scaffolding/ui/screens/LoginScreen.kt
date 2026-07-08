@@ -46,6 +46,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -173,7 +174,7 @@ internal fun LoginContent(
             )
 
             Text(
-                text = "Tu rehabilitación, en tus manos",
+                text = stringResource(R.string.login_title),
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                 textAlign = TextAlign.Center,
@@ -185,9 +186,17 @@ internal fun LoginContent(
             OutlinedTextField(
                 value = formState.email,
                 onValueChange = onEmailChange,
-                label = { Text("Correo electrónico") },
+                label = { Text(stringResource(R.string.login_email_label)) },
                 isError = formState.emailError != null,
-                supportingText = formState.emailError?.let { { Text(it, color = MaterialTheme.colorScheme.error) } },
+                supportingText =
+                    formState.emailError?.let {
+                        {
+                            Text(
+                                it.asString(),
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
+                    },
                 singleLine = true,
                 keyboardOptions =
                     KeyboardOptions(
@@ -208,17 +217,17 @@ internal fun LoginContent(
             OutlinedTextField(
                 value = formState.password,
                 onValueChange = onPasswordChange,
-                label = { Text("Contraseña") },
+                label = { Text(stringResource(R.string.login_password_label)) },
                 isError = formState.passwordError != null || uiState is LoginUiState.Error,
                 supportingText =
                     when {
                         formState.passwordError != null ->
                             {
-                                { Text(formState.passwordError, color = MaterialTheme.colorScheme.error) }
+                                { Text(formState.passwordError.asString(), color = MaterialTheme.colorScheme.error) }
                             }
                         uiState is LoginUiState.Error ->
                             {
-                                { Text(uiState.message, color = MaterialTheme.colorScheme.error) }
+                                { Text(uiState.message.asString(), color = MaterialTheme.colorScheme.error) }
                             }
                         else -> null
                     },
@@ -240,9 +249,9 @@ internal fun LoginContent(
                                 },
                             contentDescription =
                                 if (formState.passwordVisible) {
-                                    "Ocultar contraseña"
+                                    stringResource(R.string.login_hide_password)
                                 } else {
-                                    "Mostrar contraseña"
+                                    stringResource(R.string.login_show_password)
                                 },
                         )
                     }
@@ -284,7 +293,7 @@ internal fun LoginContent(
                     )
                 } else {
                     Text(
-                        text = "Iniciar sesión",
+                        text = stringResource(R.string.login_button),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White,
@@ -297,7 +306,7 @@ internal fun LoginContent(
             // Link registro
             TextButton(onClick = onNavigateToRegister, enabled = !isLoading) {
                 Text(
-                    text = "¿No tenés cuenta? Registrate",
+                    text = stringResource(R.string.login_no_account),
                     color = ElectricIndigo,
                     fontSize = 14.sp,
                 )
@@ -316,7 +325,7 @@ internal fun LoginContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Acceso Rápido (Usuarios Mock)",
+                text = stringResource(R.string.login_quick_access_title),
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
@@ -432,7 +441,11 @@ private fun PreviewLoginErrorLight() {
         Surface {
             LoginContent(
                 formState = LoginFormState(email = "user@test.com", password = "wrongpass"),
-                uiState = LoginUiState.Error("Credenciales incorrectas"),
+                uiState =
+                    LoginUiState.Error(
+                        ar.edu.unlam.mobile.scaffolding.ui.utils.UiText
+                            .DynamicString("Credenciales incorrectas"),
+                    ),
                 onEmailChange = {},
                 onPasswordChange = {},
                 onTogglePasswordVisibility = {},

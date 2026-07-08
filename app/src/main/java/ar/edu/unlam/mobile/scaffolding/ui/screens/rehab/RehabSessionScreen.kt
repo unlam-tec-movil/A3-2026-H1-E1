@@ -17,12 +17,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.domain.model.Exercise
 import ar.edu.unlam.mobile.scaffolding.domain.model.PoseResult
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.JointPrecision
@@ -62,20 +64,20 @@ fun RehabSessionScreen(
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
-            title = { Text("¿Deseas salir?") },
+            title = { Text(stringResource(R.string.rehab_session_exit_title)) },
             text = {
                 Text(
-                    text = "Se perderá el progreso de esta sesión si sales ahora.",
+                    text = stringResource(R.string.rehab_session_exit_message),
                 )
             },
             confirmButton = {
                 TextButton(onClick = onNavigateBack) {
-                    Text("Salir")
+                    Text(stringResource(R.string.rehab_session_exit_confirm))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showExitDialog = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.cancel))
                 }
             },
         )
@@ -84,10 +86,10 @@ fun RehabSessionScreen(
     if (showNextDialog) {
         AlertDialog(
             onDismissRequest = { showNextDialog = false },
-            title = { Text("¿Siguiente ejercicio?") },
+            title = { Text(stringResource(R.string.rehab_session_next_title)) },
             text = {
                 Text(
-                    text = "Podrás continuar con la siguiente actividad de tu rutina.",
+                    text = stringResource(R.string.rehab_session_next_message),
                 )
             },
             confirmButton = {
@@ -97,12 +99,12 @@ fun RehabSessionScreen(
                         onNavigateToPostSession()
                     },
                 ) {
-                    Text("Siguiente")
+                    Text(stringResource(R.string.rehab_session_next_confirm))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showNextDialog = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.cancel))
                 }
             },
         )
@@ -204,13 +206,13 @@ fun RehabSessionContent(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Volver",
+                                contentDescription = stringResource(R.string.rehab_session_back_content_desc),
                                 tint = MaterialTheme.colorScheme.onSurface,
                             )
                         }
 
                         Text(
-                            text = exercise?.name ?: "Cargando...",
+                            text = exercise?.name ?: stringResource(R.string.rehab_session_loading),
                             style = MaterialTheme.typography.headlineSmall,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
@@ -227,7 +229,7 @@ fun RehabSessionContent(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                contentDescription = "Siguiente",
+                                contentDescription = stringResource(R.string.rehab_session_next_confirm),
                                 tint = MaterialTheme.colorScheme.onSurface,
                             )
                         }
@@ -236,7 +238,7 @@ fun RehabSessionContent(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Repeticiones: $reps / ${exercise?.repetitions ?: 0}",
+                        text = stringResource(R.string.rehab_session_reps, reps, exercise?.repetitions ?: 0),
                         style = MaterialTheme.typography.titleMedium,
                         color = Color.White.copy(alpha = 0.9f),
                     )
@@ -267,7 +269,7 @@ fun RehabSessionContent(
                 }
             }
         } else {
-            Text(text = "Se necesita permiso de cámara para iniciar la sesión.")
+            Text(text = stringResource(R.string.rehab_session_camera_permission_required))
         }
     }
 }

@@ -30,9 +30,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 
@@ -63,7 +65,7 @@ fun RomProgressCard(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Rango de Movimiento (ROM)",
+                text = stringResource(R.string.dashboard_rom_card_title),
                 style =
                     MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
@@ -72,7 +74,7 @@ fun RomProgressCard(
                 modifier = Modifier.align(Alignment.Start),
             )
             Text(
-                text = "Progreso del ROM máximo alcanzado",
+                text = stringResource(R.string.dashboard_rom_card_subtitle),
                 style =
                     MaterialTheme.typography.bodyMedium.copy(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -107,9 +109,9 @@ fun RomProgressCard(
                 val missingDegrees = (targetRom - maxRom).coerceAtLeast(0f).toInt()
                 val message =
                     if (missingDegrees > 0) {
-                        "Estás a sólo $missingDegrees° de alcanzar tu meta óptima de $targetRom°."
+                        stringResource(R.string.dashboard_rom_card_missing, missingDegrees, targetRom.toInt())
                     } else {
-                        "¡Excelente! Has alcanzado tu meta óptima de $targetRom°."
+                        stringResource(R.string.dashboard_rom_card_reached, targetRom.toInt())
                     }
                 Text(
                     text = message,
@@ -183,14 +185,14 @@ fun RomProgressRing(
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = "Máximo ROM",
+                text = stringResource(R.string.dashboard_rom_card_max_rom),
                 style =
                     MaterialTheme.typography.labelMedium.copy(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     ),
             )
             Text(
-                text = "Meta: ${targetRom.toInt()}°",
+                text = stringResource(R.string.dashboard_rom_card_target, targetRom.toInt()),
                 style =
                     MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Bold,

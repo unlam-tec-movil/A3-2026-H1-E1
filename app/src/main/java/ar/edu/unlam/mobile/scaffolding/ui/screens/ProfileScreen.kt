@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.ui.screens.dashboard.AchievementsSection
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CoralDanger
@@ -61,6 +63,7 @@ import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
+import ar.edu.unlam.mobile.scaffolding.ui.utils.UiText
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.ProfileUiState
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.ProfileViewModel
 import java.text.SimpleDateFormat
@@ -188,13 +191,13 @@ internal fun ProfileContent(
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
-                            text = "Buscar Clínicas Cercanas",
+                            text = stringResource(R.string.profile_find_clinics),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            text = "Ver clínicas en el mapa",
+                            text = stringResource(R.string.profile_find_clinics_desc),
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                         )
@@ -226,7 +229,7 @@ internal fun ProfileContent(
             colors = ButtonDefaults.outlinedButtonColors(contentColor = CoralDanger),
         ) {
             Text(
-                text = "Cerrar sesión",
+                text = stringResource(R.string.profile_logout),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 15.sp,
             )
@@ -239,19 +242,19 @@ internal fun ProfileContent(
     if (uiState.showSignOutDialog) {
         AlertDialog(
             onDismissRequest = onSignOutDismiss,
-            title = { Text("Cerrar sesión") },
-            text = { Text("¿Estás seguro de que querés cerrar sesión?") },
+            title = { Text(stringResource(R.string.profile_logout)) },
+            text = { Text(stringResource(R.string.profile_logout_confirm)) },
             confirmButton = {
                 Button(
                     onClick = onSignOutConfirm,
                     colors = ButtonDefaults.buttonColors(containerColor = CoralDanger),
                 ) {
-                    Text("Cerrar sesión", color = Color.White)
+                    Text(stringResource(R.string.profile_logout), color = Color.White)
                 }
             },
             dismissButton = {
                 TextButton(onClick = onSignOutDismiss) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.cancel))
                 }
             },
         )
@@ -266,7 +269,7 @@ private fun AvatarSection(
     email: String,
     isEditing: Boolean,
     editValue: String,
-    editError: String?,
+    editError: UiText?,
     isSaving: Boolean,
     onStartEdit: () -> Unit,
     onEditChange: (String) -> Unit,
@@ -309,10 +312,10 @@ private fun AvatarSection(
                 OutlinedTextField(
                     value = editValue,
                     onValueChange = onEditChange,
-                    label = { Text("Nombre") },
+                    label = { Text(stringResource(R.string.profile_name_label)) },
                     isError = editError != null,
                     supportingText =
-                        editError?.let { { Text(it, color = MaterialTheme.colorScheme.error) } },
+                        editError?.let { { Text(it.asString(), color = MaterialTheme.colorScheme.error) } },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !isSaving,
@@ -325,10 +328,14 @@ private fun AvatarSection(
                                 )
                             } else {
                                 IconButton(onClick = onSave) {
-                                    Icon(Icons.Default.Check, "Guardar", tint = EmeraldIdeal)
+                                    Icon(
+                                        Icons.Default.Check,
+                                        stringResource(R.string.profile_save),
+                                        tint = EmeraldIdeal,
+                                    )
                                 }
                                 IconButton(onClick = onCancel) {
-                                    Icon(Icons.Default.Close, "Cancelar", tint = CoralDanger)
+                                    Icon(Icons.Default.Close, stringResource(R.string.cancel), tint = CoralDanger)
                                 }
                             }
                         }
@@ -338,7 +345,7 @@ private fun AvatarSection(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Spacer(modifier = Modifier.width(30.dp))
                     Text(
-                        text = name.ifBlank { "Sin nombre" },
+                        text = name.ifBlank { stringResource(R.string.profile_no_name) },
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -347,7 +354,7 @@ private fun AvatarSection(
                     IconButton(onClick = onStartEdit, modifier = Modifier.size(28.dp)) {
                         Icon(
                             Icons.Default.Edit,
-                            contentDescription = "Editar nombre",
+                            contentDescription = stringResource(R.string.profile_edit_name),
                             tint = ElectricIndigo,
                             modifier = Modifier.size(18.dp),
                         )
@@ -389,13 +396,27 @@ private fun DarkModeToggleCard(
         ) {
             Column {
                 Text(
-                    text = if (isDarkMode) "Modo oscuro" else "Modo claro",
+                    text =
+                        if (isDarkMode) {
+                            stringResource(
+                                R.string.profile_dark_mode_on,
+                            )
+                        } else {
+                            stringResource(R.string.profile_dark_mode_off)
+                        },
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    text = if (isDarkMode) "🌙 Tema oscuro activo" else "☀️ Tema claro activo",
+                    text =
+                        if (isDarkMode) {
+                            stringResource(
+                                R.string.profile_dark_mode_active_on,
+                            )
+                        } else {
+                            stringResource(R.string.profile_dark_mode_active_off)
+                        },
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 )
@@ -424,13 +445,13 @@ private fun SessionHistoryCard(sessions: List<Session>) {
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                text = "Historial de sesiones",
+                text = stringResource(R.string.profile_session_history),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-                text = "Últimas ${sessions.size.coerceAtMost(10)} sesiones completadas",
+                text = stringResource(R.string.profile_last_sessions_count, sessions.size.coerceAtMost(10)),
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
             )
@@ -439,7 +460,7 @@ private fun SessionHistoryCard(sessions: List<Session>) {
 
             if (sessions.isEmpty()) {
                 Text(
-                    text = "Todavía no tenés sesiones registradas.",
+                    text = stringResource(R.string.profile_no_sessions),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     modifier = Modifier.padding(vertical = 8.dp),
@@ -479,7 +500,7 @@ private fun SessionRow(session: Session) {
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-                text = "$durationMin min · ${session.successfulReps} reps exitosas",
+                text = stringResource(R.string.profile_session_row_desc, durationMin, session.successfulReps),
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
             )

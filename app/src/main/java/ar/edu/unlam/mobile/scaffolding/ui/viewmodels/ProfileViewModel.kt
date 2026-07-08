@@ -2,12 +2,14 @@ package ar.edu.unlam.mobile.scaffolding.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.application.usecases.user.SignOutUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.user.UpdateUserUseCase
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
 import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
+import ar.edu.unlam.mobile.scaffolding.ui.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +29,7 @@ data class ProfileUiState(
     val isDarkMode: Boolean = false,
     val isEditingName: Boolean = false,
     val editNameValue: String = "",
-    val editNameError: String? = null,
+    val editNameError: UiText? = null,
     val isSavingName: Boolean = false,
     val showSignOutDialog: Boolean = false,
     val navigateToLogin: Boolean = false,
@@ -135,7 +137,12 @@ class ProfileViewModel
                         _uiState.update {
                             it.copy(
                                 isSavingName = false,
-                                editNameError = e.message ?: "Error al guardar",
+                                editNameError =
+                                    if (e.message != null) {
+                                        UiText.DynamicString(e.message!!)
+                                    } else {
+                                        UiText.StringResource(R.string.profile_error_save_failed)
+                                    },
                             )
                         }
                     }
@@ -185,9 +192,9 @@ class ProfileViewModel
             }
         }
 
-        private fun validateName(name: String): String? {
-            if (name.isBlank()) return "El nombre no puede estar vacío"
-            if (name.trim().length < 2) return "El nombre debe tener al menos 2 caracteres"
+        private fun validateName(name: String): UiText? {
+            if (name.isBlank()) return UiText.StringResource(R.string.profile_error_empty_name)
+            if (name.trim().length < 2) return UiText.StringResource(R.string.profile_error_short_name)
             return null
         }
     }

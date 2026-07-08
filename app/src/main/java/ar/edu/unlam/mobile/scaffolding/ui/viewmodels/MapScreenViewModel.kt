@@ -8,6 +8,7 @@ import android.provider.Settings
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.application.service.local.db.getNearestClinics
 import ar.edu.unlam.mobile.scaffolding.application.service.local.remote.routing.GetRouteUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.location.GetClinicsStoredUseCase
@@ -16,6 +17,7 @@ import ar.edu.unlam.mobile.scaffolding.application.usecases.mapprefs.GetLastDest
 import ar.edu.unlam.mobile.scaffolding.application.usecases.mapprefs.SaveLastDestinationClinicIdUseCase
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.RouteResponse
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
+import ar.edu.unlam.mobile.scaffolding.ui.utils.UiText
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -52,16 +54,16 @@ data class LocationUiState(
     val isLoadingPermission: Boolean = true,
     val permissionGranted: Boolean = false,
     val clinicsLoadSuccess: Boolean = false,
-    val clinicsLoadError: String? = null,
+    val clinicsLoadError: UiText? = null,
     val clinics: List<Clinic> = emptyList(),
     val clinicsNear: List<Clinic> = emptyList(),
     val selectedClinic: Clinic? = null,
     val searchBarText: String = "",
     val routeDistance: Double? = null,
-    val routeTime: String? = null,
+    val routeTime: UiText? = null,
     val mapInitialized: Boolean = false,
     val lastSavedClinicId: Int? = null,
-    val routeError: String? = null,
+    val routeError: UiText? = null,
     val lastRouteRequestLocation: LatLng? = null,
 ) {
     // Returns all clinics when search is empty; filters by name otherwise
@@ -319,7 +321,7 @@ class MapScreenViewModel
                     _mapScreenUiState.update { currentState ->
                         currentState.copy(
                             showRoute = false,
-                            routeError = "Could not load route. Please try again later.",
+                            routeError = UiText.StringResource(R.string.map_route_error),
                         )
                     }
                 }
@@ -333,7 +335,11 @@ class MapScreenViewModel
                 val style = mapController.style ?: return@launch
 
                 if (state.clinics.isEmpty()) {
-                    _mapScreenUiState.update { it.copy(clinicsLoadError = "Failed to load clinics") }
+                    _mapScreenUiState.update {
+                        it.copy(
+                            clinicsLoadError = UiText.StringResource(R.string.map_load_clinics_error),
+                        )
+                    }
                     return@launch
                 }
 
@@ -379,7 +385,11 @@ class MapScreenViewModel
                             it.copy(
                                 isLoadingClinics = false,
                                 clinicsLoadSuccess = false,
-                                clinicsLoadError = e.message ?: "Unknown error",
+                                clinicsLoadError =
+                                    UiText.StringResource(
+                                        R.string.map_clinics_load_error,
+                                        e.message ?: "Unknown error",
+                                    ),
                             )
                         }
                     }.collect { allClinics ->
@@ -441,8 +451,16 @@ class MapScreenViewModel
                 )
             }
 
-        private fun formatTravelTime(timeInMillis: Long): String {
+        private fun formatTravelTime(timeInMillis: Long): UiText {
             val minutes = (timeInMillis / 60000).toInt()
-            return if (minutes < 60) "$minutes min" else "${minutes / 60}h ${minutes % 60}min"
+            return if (minutes < 60) {
+                UiText.StringResource(R.string.map_travel_time_minutes, minutes)
+            } else {
+                UiText.StringResource(
+                    R.string.map_travel_time_hours_minutes,
+                    minutes / 60,
+                    minutes % 60,
+                )
+            }
         }
     }

@@ -13,10 +13,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
@@ -32,8 +34,8 @@ fun EnvironmentCheckScreen(
     val uiState by viewModel.uiState.collectAsState()
     val exercise = uiState.exercises.find { it.id == exerciseId }
 
-    val exerciseName = exercise?.name ?: "Ejercicio"
-    val bodyPart = exercise?.bodyPart ?: "el área indicada"
+    val exerciseName = exercise?.name ?: stringResource(R.string.env_check_default_exercise)
+    val bodyPart = exercise?.bodyPart ?: stringResource(R.string.env_check_default_body_part)
 
     Column(
         modifier =
@@ -49,14 +51,14 @@ fun EnvironmentCheckScreen(
             modifier = Modifier.padding(top = 16.dp),
         ) {
             Text(
-                text = "Preparación de la Sesión",
+                text = stringResource(R.string.env_check_title),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Ejercicio: $exerciseName",
+                text = stringResource(R.string.env_check_exercise_name, exerciseName),
                 style = MaterialTheme.typography.titleMedium,
                 color = ElectricIndigo,
                 fontWeight = FontWeight.SemiBold,
@@ -79,7 +81,7 @@ fun EnvironmentCheckScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Instrucciones de Entorno",
+                        text = stringResource(R.string.env_check_instruction_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -89,10 +91,10 @@ fun EnvironmentCheckScreen(
                     modifier = Modifier.padding(vertical = 12.dp),
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f),
                 )
-                CheckItem(text = "Asegúrate de que tu $bodyPart esté visible en la cámara.")
-                CheckItem(text = "Ubica el móvil a unos 2 metros de distancia.")
-                CheckItem(text = "Busca un lugar con buena iluminación.")
-                CheckItem(text = "Mantén el cuerpo entero dentro del encuadre.")
+                CheckItem(text = stringResource(R.string.env_check_instruction_visibility, bodyPart))
+                CheckItem(text = stringResource(R.string.env_check_instruction_distance))
+                CheckItem(text = stringResource(R.string.env_check_instruction_lighting))
+                CheckItem(text = stringResource(R.string.env_check_instruction_framing))
             }
         }
 
@@ -107,7 +109,7 @@ fun EnvironmentCheckScreen(
             shape = RoundedCornerShape(14.dp),
         ) {
             Text(
-                text = "Comenzar Ejercicio",
+                text = stringResource(R.string.env_check_start_button),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
