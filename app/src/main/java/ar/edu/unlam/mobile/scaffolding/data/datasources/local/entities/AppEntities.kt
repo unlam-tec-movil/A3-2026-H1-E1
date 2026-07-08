@@ -45,6 +45,7 @@ data class ExerciseEntity(
     val repetitions: Int,
     val sets: Int,
     val bodyPart: String,
+    val illustrationRes: Int? = null,
 )
 
 @Entity(tableName = "sessions")

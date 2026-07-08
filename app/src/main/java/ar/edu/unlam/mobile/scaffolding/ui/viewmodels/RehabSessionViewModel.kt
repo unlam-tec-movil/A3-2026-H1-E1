@@ -54,8 +54,20 @@ class RehabSessionViewModel
         private val _isSessionFinished = MutableStateFlow(false)
         val isSessionFinished: StateFlow<Boolean> = _isSessionFinished.asStateFlow()
 
+        private val _showFatigueAlert = MutableStateFlow(false)
+        val showFatigueAlert: StateFlow<Boolean> = _showFatigueAlert.asStateFlow()
+
         private var wasAtTarget = false
         private var sessionStartTime = 0L
+        private var isMoving = false
+        private var repStartTime = 0L
+        private var firstRepDuration = 0L
+        private var hasReachedStart = false
+
+        private val _fatigueRestTimer = MutableStateFlow(0)
+        val fatigueRestTimer: StateFlow<Int> = _fatigueRestTimer.asStateFlow()
+
+        private var timerJob: kotlinx.coroutines.Job? = null
 
         // ROM tracking
         private val repsMaxAngles = mutableListOf<Float>()
@@ -94,6 +106,17 @@ class RehabSessionViewModel
 
                         _precision.value = syncMotorUseCase.execute(angle, exercise)
 
+                        // Fatigue detection logic
+                        val isAtStart = kotlin.math.abs(angle - exercise.startAngle) < 15f
+                        if (isAtStart) {
+                            hasReachedStart = true
+                        }
+
+                        if (!isMoving && !isAtStart && hasReachedStart) {
+                            isMoving = true
+                            repStartTime = System.currentTimeMillis()
+                        }
+
                         val (completed, newWasAtTarget) =
                             syncMotorUseCase.checkRepetition(
                                 angle,
@@ -106,6 +129,19 @@ class RehabSessionViewModel
                             _repetitionCount.value += 1
                             repsMaxAngles.add(currentRepMaxAngle)
                             currentRepMaxAngle = 0f
+                            isMoving = false
+                            hasReachedStart = true
+
+                            val currentRepDuration = System.currentTimeMillis() - repStartTime
+                            if (_repetitionCount.value == 1) {
+                                firstRepDuration = currentRepDuration
+                            } else if (firstRepDuration > 0) {
+                                // 30% slower means duration is 1.3x
+                                if (currentRepDuration > firstRepDuration * 1.3) {
+                                    _showFatigueAlert.value = true
+                                    startFatigueTimer()
+                                }
+                            }
 
                             if (_repetitionCount.value >= exercise.repetitions) {
                                 finishSession()
@@ -127,6 +163,24 @@ class RehabSessionViewModel
 
         fun dismissFallAlert() {
             _fallDetected.value = false
+        }
+
+        fun dismissFatigueAlert() {
+            _showFatigueAlert.value = false
+            timerJob?.cancel()
+        }
+
+        private fun startFatigueTimer() {
+            _fatigueRestTimer.value = 60
+            timerJob?.cancel()
+            timerJob =
+                viewModelScope.launch {
+                    while (_fatigueRestTimer.value > 0) {
+                        kotlinx.coroutines.delay(1000)
+                        _fatigueRestTimer.value -= 1
+                    }
+                    _showFatigueAlert.value = false
+                }
         }
 
         private fun finishSession() {

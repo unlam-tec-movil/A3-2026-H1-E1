@@ -2,6 +2,7 @@ package ar.edu.unlam.mobile.scaffolding.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.domain.model.Exercise
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -85,6 +86,7 @@ class RoutineListViewModel
                             repetitions = 10,
                             sets = 3,
                             bodyPart = "Pierna Izquierda",
+                            illustrationRes = R.drawable.circle_mark,
                         ),
                         Exercise(
                             id = "ex_knee_extension",
@@ -98,6 +100,7 @@ class RoutineListViewModel
                             repetitions = 12,
                             sets = 3,
                             bodyPart = "Pierna Derecha",
+                            illustrationRes = R.drawable.circle_mark,
                         ),
                         Exercise(
                             id = "ex_assisted_squats",
@@ -111,6 +114,7 @@ class RoutineListViewModel
                             repetitions = 8,
                             sets = 4,
                             bodyPart = "Piernas",
+                            illustrationRes = R.drawable.circle_mark,
                         ),
                         Exercise(
                             id = "ex_heel_raises",
@@ -124,6 +128,7 @@ class RoutineListViewModel
                             repetitions = 15,
                             sets = 3,
                             bodyPart = "Tobillo Derecho",
+                            illustrationRes = R.drawable.circle_mark,
                         ),
                     )
                 rehabRepository.insertExercises(mockExercises)

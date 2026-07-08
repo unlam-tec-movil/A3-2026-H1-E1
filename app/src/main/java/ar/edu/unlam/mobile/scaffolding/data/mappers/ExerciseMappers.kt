@@ -16,6 +16,7 @@ fun ExerciseEntity.toDomain(): Exercise =
         repetitions = repetitions,
         sets = sets,
         bodyPart = bodyPart,
+        illustrationRes = illustrationRes,
     )
 
 fun Exercise.toEntity(): ExerciseEntity =
@@ -31,4 +32,5 @@ fun Exercise.toEntity(): ExerciseEntity =
         repetitions = repetitions,
         sets = sets,
         bodyPart = bodyPart,
+        illustrationRes = illustrationRes,
     )
