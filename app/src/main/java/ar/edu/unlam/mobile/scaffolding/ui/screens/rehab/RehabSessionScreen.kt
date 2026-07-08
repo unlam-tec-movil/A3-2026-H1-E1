@@ -337,6 +337,7 @@ fun RehabSessionContent(
                                     .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(8.dp)),
                             contentAlignment = Alignment.Center,
                         ) {
+                            /*
                             if (exercise?.illustrationRes != null) {
                                 Image(
                                     painter = painterResource(id = exercise.illustrationRes),
@@ -345,11 +346,12 @@ fun RehabSessionContent(
                                     contentScale = ContentScale.Fit,
                                 )
                             } else {
+                            */
                                 Text(
                                     text = "💪",
                                     fontSize = 24.sp,
                                 )
-                            }
+                            // }
                         }
                     }
                 }
