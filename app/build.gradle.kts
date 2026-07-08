@@ -12,7 +12,7 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
-    id("com.google.gms.google-services")
+    // id("com.google.gms.google-services")
 }
 
 tasks.withType<KotlinCompile>().configureEach {

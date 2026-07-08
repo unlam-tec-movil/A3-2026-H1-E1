@@ -91,6 +91,7 @@ class RoutineListViewModel
                             repetitions = 10,
                             sets = 3,
                             bodyPart = "Pierna Izquierda",
+                            illustrationRes = null, // R.drawable.circle_mark,
                         ),
                         Exercise(
                             id = "ex_knee_extension",
@@ -104,6 +105,7 @@ class RoutineListViewModel
                             repetitions = 12,
                             sets = 3,
                             bodyPart = "Pierna Derecha",
+                            illustrationRes = null, // R.drawable.circle_mark,
                         ),
                         Exercise(
                             id = "ex_assisted_squats",
@@ -117,6 +119,7 @@ class RoutineListViewModel
                             repetitions = 8,
                             sets = 4,
                             bodyPart = "Piernas",
+                            illustrationRes = null, // R.drawable.circle_mark,
                         ),
                         Exercise(
                             id = "ex_heel_raises",
@@ -130,6 +133,7 @@ class RoutineListViewModel
                             repetitions = 15,
                             sets = 3,
                             bodyPart = "Tobillo Derecho",
+                            illustrationRes = null, // R.drawable.circle_mark,
                         ),
                     )
                 rehabRepository.insertExercises(mockExercises)

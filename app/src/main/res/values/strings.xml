@@ -48,6 +48,8 @@
     <string name="onboarding_slide2_desc">La cámara y los sensores detectan tus movimientos. El sistema analiza ángulos articulares y sincroniza ejercicios para guiarte hacia una recuperación más rápida.</string>
     <string name="onboarding_slide3_title">Permisos necesarios</string>
     <string name="onboarding_slide3_desc">GambApp necesita acceso a cámara, ubicación y sensores de actividad para funcionar correctamente. Tu privacidad siempre está protegida.</string>
+    <string name="onboarding_slide4_title">Health Connect</string>
+    <string name="onboarding_slide4_desc">Sincroniza tus datos de salud (ritmo cardíaco y calorías) para un seguimiento clínico detallado de tu rehabilitación.</string>
     <string name="onboarding_skip">Saltar</string>
     <string name="onboarding_next">Siguiente</string>
     <string name="onboarding_start">Empezar</string>

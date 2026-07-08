@@ -14,4 +14,5 @@ data class Exercise(
     val sets: Int,
     // e.g., "Brazo Derecho"
     val bodyPart: String,
+    val illustrationRes: Int? = null,
 )

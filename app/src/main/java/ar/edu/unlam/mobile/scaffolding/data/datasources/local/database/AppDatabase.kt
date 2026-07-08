@@ -17,7 +17,7 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.local.entities.*
         SessionEntity::class,
         AchievementEntity::class,
     ],
-    version = 4,
+    version = 11,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {

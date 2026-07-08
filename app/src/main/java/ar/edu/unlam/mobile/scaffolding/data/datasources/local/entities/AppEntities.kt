@@ -11,16 +11,6 @@ data class UserEntity(
     val sessionToken: String?,
 )
 
-//
-// @Entity(tableName = "clinics")
-// data class AppClinicEntity(
-//    @PrimaryKey val id: String,
-//    val name: String,
-//    val address: String,
-//    val latitude: Double,
-//    val longitude: Double,
-//    val phone: String,
-// )
 @Entity(tableName = "clinics")
 data class AppClinicEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -37,7 +27,7 @@ data class ExerciseEntity(
     @PrimaryKey val id: String,
     val name: String,
     val description: String,
-    val targetJoints: String, // Stored as comma-separated string or JSON
+    val targetJoints: String,
     val startAngle: Float,
     val endAngle: Float,
     val toleranceIdeal: Float,
