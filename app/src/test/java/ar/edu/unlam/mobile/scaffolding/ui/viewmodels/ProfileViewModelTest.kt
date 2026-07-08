@@ -51,6 +51,7 @@ class ProfileViewModelTest {
         every { userRepository.getUser() } returns flowOf(mockUser)
         every { rehabRepository.getSessions(any()) } returns flowOf(mockSessions)
         every { sessionPreferences.isDarkMode } returns flowOf(false)
+        every { sessionPreferences.isDynamicThemeActive } returns flowOf(true)
     }
 
     @After
