@@ -7,7 +7,6 @@ import ar.edu.unlam.mobile.scaffolding.application.port.out.local.db.ClinicsRepo
 import ar.edu.unlam.mobile.scaffolding.application.port.out.local.db.HasStoredClinicsUseCase
 import ar.edu.unlam.mobile.scaffolding.application.port.out.local.location.LocationServicePort
 import ar.edu.unlam.mobile.scaffolding.application.port.out.local.prefs.MapPrefsRepositoryPort
-import ar.edu.unlam.mobile.scaffolding.application.port.out.local.sensor.MeasurableSensorPort
 import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.map.ApiKeyProvider
 import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.routing.RoutingApi
 import ar.edu.unlam.mobile.scaffolding.application.port.out.remote.routing.RoutingApiKeyProvider
@@ -30,7 +29,6 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.location.LocationService
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.model.Constants
 import ar.edu.unlam.mobile.scaffolding.data.datasources.network.routing.BuildConfigRoutingApiKeyProviderImpl
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.AccelerometerDataSource
-import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.LightSensor
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.LightSensorDataSource
 import ar.edu.unlam.mobile.scaffolding.data.datasources.sensor.StepCounterDataSource
 import ar.edu.unlam.mobile.scaffolding.data.repositories.AchievementRepositoryImpl
@@ -60,17 +58,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    // Inside AppModule object
     @Provides
     @Singleton
     @ApplicationScope
     fun providesApplicationScope(): CoroutineScope = CoroutineScope(SupervisorJob())
-
-    @Provides
-    @Singleton
-    fun providesLightSensor(
-        @ApplicationContext context: Context,
-    ): MeasurableSensorPort = LightSensor(context = context)
 
     @Provides
     @Singleton
@@ -181,7 +172,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesDataBaseRepository(
+    fun providesClinicsInDataBaseRepository(
         dao: ClinicsDao,
         @ApplicationContext context: Context,
     ): ClinicsRepositoryPort = ClinicsRepositoryImpl(clinicsDao = dao, context)
@@ -195,7 +186,7 @@ object AppModule {
                 klass = AppDatabase::class.java,
                 name = "app_database",
             ).createFromAsset("databases/prepopulated.db")
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration(true)
             .build()
 
     @Provides

@@ -9,8 +9,6 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -33,7 +31,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
-import ar.edu.unlam.mobile.scaffolding.ui.components.FABShortCut
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
 import ar.edu.unlam.mobile.scaffolding.ui.screens.DashboardScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.LoginScreen
@@ -42,7 +39,6 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.OnboardingScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.ProfileScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.RegisterScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.SplashScreen
-import ar.edu.unlam.mobile.scaffolding.ui.screens.UserScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.progress.ProgressScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.EnvironmentCheckScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.rehab.PostSessionScreen
@@ -71,22 +67,6 @@ fun MainScreen() {
     val showFab = currentRoute != Screen.MapScreen.route
 
     Scaffold(
-        floatingActionButton = {
-            if (showFab) {
-                FABShortCut(
-                    onClick = {
-                        controller.navigate(Screen.MapScreen.route) {
-                            launchSingleTop = true
-                            popUpTo(Screen.Dashboard.route) {
-                                saveState = currentRoute != Screen.MapScreen.route
-                            }
-                            restoreState = false
-                        }
-                    },
-                    icon = Icons.Default.Map,
-                )
-            }
-        },
         bottomBar = { if (showChrome) BottomBar(controller = controller) },
         snackbarHost = {
             SnackbarHost(snackBarHostState) { data ->
@@ -330,15 +310,6 @@ fun MainScreen() {
                 exitTransition = { slideOutHorizontally(animationSpec = tween(500, easing = FastOutSlowInEasing)) },
             ) {
                 MapScreen(onLoadedStateChange = { newStateFromMapScreen -> isMapLoading = newStateFromMapScreen })
-            }
-
-            // User
-            composable(
-                route = Screen.User.route,
-                arguments = listOf(navArgument("id") { type = NavType.StringType }),
-            ) { navBackStackEntry ->
-                val id = navBackStackEntry.arguments?.getString("id") ?: "1"
-                UserScreen(userId = id, modifier = Modifier.padding(paddingValues))
             }
         }
     }

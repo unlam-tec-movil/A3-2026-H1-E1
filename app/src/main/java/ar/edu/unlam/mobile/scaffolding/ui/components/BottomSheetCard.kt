@@ -32,6 +32,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -53,7 +54,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
-import ar.edu.unlam.mobile.scaffolding.ui.screens.HorizontalDivider
 
 @Composable
 fun BottomSheetCard(
@@ -67,9 +67,9 @@ fun BottomSheetCard(
     val context = LocalContext.current
     val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
-    val addresssInteractionSource = remember { MutableInteractionSource() }
+    val addressInteractionSource = remember { MutableInteractionSource() }
     val phoneNumberInteractionSource = remember { MutableInteractionSource() }
-    val isAddressPressed by addresssInteractionSource.collectIsPressedAsState()
+    val isAddressPressed by addressInteractionSource.collectIsPressedAsState()
     val isPNPressed by phoneNumberInteractionSource.collectIsPressedAsState()
 
     var isPNLongPressTriggered by remember { mutableStateOf(false) }
@@ -162,7 +162,7 @@ fun BottomSheetCard(
                                     ),
                                     shape = RoundedCornerShape(16.dp),
                                 ).combinedClickable(
-                                    interactionSource = addresssInteractionSource,
+                                    interactionSource = addressInteractionSource,
                                     onClick = {
                                         Toast
                                             .makeText(
