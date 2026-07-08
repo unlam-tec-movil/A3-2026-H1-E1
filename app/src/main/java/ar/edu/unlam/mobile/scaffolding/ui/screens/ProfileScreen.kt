@@ -95,6 +95,7 @@ fun ProfileScreen(
         onSaveName = viewModel::onSaveName,
         onCancelEditName = viewModel::onCancelEditName,
         onToggleDarkMode = viewModel::onToggleDarkMode,
+        onToggleDynamicTheme = viewModel::onToggleDynamicTheme,
         onSignOutRequest = viewModel::onSignOutRequest,
         onSignOutDismiss = viewModel::onSignOutDismiss,
         onSignOutConfirm = viewModel::onSignOutConfirm,
@@ -113,6 +114,7 @@ internal fun ProfileContent(
     onSaveName: () -> Unit,
     onCancelEditName: () -> Unit,
     onToggleDarkMode: () -> Unit,
+    onToggleDynamicTheme: () -> Unit,
     onSignOutRequest: () -> Unit,
     onSignOutDismiss: () -> Unit,
     onSignOutConfirm: () -> Unit,
@@ -157,6 +159,12 @@ internal fun ProfileContent(
         DarkModeToggleCard(
             isDarkMode = uiState.isDarkMode,
             onToggle = onToggleDarkMode,
+        )
+
+        // Dynamic theme toggle
+        DynamicThemeToggleCard(
+            isDynamicThemeActive = uiState.isDynamicThemeActive,
+            onToggle = onToggleDynamicTheme,
         )
 
         // Buscar Clínicas Cercanas Card
@@ -434,6 +442,57 @@ private fun DarkModeToggleCard(
     }
 }
 
+// DynamicThemeToggleCard
+@Composable
+private fun DynamicThemeToggleCard(
+    isDynamicThemeActive: Boolean,
+    onToggle: () -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp),
+    ) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column {
+                Text(
+                    text = stringResource(R.string.profile_dynamic_theme_label),
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text =
+                        if (isDynamicThemeActive) {
+                            stringResource(R.string.profile_dynamic_theme_enabled)
+                        } else {
+                            stringResource(R.string.profile_dynamic_theme_disabled)
+                        },
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                )
+            }
+            Switch(
+                checked = isDynamicThemeActive,
+                onCheckedChange = { onToggle() },
+                colors =
+                    SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = ElectricIndigo,
+                    ),
+            )
+        }
+    }
+}
+
 // SessionHistoryCard
 @Composable
 private fun SessionHistoryCard(sessions: List<Session>) {
@@ -541,6 +600,7 @@ private fun PreviewProfileLight() {
                 onSaveName = {},
                 onCancelEditName = {},
                 onToggleDarkMode = {},
+                onToggleDynamicTheme = {},
                 onSignOutRequest = {},
                 onSignOutDismiss = {},
                 onSignOutConfirm = {},
@@ -571,6 +631,7 @@ private fun PreviewProfileEditingLight() {
                 onSaveName = {},
                 onCancelEditName = {},
                 onToggleDarkMode = {},
+                onToggleDynamicTheme = {},
                 onSignOutRequest = {},
                 onSignOutDismiss = {},
                 onSignOutConfirm = {},
@@ -601,6 +662,7 @@ private fun PreviewProfileDark() {
                 onSaveName = {},
                 onCancelEditName = {},
                 onToggleDarkMode = {},
+                onToggleDynamicTheme = {},
                 onSignOutRequest = {},
                 onSignOutDismiss = {},
                 onSignOutConfirm = {},

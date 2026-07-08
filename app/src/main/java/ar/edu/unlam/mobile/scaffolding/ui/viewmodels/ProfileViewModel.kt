@@ -27,6 +27,7 @@ data class ProfileUiState(
     val initials: String = "",
     val recentSessions: List<Session> = emptyList(),
     val isDarkMode: Boolean = false,
+    val isDynamicThemeActive: Boolean = true,
     val isEditingName: Boolean = false,
     val editNameValue: String = "",
     val editNameError: UiText? = null,
@@ -60,10 +61,12 @@ class ProfileViewModel
                 combine(
                     userRepository.getUser(),
                     sessionPreferences.isDarkMode,
-                ) { user, darkMode ->
+                    sessionPreferences.isDynamicThemeActive,
+                ) { user, darkMode, dynamicThemeActive ->
                     val userId = user?.id ?: ""
-                    Triple(user, darkMode, userId)
-                }.collect { (user, darkMode, userId) ->
+                    Triple(user, Pair(darkMode, dynamicThemeActive), userId)
+                }.collect { (user, preferences, userId) ->
+                    val (darkMode, dynamicThemeActive) = preferences
                     if (userId.isNotEmpty()) {
                         observeSessions(userId)
                     }
@@ -74,6 +77,7 @@ class ProfileViewModel
                             email = user?.email ?: "",
                             initials = buildInitials(user?.name ?: ""),
                             isDarkMode = darkMode,
+                            isDynamicThemeActive = dynamicThemeActive,
                             isLoading = false,
                         )
                     }
@@ -158,6 +162,15 @@ class ProfileViewModel
             viewModelScope.launch {
                 val newValue = !_uiState.value.isDarkMode
                 sessionPreferences.setDarkMode(newValue)
+            }
+        }
+
+        // Dynamic theme
+        fun onToggleDynamicTheme() {
+            viewModelScope.launch {
+                val newValue = !_uiState.value.isDynamicThemeActive
+                _uiState.update { it.copy(isDynamicThemeActive = newValue) }
+                sessionPreferences.setDynamicThemeActive(newValue)
             }
         }
 

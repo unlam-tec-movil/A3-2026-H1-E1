@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        themeSensorManager.startListening()
+        // Theme sensor manager will be started conditionally in setContent when isDynamicThemeActive is true
     }
 
     override fun onStop() {
@@ -49,6 +49,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val isDarkMode by sessionPreferences.isDarkMode.collectAsState(initial = false)
+            val isDynamicThemeActive by sessionPreferences.isDynamicThemeActive.collectAsState(initial = true)
 
             LaunchedEffect(isDarkMode) {
                 enableEdgeToEdge(
@@ -79,7 +80,15 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
-            GambAppTheme(darkTheme = isDarkMode) {
+            LaunchedEffect(isDynamicThemeActive) {
+                if (isDynamicThemeActive) {
+                    themeSensorManager.startListening()
+                } else {
+                    themeSensorManager.stopListening()
+                }
+            }
+
+            GambAppTheme(darkTheme = isDarkMode, dynamicColor = isDynamicThemeActive) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
