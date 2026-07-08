@@ -1,15 +1,34 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens.rehab
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,9 +38,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.mobile.scaffolding.R
+import ar.edu.unlam.mobile.scaffolding.ui.components.CheckMeasurableItem
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
+import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.EnvironmentCheckViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.RoutineListViewModel
 
 @Composable
@@ -29,13 +50,16 @@ fun EnvironmentCheckScreen(
     exerciseId: String,
     onNavigateToSession: (String) -> Unit,
     modifier: Modifier = Modifier,
+    envCheckScreen: EnvironmentCheckViewModel = hiltViewModel(),
     viewModel: RoutineListViewModel = hiltViewModel(),
 ) {
+    val envCheckUiState by envCheckScreen.uiState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
     val exercise = uiState.exercises.find { it.id == exerciseId }
 
     val exerciseName = exercise?.name ?: stringResource(R.string.env_check_default_exercise)
     val bodyPart = exercise?.bodyPart ?: stringResource(R.string.env_check_default_body_part)
+    var allowExerciseButton by remember { mutableStateOf(false) }
 
     Column(
         modifier =
@@ -93,8 +117,11 @@ fun EnvironmentCheckScreen(
                 )
                 CheckItem(text = stringResource(R.string.env_check_instruction_visibility, bodyPart))
                 CheckItem(text = stringResource(R.string.env_check_instruction_distance))
-                CheckItem(text = stringResource(R.string.env_check_instruction_lighting))
                 CheckItem(text = stringResource(R.string.env_check_instruction_framing))
+                CheckMeasurableItem(
+                    envCheckUiState.lightLevel,
+                    onProperLight = { valueFromSensor -> allowExerciseButton = valueFromSensor },
+                )
             }
         }
 
@@ -107,6 +134,7 @@ fun EnvironmentCheckScreen(
                     .padding(bottom = 8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = ElectricIndigo),
             shape = RoundedCornerShape(14.dp),
+            enabled = allowExerciseButton,
         ) {
             Text(
                 text = stringResource(R.string.env_check_start_button),
