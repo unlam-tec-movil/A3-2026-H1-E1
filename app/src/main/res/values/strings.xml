@@ -77,6 +77,9 @@
     <string name="profile_dark_mode_off">Modo claro</string>
     <string name="profile_dark_mode_active_on">🌙 Tema oscuro activo</string>
     <string name="profile_dark_mode_active_off">☀️ Tema claro activo</string>
+    <string name="profile_dynamic_theme_label">Dynamic Theme</string>
+    <string name="profile_dynamic_theme_enabled">Colors adapt automatically</string>
+    <string name="profile_dynamic_theme_disabled">Using static colors</string>
     <string name="profile_session_row_desc">%1$d min · %2$d reps exitosas</string>
     <string name="profile_error_empty_name">El nombre no puede estar vacío</string>
     <string name="profile_error_short_name">El nombre debe tener al menos 2 caracteres</string>

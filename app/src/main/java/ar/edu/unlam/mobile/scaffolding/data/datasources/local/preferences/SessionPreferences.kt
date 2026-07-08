@@ -17,11 +17,13 @@ class SessionPreferences(
         private val SESSION_TOKEN = stringPreferencesKey("session_token")
         private val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
         private val DARK_MODE = booleanPreferencesKey("dark_mode")
+        private val DYNAMIC_THEME_ACTIVE = booleanPreferencesKey("dynamic_theme_active")
     }
 
     val sessionToken: Flow<String?> = context.dataStore.data.map { it[SESSION_TOKEN] }
     val isOnboardingCompleted: Flow<Boolean> = context.dataStore.data.map { it[ONBOARDING_COMPLETED] ?: false }
     val isDarkMode: Flow<Boolean> = context.dataStore.data.map { it[DARK_MODE] ?: false }
+    val isDynamicThemeActive: Flow<Boolean> = context.dataStore.data.map { it[DYNAMIC_THEME_ACTIVE] ?: true }
 
     suspend fun saveSessionToken(token: String) {
         context.dataStore.edit { it[SESSION_TOKEN] = token }
@@ -33,6 +35,10 @@ class SessionPreferences(
 
     suspend fun setDarkMode(enabled: Boolean) {
         context.dataStore.edit { it[DARK_MODE] = enabled }
+    }
+
+    suspend fun setDynamicThemeActive(enabled: Boolean) {
+        context.dataStore.edit { it[DYNAMIC_THEME_ACTIVE] = enabled }
     }
 
     suspend fun clearSession() {
