@@ -25,8 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
 
@@ -61,7 +63,7 @@ fun ActiveRoutineBanner(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Tu Rutina de Hoy 🏋️",
+                    text = stringResource(R.string.dashboard_routine_banner_title),
                     style =
                         MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
@@ -70,7 +72,7 @@ fun ActiveRoutineBanner(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Ver los ejercicios y objetivos asignados para hoy",
+                    text = stringResource(R.string.dashboard_routine_banner_desc),
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             color = Color.White.copy(alpha = 0.85f),
@@ -88,7 +90,7 @@ fun ActiveRoutineBanner(
             ) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
-                    contentDescription = "Ver Rutina",
+                    contentDescription = stringResource(R.string.dashboard_routine_banner_content_desc),
                     tint = Color.White,
                     modifier = Modifier.size(24.dp),
                 )

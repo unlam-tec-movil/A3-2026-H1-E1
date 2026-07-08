@@ -50,9 +50,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.domain.model.Clinic
 
 @Composable
@@ -66,6 +68,11 @@ fun BottomSheetCard(
 ) {
     val context = LocalContext.current
     val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+    val pressLongerAddressMsg = stringResource(R.string.bottom_sheet_press_longer_address)
+    val addressCopiedMsg = stringResource(R.string.bottom_sheet_address_copied)
+    val pressLongerPhoneMsg = stringResource(R.string.bottom_sheet_press_longer_phone)
+    val phoneCopiedMsg = stringResource(R.string.bottom_sheet_phone_copied)
 
     val addressInteractionSource = remember { MutableInteractionSource() }
     val phoneNumberInteractionSource = remember { MutableInteractionSource() }
@@ -167,7 +174,7 @@ fun BottomSheetCard(
                                         Toast
                                             .makeText(
                                                 context,
-                                                "press longer to copy the address",
+                                                pressLongerAddressMsg,
                                                 Toast.LENGTH_SHORT,
                                             ).show()
                                     },
@@ -178,7 +185,7 @@ fun BottomSheetCard(
                                         Toast
                                             .makeText(
                                                 context,
-                                                "address successfully copied",
+                                                addressCopiedMsg,
                                                 Toast.LENGTH_SHORT,
                                             ).show()
                                         clipboardManager.setPrimaryClip(clip)
@@ -252,7 +259,7 @@ fun BottomSheetCard(
                                             Toast
                                                 .makeText(
                                                     context,
-                                                    "press longer to copy the phone number",
+                                                    pressLongerPhoneMsg,
                                                     Toast.LENGTH_SHORT,
                                                 ).show()
                                         },
@@ -263,7 +270,7 @@ fun BottomSheetCard(
                                             Toast
                                                 .makeText(
                                                     context,
-                                                    "phone number successfully copied",
+                                                    phoneCopiedMsg,
                                                     Toast.LENGTH_SHORT,
                                                 ).show()
                                             clipboardManager.setPrimaryClip(clip)
@@ -316,7 +323,7 @@ fun BottomSheetCard(
                     distance?.let { distance ->
                         InfoChip(
                             icon = Icons.Outlined.NearMe,
-                            label = String.format("%.2f km", distance / 1000),
+                            label = stringResource(R.string.bottom_sheet_distance_km, distance / 1000),
                         )
                     }
                     estimatedArrival?.let { ea ->
@@ -346,7 +353,7 @@ fun BottomSheetCard(
                         modifier = Modifier.size(16.dp),
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "Calculate Route")
+                    Text(text = stringResource(R.string.bottom_sheet_calculate_route))
                 }
                 OutlinedButton(
                     border =
@@ -364,7 +371,10 @@ fun BottomSheetCard(
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
                     onClick = onCloseClick,
                 ) {
-                    Icon(imageVector = Icons.Default.SwipeDownAlt, contentDescription = "button to hide card")
+                    Icon(
+                        imageVector = Icons.Default.SwipeDownAlt,
+                        contentDescription = stringResource(R.string.bottom_sheet_hide_card_content_desc),
+                    )
                 }
             }
         }

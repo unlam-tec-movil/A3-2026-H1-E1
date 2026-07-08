@@ -13,9 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
 import ar.edu.unlam.mobile.scaffolding.ui.theme.DarkBg
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ElectricIndigo
@@ -76,7 +78,7 @@ fun PostSessionScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "¡Sesión Completada!",
+                        text = stringResource(R.string.post_session_title),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground,
@@ -98,7 +100,7 @@ fun PostSessionScreen(
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Text(
-                            text = exercise?.name ?: "Ejercicio",
+                            text = exercise?.name ?: stringResource(R.string.post_session_default_exercise),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -109,18 +111,18 @@ fun PostSessionScreen(
                         )
 
                         ResultRow(
-                            label = "Repeticiones",
+                            label = stringResource(R.string.post_session_reps_label),
                             value = "${session?.successfulReps ?: 0}",
                             valueColor = EmeraldIdeal,
                         )
                         ResultRow(
-                            label = "Duración",
-                            value = "${session?.durationSeconds ?: 0} seg",
+                            label = stringResource(R.string.post_session_duration_label),
+                            value = stringResource(R.string.post_session_duration_value, session?.durationSeconds ?: 0),
                             valueColor = CyanWave,
                         )
                         ResultRow(
-                            label = "ROM Promedio",
-                            value = String.format("%.1f°", session?.averageRom ?: 0f),
+                            label = stringResource(R.string.post_session_rom_label),
+                            value = stringResource(R.string.post_session_rom_value, session?.averageRom ?: 0f),
                             valueColor = ElectricIndigo,
                         )
                     }
@@ -143,7 +145,7 @@ fun PostSessionScreen(
                     shape = RoundedCornerShape(14.dp),
                 ) {
                     Text(
-                        text = "Guardar y Volver",
+                        text = stringResource(R.string.post_session_save_button),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,

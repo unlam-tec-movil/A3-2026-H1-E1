@@ -1,5 +1,6 @@
 package ar.edu.unlam.mobile.scaffolding.ui.viewmodels
 
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.application.usecases.user.SignOutUseCase
 import ar.edu.unlam.mobile.scaffolding.application.usecases.user.UpdateUserUseCase
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.preferences.SessionPreferences
@@ -7,6 +8,7 @@ import ar.edu.unlam.mobile.scaffolding.domain.model.Session
 import ar.edu.unlam.mobile.scaffolding.domain.model.User
 import ar.edu.unlam.mobile.scaffolding.domain.repository.RehabRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
+import ar.edu.unlam.mobile.scaffolding.ui.utils.UiText
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -176,7 +178,7 @@ class ProfileViewModelTest {
             vm.onEditNameChange("J")
 
             assertEquals(
-                "El nombre debe tener al menos 2 caracteres",
+                UiText.StringResource(R.string.profile_error_short_name),
                 vm.uiState.value.editNameError,
             )
         }
@@ -327,7 +329,7 @@ class ProfileViewModelTest {
             vm.onSaveName()
             advanceUntilIdle()
 
-            assertEquals("Error al guardar", vm.uiState.value.editNameError)
+            assertEquals(UiText.DynamicString("Error al guardar"), vm.uiState.value.editNameError)
         }
 
     // Cobertura adicional
@@ -386,7 +388,7 @@ class ProfileViewModelTest {
             vm.onSaveName()
             advanceUntilIdle()
 
-            assertEquals("El nombre no puede estar vacío", vm.uiState.value.editNameError)
+            assertEquals(UiText.StringResource(R.string.profile_error_empty_name), vm.uiState.value.editNameError)
             coVerify(exactly = 0) { updateUserUseCase(any()) }
         }
 
@@ -411,7 +413,7 @@ class ProfileViewModelTest {
             advanceUntilIdle()
             vm.onStartEditName()
             vm.onEditNameChange("J") // sets error
-            assertEquals("El nombre debe tener al menos 2 caracteres", vm.uiState.value.editNameError)
+            assertEquals(UiText.StringResource(R.string.profile_error_short_name), vm.uiState.value.editNameError)
 
             vm.onEditNameChange("Juan") // valid — clears error
 

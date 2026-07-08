@@ -42,12 +42,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.domain.model.Exercise
 import ar.edu.unlam.mobile.scaffolding.ui.navigation.Screen
 import ar.edu.unlam.mobile.scaffolding.ui.theme.CyanWave
@@ -77,7 +79,7 @@ fun RoutineListScreen(
             )
         } else if (uiState.error != null) {
             Text(
-                text = "Error: ${uiState.error}",
+                text = stringResource(R.string.general_error, uiState.error!!.asString()),
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.align(Alignment.Center),
             )
@@ -100,7 +102,7 @@ fun RoutineListScreen(
 
                 // List section title
                 Text(
-                    text = "Tus Ejercicios de Hoy",
+                    text = stringResource(R.string.routine_list_title),
                     style =
                         MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
@@ -118,7 +120,7 @@ fun RoutineListScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = "No tienes rutinas asignadas para hoy.",
+                            text = stringResource(R.string.routine_list_empty),
                             style =
                                 MaterialTheme.typography.bodyLarge.copy(
                                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
@@ -205,7 +207,7 @@ fun RoutineHeader(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Rutina Activa 🎯",
+                    text = stringResource(R.string.routine_list_header_title),
                     style =
                         MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
@@ -216,7 +218,7 @@ fun RoutineHeader(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "Ejercicios recomendados para tu rehabilitación hoy.",
+                    text = stringResource(R.string.routine_list_header_desc),
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -321,7 +323,7 @@ fun ExerciseCard(
             ) {
                 // Sets Badge
                 DetailBadge(
-                    label = "Series",
+                    label = stringResource(R.string.routine_list_badge_series),
                     value = "${exercise.sets}",
                     color = ElectricIndigo,
                     modifier = Modifier.weight(1f),
@@ -329,7 +331,7 @@ fun ExerciseCard(
 
                 // Reps Badge
                 DetailBadge(
-                    label = "Repeticiones",
+                    label = stringResource(R.string.routine_list_badge_reps),
                     value = "${exercise.repetitions}",
                     color = EmeraldIdeal,
                     modifier = Modifier.weight(1f),
@@ -337,7 +339,7 @@ fun ExerciseCard(
 
                 // Target Angle Badge
                 DetailBadge(
-                    label = "Ángulo Obj.",
+                    label = stringResource(R.string.routine_list_badge_target_angle),
                     value = "${exercise.endAngle.toInt()}°",
                     color = CyanWave,
                     modifier = Modifier.weight(1f),
@@ -366,7 +368,7 @@ fun ExerciseCard(
                 Spacer(modifier = Modifier.width(6.dp))
 
                 Text(
-                    text = "Iniciar Ejercicio",
+                    text = stringResource(R.string.routine_list_start_button),
                     style =
                         MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.Bold,

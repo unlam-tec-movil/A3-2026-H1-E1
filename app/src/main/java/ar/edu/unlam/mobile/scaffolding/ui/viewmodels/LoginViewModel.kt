@@ -2,7 +2,9 @@ package ar.edu.unlam.mobile.scaffolding.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.application.usecases.user.LoginUseCase
+import ar.edu.unlam.mobile.scaffolding.ui.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +21,7 @@ sealed interface LoginUiState {
     object Success : LoginUiState
 
     data class Error(
-        val message: String,
+        val message: UiText,
     ) : LoginUiState
 }
 
@@ -27,8 +29,8 @@ sealed interface LoginUiState {
 data class LoginFormState(
     val email: String = "",
     val password: String = "",
-    val emailError: String? = null,
-    val passwordError: String? = null,
+    val emailError: UiText? = null,
+    val passwordError: UiText? = null,
     val passwordVisible: Boolean = false,
 )
 
@@ -89,7 +91,10 @@ class LoginViewModel
                         loginUseCase(form.email.trim(), form.password)
                         LoginUiState.Success
                     }.getOrElse { e ->
-                        LoginUiState.Error(e.message ?: "Error desconocido")
+                        LoginUiState.Error(
+                            e.message?.let { UiText.DynamicString(it) }
+                                ?: UiText.StringResource(R.string.unknown_error),
+                        )
                     }
             }
         }
@@ -102,7 +107,10 @@ class LoginViewModel
                         loginUseCase.loginWithMock(email)
                         LoginUiState.Success
                     }.getOrElse { e ->
-                        LoginUiState.Error(e.message ?: "Error desconocido")
+                        LoginUiState.Error(
+                            e.message?.let { UiText.DynamicString(it) }
+                                ?: UiText.StringResource(R.string.unknown_error),
+                        )
                     }
             }
         }
@@ -112,15 +120,15 @@ class LoginViewModel
         }
 
         // Validaciones
-        private fun validateEmail(email: String): String? {
-            if (email.isBlank()) return "El correo no puede estar vacío"
+        private fun validateEmail(email: String): UiText? {
+            if (email.isBlank()) return UiText.StringResource(R.string.login_error_empty_email)
             val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
-            if (!emailRegex.matches(email.trim())) return "Formato de correo inválido"
+            if (!emailRegex.matches(email.trim())) return UiText.StringResource(R.string.login_error_invalid_email)
             return null
         }
 
-        private fun validatePassword(password: String): String? {
-            if (password.isBlank()) return "La contraseña no puede estar vacía"
+        private fun validatePassword(password: String): UiText? {
+            if (password.isBlank()) return UiText.StringResource(R.string.login_error_empty_password)
             return null
         }
     }

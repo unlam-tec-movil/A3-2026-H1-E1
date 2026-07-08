@@ -71,6 +71,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -122,6 +123,7 @@ fun MapScreen(
     var showFabReposition by remember { mutableStateOf<Boolean>(false) }
     var allowGoToConfigFeature by remember { mutableStateOf(true) }
     val dragHintOffsetY = remember { Animatable(0f) }
+    val permissionDeniedMessage = stringResource(R.string.map_permission_denied_toast)
 
     val controller = vm.mapController
     val routeColor = MaterialTheme.colorScheme.primary.toHex()
@@ -134,7 +136,12 @@ fun MapScreen(
             if (permissionGranted) {
                 vm.onLocationPermissionGranted()
             } else {
-                Toast.makeText(context, "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show()
+                Toast
+                    .makeText(
+                        context,
+                        permissionDeniedMessage,
+                        Toast.LENGTH_SHORT,
+                    ).show()
             }
         }
 
@@ -231,7 +238,7 @@ fun MapScreen(
     }
     LaunchedEffect(uiState.routeError) {
         uiState.routeError?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, it.asString(context), Toast.LENGTH_SHORT).show()
         }
     }
     // Check permission each time the app came back from for example settings
@@ -362,7 +369,7 @@ fun MapScreen(
                             onQueryChange = { vm.onSearchBarInputChange(newValue = it) },
                             onSearch = { searchBarState = false },
                             expanded = searchBarState,
-                            placeholder = { Text("Buscar clínicas...") },
+                            placeholder = { Text(stringResource(R.string.map_search_placeholder)) },
                             onExpandedChange = { searchBarState = it },
                             leadingIcon = {
                                 Icon(Icons.Default.Search, contentDescription = null)
@@ -370,7 +377,10 @@ fun MapScreen(
                             trailingIcon = {
                                 if (uiState.searchBarText.isNotEmpty()) {
                                     IconButton(onClick = { vm.onSearchBarInputChange("") }) {
-                                        Icon(Icons.Default.Close, contentDescription = "Limpiar búsqueda")
+                                        Icon(
+                                            Icons.Default.Close,
+                                            contentDescription = stringResource(R.string.map_clear_search_content_desc),
+                                        )
                                     }
                                 }
                             },
@@ -386,7 +396,7 @@ fun MapScreen(
                                         .verticalScroll(rememberScrollState()),
                             ) {
                                 Text(
-                                    text = "Se encontraron ${uiState.filteredClinics.size} clínica(s)",
+                                    text = stringResource(R.string.map_search_count, uiState.filteredClinics.size),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -471,7 +481,7 @@ fun MapScreen(
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                                 Text(
-                                    text = "No hay clínicas que coincidan con \"${uiState.searchBarText}\"",
+                                    text = stringResource(R.string.map_search_empty, uiState.searchBarText),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -560,13 +570,13 @@ fun MapScreen(
                                 ) {
                                     Icon(
                                         Icons.Default.Phone,
-                                        contentDescription = "Llamar clínica",
+                                        contentDescription = stringResource(R.string.map_call_clinic_content_desc),
                                         modifier = Modifier.padding(start = 15.dp),
                                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                     )
                                     Icon(
                                         Icons.Default.DeleteSweep,
-                                        contentDescription = "Crear ruta",
+                                        contentDescription = stringResource(R.string.map_create_route_content_desc),
                                         modifier = Modifier.padding(end = 18.dp),
                                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                     )
@@ -585,7 +595,7 @@ fun MapScreen(
                                             },
                                     clinic = clinicSelected,
                                     distance = uiState.routeDistance,
-                                    estimatedArrival = uiState.routeTime,
+                                    estimatedArrival = uiState.routeTime?.asString(),
                                     onCloseClick = {
                                         showBottomSheetCard = false
                                         showFabReposition = true
@@ -650,7 +660,7 @@ fun MapScreen(
                     ) {
                         Icon(
                             Icons.Default.Settings,
-                            contentDescription = "ir a ajustes",
+                            contentDescription = stringResource(R.string.map_go_to_settings_content_desc),
                             modifier = Modifier.padding(top = 25.dp),
                             tint = MaterialTheme.colorScheme.background,
                         )
@@ -716,7 +726,7 @@ fun MapScreen(
                         .padding(paddingValues),
             ) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "Error al cargar clínicas: ${uiState.clinicsLoadError}")
+                    Text(text = uiState.clinicsLoadError?.asString() ?: "")
                 }
             }
         } else if (!uiState.permissionGranted) {

@@ -1,6 +1,8 @@
 package ar.edu.unlam.mobile.scaffolding.ui.viewmodels
 
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.application.usecases.user.CreateUserUseCase
+import ar.edu.unlam.mobile.scaffolding.ui.utils.UiText
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -62,7 +64,7 @@ class RegisterViewModelTest {
     fun `onNameChange should set nameError when name is too short`() {
         viewModel.onNameChange("J")
 
-        assertEquals("El nombre debe tener al menos 2 caracteres", viewModel.formState.value.nameError)
+        assertEquals(UiText.StringResource(R.string.register_error_short_name), viewModel.formState.value.nameError)
     }
 
     @Test
@@ -85,7 +87,7 @@ class RegisterViewModelTest {
     fun `onEmailChange should set emailError when format is invalid`() {
         viewModel.onEmailChange("bad_email")
 
-        assertEquals("Formato de correo inválido", viewModel.formState.value.emailError)
+        assertEquals(UiText.StringResource(R.string.register_error_invalid_email), viewModel.formState.value.emailError)
     }
 
     @Test
@@ -101,7 +103,10 @@ class RegisterViewModelTest {
     fun `onPasswordChange should set passwordError when shorter than 8 chars`() {
         viewModel.onPasswordChange("1234567")
 
-        assertEquals("La contraseña debe tener al menos 8 caracteres", viewModel.formState.value.passwordError)
+        assertEquals(
+            UiText.StringResource(R.string.register_error_short_password),
+            viewModel.formState.value.passwordError,
+        )
     }
 
     @Test
@@ -117,7 +122,10 @@ class RegisterViewModelTest {
         viewModel.onConfirmPasswordChange("different_pass")
         viewModel.onPasswordChange("password123")
 
-        assertEquals("Las contraseñas no coinciden", viewModel.formState.value.confirmPasswordError)
+        assertEquals(
+            UiText.StringResource(R.string.register_error_passwords_mismatch),
+            viewModel.formState.value.confirmPasswordError,
+        )
     }
 
     // Validación de confirmar contraseña
@@ -126,7 +134,10 @@ class RegisterViewModelTest {
         viewModel.onPasswordChange("password123")
         viewModel.onConfirmPasswordChange("other_pass")
 
-        assertEquals("Las contraseñas no coinciden", viewModel.formState.value.confirmPasswordError)
+        assertEquals(
+            UiText.StringResource(R.string.register_error_passwords_mismatch),
+            viewModel.formState.value.confirmPasswordError,
+        )
     }
 
     @Test
@@ -165,10 +176,10 @@ class RegisterViewModelTest {
             advanceUntilIdle()
 
             val form = viewModel.formState.value
-            assertEquals("El nombre no puede estar vacío", form.nameError)
-            assertEquals("El correo no puede estar vacío", form.emailError)
-            assertEquals("La contraseña no puede estar vacía", form.passwordError)
-            assertEquals("Confirmá tu contraseña", form.confirmPasswordError)
+            assertEquals(UiText.StringResource(R.string.register_error_empty_name), form.nameError)
+            assertEquals(UiText.StringResource(R.string.register_error_empty_email), form.emailError)
+            assertEquals(UiText.StringResource(R.string.register_error_empty_password), form.passwordError)
+            assertEquals(UiText.StringResource(R.string.register_error_confirm_password), form.confirmPasswordError)
             assertTrue(viewModel.uiState.value is RegisterUiState.Idle)
             coVerify(exactly = 0) { createUserUseCase(any(), any(), any()) }
         }
@@ -184,7 +195,7 @@ class RegisterViewModelTest {
             advanceUntilIdle()
 
             assertEquals(
-                "La contraseña debe tener al menos 8 caracteres",
+                UiText.StringResource(R.string.register_error_short_password),
                 viewModel.formState.value.passwordError,
             )
             coVerify(exactly = 0) { createUserUseCase(any(), any(), any()) }
@@ -200,7 +211,10 @@ class RegisterViewModelTest {
             viewModel.onRegister()
             advanceUntilIdle()
 
-            assertEquals("Las contraseñas no coinciden", viewModel.formState.value.confirmPasswordError)
+            assertEquals(
+                UiText.StringResource(R.string.register_error_passwords_mismatch),
+                viewModel.formState.value.confirmPasswordError,
+            )
             coVerify(exactly = 0) { createUserUseCase(any(), any(), any()) }
         }
 
@@ -251,7 +265,7 @@ class RegisterViewModelTest {
 
             val state = viewModel.uiState.value
             assertTrue(state is RegisterUiState.Error)
-            assertEquals("El email ya está registrado", (state as RegisterUiState.Error).message)
+            assertEquals(UiText.DynamicString("El email ya está registrado"), (state as RegisterUiState.Error).message)
         }
 
     @Test
@@ -268,7 +282,7 @@ class RegisterViewModelTest {
 
             val state = viewModel.uiState.value
             assertTrue(state is RegisterUiState.Error)
-            assertEquals("Error desconocido", (state as RegisterUiState.Error).message)
+            assertEquals(UiText.StringResource(R.string.unknown_error), (state as RegisterUiState.Error).message)
         }
 
     // onErrorConsumed

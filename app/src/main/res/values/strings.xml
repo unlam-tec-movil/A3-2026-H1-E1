@@ -1,4 +1,206 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GambApp</string>
+
+    <!-- General / Errors -->
+    <string name="general_error">Error: %s</string>
+    <string name="unknown_error">Error desconocido</string>
+    <string name="cancel">Cancelar</string>
+    <string name="accept">Aceptar</string>
+    <string name="close">Cerrar</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">Tu rehabilitación, en tus manos</string>
+    <string name="login_email_label">Correo electrónico</string>
+    <string name="login_password_label">Contraseña</string>
+    <string name="login_button">Iniciar Sesión</string>
+    <string name="login_no_account">¿No tienes cuenta? Regístrate</string>
+    <string name="login_hide_password">Ocultar contraseña</string>
+    <string name="login_show_password">Mostrar contraseña</string>
+    <string name="login_quick_access_title">Acceso Rápido (Usuarios Mock)</string>
+    <string name="login_error_empty_email">El correo no puede estar vacío</string>
+    <string name="login_error_invalid_email">Formato de correo inválido</string>
+    <string name="login_error_empty_password">La contraseña no puede estar vacía</string>
+    <string name="login_error_short_password">La contraseña debe tener al menos 6 caracteres</string>
+
+    <!-- Register Screen -->
+    <string name="register_title">Crea tu Cuenta</string>
+    <string name="register_subtitle">Comienza tu camino de recuperación</string>
+    <string name="register_name_label">Nombre completo</string>
+    <string name="register_email_label">Correo electrónico</string>
+    <string name="register_password_label">Contraseña</string>
+    <string name="register_confirm_password_label">Confirmar contraseña</string>
+    <string name="register_button">Registrarse</string>
+    <string name="register_have_account">¿Ya tienes cuenta? Inicia sesión</string>
+    <string name="register_error_empty_name">El nombre no puede estar vacío</string>
+    <string name="register_error_short_name">El nombre debe tener al menos 2 caracteres</string>
+    <string name="register_error_empty_email">El correo no puede estar vacío</string>
+    <string name="register_error_invalid_email">Formato de correo inválido</string>
+    <string name="register_error_empty_password">La contraseña no puede estar vacía</string>
+    <string name="register_error_short_password">La contraseña debe tener al menos 8 caracteres</string>
+    <string name="register_error_confirm_password">Confirmá tu contraseña</string>
+    <string name="register_error_passwords_mismatch">Las contraseñas no coinciden</string>
+
+    <!-- Onboarding Screen -->
+    <string name="onboarding_slide1_title">Bienvenido a GambApp</string>
+    <string name="onboarding_slide1_desc">Tu compañero de rehabilitación inteligente. Seguimos tu progreso en tiempo real usando los sensores de tu teléfono para que cada sesión cuente.</string>
+    <string name="onboarding_slide2_title">¿Cómo funciona?</string>
+    <string name="onboarding_slide2_desc">La cámara y los sensores detectan tus movimientos. El sistema analiza ángulos articulares y sincroniza ejercicios para guiarte hacia una recuperación más rápida.</string>
+    <string name="onboarding_slide3_title">Permisos necesarios</string>
+    <string name="onboarding_slide3_desc">GambApp necesita acceso a cámara, ubicación y sensores de actividad para funcionar correctamente. Tu privacidad siempre está protegida.</string>
+    <string name="onboarding_skip">Saltar</string>
+    <string name="onboarding_next">Siguiente</string>
+    <string name="onboarding_start">Empezar</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_title">Perfil</string>
+    <string name="profile_view_details">Ver Detalles</string>
+    <string name="profile_logout">Cerrar Sesión</string>
+    <string name="profile_logout_confirm">¿Estás seguro de que deseas cerrar sesión?</string>
+    <string name="profile_settings">Configuración</string>
+    <string name="profile_dark_mode">Modo Oscuro</string>
+    <string name="profile_dark_mode_desc">Activar tema oscuro en toda la aplicación</string>
+    <string name="profile_session_history">Historial de Sesiones</string>
+    <string name="profile_last_sessions_count">Últimas %d sesiones</string>
+    <string name="profile_no_sessions">No hay sesiones registradas aún.</string>
+    <string name="profile_session_detail_title">Detalle de la Sesión</string>
+    <string name="profile_session_date">Fecha: %s</string>
+    <string name="profile_session_duration">Duración: %s</string>
+    <string name="profile_session_rom">ROM Promedio: %d°</string>
+    <string name="profile_session_reps">Repeticiones Exitosas: %d</string>
+    <string name="profile_find_clinics">Buscar Clínicas Cercanas</string>
+    <string name="profile_find_clinics_desc">Ver clínicas en el mapa</string>
+    <string name="profile_name_label">Nombre</string>
+    <string name="profile_no_name">Sin nombre</string>
+    <string name="profile_edit_name">Editar nombre</string>
+    <string name="profile_dark_mode_on">Modo oscuro</string>
+    <string name="profile_dark_mode_off">Modo claro</string>
+    <string name="profile_dark_mode_active_on">🌙 Tema oscuro activo</string>
+    <string name="profile_dark_mode_active_off">☀️ Tema claro activo</string>
+    <string name="profile_session_row_desc">%1$d min · %2$d reps exitosas</string>
+    <string name="profile_error_empty_name">El nombre no puede estar vacío</string>
+    <string name="profile_error_short_name">El nombre debe tener al menos 2 caracteres</string>
+    <string name="profile_error_save_failed">Error al guardar</string>
+    <string name="profile_save">Guardar</string>
+
+    <!-- Dashboard Screen -->
+    <string name="dashboard_greeting">¡Hola, %s! 👋</string>
+    <string name="dashboard_health_summary">Tu resumen de salud para hoy</string>
+    <string name="dashboard_achievement_unlocked">¡Logro Desbloqueado!</string>
+    <string name="dashboard_cool">¡Genial!</string>
+
+    <!-- Active Routine Banner -->
+    <string name="dashboard_routine_banner_title">Tu Rutina de Hoy 🏋️</string>
+    <string name="dashboard_routine_banner_desc">Ver los ejercicios y objetivos asignados para hoy</string>
+    <string name="dashboard_routine_banner_content_desc">Ver Rutina</string>
+
+    <!-- ROM Progress Card -->
+    <string name="dashboard_rom_card_title">Rango de Movimiento (ROM)</string>
+    <string name="dashboard_rom_card_subtitle">Progreso del ROM máximo alcanzado</string>
+    <string name="dashboard_rom_card_missing">Estás a sólo %1$d° de alcanzar tu meta óptima de %2$d°.</string>
+    <string name="dashboard_rom_card_reached">¡Excelente! Has alcanzado tu meta óptima de %d°.</string>
+    <string name="dashboard_rom_card_max_rom">Máximo ROM</string>
+    <string name="dashboard_rom_card_target">Meta: %d°</string>
+
+    <!-- Steps Card -->
+    <string name="dashboard_steps_card_title">Pasos Diarios</string>
+    <string name="dashboard_steps_card_subtitle">Actividad física registrada hoy</string>
+    <string name="dashboard_steps_card_target">Meta: %,d</string>
+    <string name="dashboard_steps_card_calories">Calorías</string>
+    <string name="dashboard_steps_card_calories_val">%d kcal</string>
+    <string name="dashboard_steps_card_distance">Distancia</string>
+    <string name="dashboard_steps_card_distance_val">%.1f km</string>
+    <string name="dashboard_steps_card_active_time">Tiempo activo</string>
+    <string name="dashboard_steps_card_active_time_val">%d min</string>
+
+    <!-- Achievements Card -->
+    <string name="dashboard_achievements_title">Tus Logros y Medallas 🏆</string>
+    <string name="dashboard_achievements_subtitle">Gamificación y progreso del tratamiento</string>
+    <string name="dashboard_achievements_ratio">%1$d / %2$d</string>
+    <string name="dashboard_achievements_unlocked">Desbloqueados</string>
+
+    <!-- Last Session Card -->
+    <string name="dashboard_last_session_title">Última Sesión Activa</string>
+    <string name="dashboard_last_session_subtitle">Resultados de tu último entrenamiento</string>
+    <string name="dashboard_last_session_date_label">Fecha del entrenamiento</string>
+    <string name="dashboard_last_session_duration">Duración</string>
+    <string name="dashboard_last_session_duration_min_sec">%1$dm %2$ds</string>
+    <string name="dashboard_last_session_duration_min">%d min</string>
+    <string name="dashboard_last_session_avg_rom">ROM Promedio</string>
+    <string name="dashboard_last_session_successful_reps">Rep. Exitosas</string>
+    <string name="dashboard_last_session_empty">No hay registros de sesiones de entrenamiento aún.</string>
+
+    <!-- Location Denied Card -->
+    <string name="dashboard_location_denied_text">Gambapp necesita conocer tu ubicacion para poder recomendarte clinicas cercanas.</string>
+
+    <!-- Bottom Sheet Card -->
+    <string name="bottom_sheet_press_longer_address">Mantén pulsado para copiar la dirección</string>
+    <string name="bottom_sheet_address_copied">Dirección copiada con éxito</string>
+    <string name="bottom_sheet_press_longer_phone">Mantén pulsado para copiar el teléfono</string>
+    <string name="bottom_sheet_phone_copied">Teléfono copiado con éxito</string>
+    <string name="bottom_sheet_distance_km">%.2f km</string>
+    <string name="bottom_sheet_calculate_route">Calcular ruta</string>
+    <string name="bottom_sheet_hide_card_content_desc">Botón para ocultar tarjeta</string>
+
+    <!-- Map Screen -->
+    <string name="map_search_placeholder">Buscar clínicas...</string>
+    <string name="map_clear_search_content_desc">Limpiar búsqueda</string>
+    <string name="map_search_count">Se encontraron %d clínica(s)</string>
+    <string name="map_search_empty">No hay clínicas que coincidan con \"%s\"</string>
+    <string name="map_call_clinic_content_desc">Llamar clínica</string>
+    <string name="map_create_route_content_desc">Crear ruta</string>
+    <string name="map_go_to_settings_content_desc">ir a ajustes</string>
+    <string name="map_clinics_load_error">Error al cargar clínicas: %s</string>
+    <string name="map_permission_denied_toast">Permiso de ubicación denegado</string>
+    <string name="map_route_error">No se pudo cargar la ruta. Inténtalo de nuevo más tarde.</string>
+    <string name="map_load_clinics_error">No se pudieron cargar las clínicas</string>
+    <string name="map_travel_time_minutes">%d min</string>
+    <string name="map_travel_time_hours_minutes">%1$dh %2$dmin</string>
+
+    <!-- Greeting Component -->
+    <string name="greeting_format">Hello %s!</string>
+
+    <!-- Routine List Screen -->
+    <string name="routine_list_title">Tus Ejercicios de Hoy</string>
+    <string name="routine_list_empty">No tienes rutinas asignadas para hoy.</string>
+    <string name="routine_list_header_title">Rutina Activa 🎯</string>
+    <string name="routine_list_header_desc">Ejercicios recomendados para tu rehabilitación hoy.</string>
+    <string name="routine_list_badge_series">Series</string>
+    <string name="routine_list_badge_reps">Repeticiones</string>
+    <string name="routine_list_badge_target_angle">Ángulo Obj.</string>
+    <string name="routine_list_start_button">Iniciar Ejercicio</string>
+
+    <!-- Environment Check Screen -->
+    <string name="env_check_default_exercise">Ejercicio</string>
+    <string name="env_check_default_body_part">el área indicada</string>
+    <string name="env_check_title">Preparación de la Sesión</string>
+    <string name="env_check_exercise_name">Ejercicio: %s</string>
+    <string name="env_check_instruction_title">Instrucciones de Entorno</string>
+    <string name="env_check_instruction_visibility">Asegúrate de que tu %s esté visible en la cámara.</string>
+    <string name="env_check_instruction_distance">Ubica el móvil a unos 2 metros de distancia.</string>
+    <string name="env_check_instruction_lighting">Busca un lugar con buena iluminación.</string>
+    <string name="env_check_instruction_framing">Mantén el cuerpo entero dentro del encuadre.</string>
+    <string name="env_check_start_button">Comenzar Ejercicio</string>
+
+    <!-- Rehab Session Screen -->
+    <string name="rehab_session_exit_title">¿Deseas salir?</string>
+    <string name="rehab_session_exit_message">Se perderá el progreso de esta sesión si sales ahora.</string>
+    <string name="rehab_session_exit_confirm">Salir</string>
+    <string name="rehab_session_next_title">¿Siguiente ejercicio?</string>
+    <string name="rehab_session_next_message">Podrás continuar con la siguiente actividad de tu rutina.</string>
+    <string name="rehab_session_next_confirm">Siguiente</string>
+    <string name="rehab_session_loading">Cargando...</string>
+    <string name="rehab_session_reps">Repeticiones: %1$d / %2$d</string>
+    <string name="rehab_session_camera_permission_required">Se necesita permiso de cámara para iniciar la sesión.</string>
+    <string name="rehab_session_back_content_desc">Volver</string>
+
+    <!-- Post Session Screen -->
+    <string name="post_session_title">¡Sesión Completada!</string>
+    <string name="post_session_default_exercise">Ejercicio</string>
+    <string name="post_session_reps_label">Repeticiones</string>
+    <string name="post_session_duration_label">Duración</string>
+    <string name="post_session_duration_value">%d seg</string>
+    <string name="post_session_rom_label">ROM Promedio</string>
+    <string name="post_session_rom_value">%.1f°</string>
+    <string name="post_session_save_button">Guardar y Volver</string>
 </resources>
