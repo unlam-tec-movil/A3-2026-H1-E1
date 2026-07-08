@@ -1,5 +1,8 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens
 
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -36,11 +39,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.health.connect.client.HealthConnectClient
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ar.edu.unlam.mobile.scaffolding.R
@@ -72,6 +77,11 @@ private val slides =
             titleRes = R.string.onboarding_slide3_title,
             descriptionRes = R.string.onboarding_slide3_desc,
         ),
+        OnboardingSlide(
+            emoji = "💓",
+            titleRes = R.string.onboarding_slide4_title,
+            descriptionRes = R.string.onboarding_slide4_desc,
+        ),
     )
 
 // OnboardingScreen
@@ -81,6 +91,15 @@ fun OnboardingScreen(
     viewModel: OnboardingViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    val permissionsLauncher =
+        rememberLauncherForActivityResult(
+            contract = viewModel.getPermissionContract(),
+        ) { granted ->
+            val allGranted = granted.containsAll(viewModel.getHealthPermissions())
+            viewModel.updatePermissionsStatus(allGranted)
+        }
 
     // Consume la señal de navegación
     LaunchedEffect(uiState.navigateToLogin) {
@@ -172,33 +191,111 @@ fun OnboardingScreen(
 
             // Botón principal
             val isLastPage = uiState.currentPage == uiState.totalPages - 1
-            Button(
-                onClick = {
-                    if (isLastPage) viewModel.completeOnboarding() else viewModel.nextPage()
-                },
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(52.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = ElectricIndigo),
-                shape = MaterialTheme.shapes.medium,
-            ) {
-                Text(
-                    text =
-                        if (isLastPage) {
-                            stringResource(
-                                R.string.onboarding_start,
-                            )
-                        } else {
-                            stringResource(R.string.onboarding_next)
-                        },
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White,
+            val isHealthConnectPage = uiState.currentPage == 3
+
+            if (isHealthConnectPage) {
+                HealthConnectActionButtons(
+                    status = uiState.healthConnectStatus,
+                    hasPermissions = uiState.hasHealthConnectPermissions,
+                    onInstall = {
+                        val intent =
+                            Intent(Intent.ACTION_VIEW).apply {
+                                data = Uri.parse("market://details?id=com.google.android.apps.healthdata")
+                                setPackage("com.android.vending")
+                            }
+                        context.startActivity(intent)
+                    },
+                    onRequestPermissions = {
+                        permissionsLauncher.launch(viewModel.getHealthPermissions())
+                    },
+                    onContinue = viewModel::completeOnboarding,
                 )
+            } else {
+                Button(
+                    onClick = {
+                        if (isLastPage) viewModel.completeOnboarding() else viewModel.nextPage()
+                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(52.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = ElectricIndigo),
+                    shape = MaterialTheme.shapes.medium,
+                ) {
+                    Text(
+                        text =
+                            if (isLastPage) {
+                                stringResource(R.string.onboarding_start)
+                            } else {
+                                stringResource(R.string.onboarding_next)
+                            },
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+private fun HealthConnectActionButtons(
+    status: Int,
+    hasPermissions: Boolean,
+    onInstall: () -> Unit,
+    onRequestPermissions: () -> Unit,
+    onContinue: () -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        when (status) {
+            HealthConnectClient.SDK_UNAVAILABLE -> {
+                Text(
+                    text = "Health Connect no está disponible en este dispositivo.",
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                )
+                Button(
+                    onClick = onContinue,
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = ElectricIndigo),
+                ) {
+                    Text("Continuar sin Health Connect", color = Color.White)
+                }
+            }
+
+            2 -> { // SDK_AVAILABLE_V2 o similar (dependiendo de la versión de la lib)
+                Button(
+                    onClick = onInstall,
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = ElectricIndigo),
+                ) {
+                    Text("Instalar Health Connect", color = Color.White)
+                }
+            }
+
+            else -> {
+                if (!hasPermissions) {
+                    Button(
+                        onClick = onRequestPermissions,
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = ElectricIndigo),
+                    ) {
+                        Text("Vincular Salud", color = Color.White)
+                    }
+                } else {
+                    Button(
+                        onClick = onContinue,
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                    ) {
+                        Text("¡Sincronizado! Empezar", color = Color.White)
+                    }
+                }
+            }
         }
     }
 }

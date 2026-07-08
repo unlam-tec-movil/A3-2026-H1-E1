@@ -4,17 +4,42 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.Preview.SurfaceProvider
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -22,8 +47,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.LifecycleOwner
 import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.domain.model.Exercise
 import ar.edu.unlam.mobile.scaffolding.domain.model.PoseResult
@@ -35,6 +62,7 @@ import ar.edu.unlam.mobile.scaffolding.ui.theme.DarkBg
 import ar.edu.unlam.mobile.scaffolding.ui.theme.EmeraldIdeal
 import ar.edu.unlam.mobile.scaffolding.ui.theme.GambAppTheme
 import ar.edu.unlam.mobile.scaffolding.ui.viewmodels.RehabSessionViewModel
+import java.util.Locale
 
 @Composable
 fun RehabSessionScreen(
@@ -51,6 +79,9 @@ fun RehabSessionScreen(
     val currentExercise by viewModel.currentExercise.collectAsState()
     val repetitionCount by viewModel.repetitionCount.collectAsState()
     val isSessionFinished by viewModel.isSessionFinished.collectAsState()
+    val fallDetected by viewModel.fallDetected.collectAsState()
+    val showFatigueAlert by viewModel.showFatigueAlert.collectAsState()
+    val fatigueRestTimer by viewModel.fatigueRestTimer.collectAsState()
 
     var showExitDialog by remember { mutableStateOf(false) }
     var showNextDialog by remember { mutableStateOf(false) }
@@ -59,6 +90,62 @@ fun RehabSessionScreen(
         LaunchedEffect(Unit) {
             onNavigateToPostSession()
         }
+    }
+
+    if (showFatigueAlert) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissFatigueAlert() },
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        "¿Descansamos?",
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                    IconButton(onClick = { viewModel.dismissFatigueAlert() }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cerrar",
+                        )
+                    }
+                }
+            },
+            text = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Detectamos fatiga. Te recomendamos descansar 60 segundos.",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text =
+                            String.format(
+                                Locale.getDefault(),
+                                "%02d:%02d",
+                                fatigueRestTimer / 60,
+                                fatigueRestTimer % 60,
+                            ),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { viewModel.dismissFatigueAlert() },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text("Omitir y continuar")
+                }
+            },
+            shape = RoundedCornerShape(16.dp),
+            properties = DialogProperties(usePlatformDefaultWidth = false),
+            modifier = Modifier.padding(32.dp),
+        )
     }
 
     if (showExitDialog) {
@@ -105,6 +192,25 @@ fun RehabSessionScreen(
             dismissButton = {
                 TextButton(onClick = { showNextDialog = false }) {
                     Text(stringResource(R.string.cancel))
+                }
+            },
+        )
+    }
+
+    if (fallDetected) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissFallAlert() },
+            title = { Text("¡Movimiento brusco detectado!") },
+            text = {
+                Text(
+                    text = "Hemos pausado la sesión para tu seguridad. ¿Te encuentras bien?",
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { viewModel.dismissFallAlert() },
+                ) {
+                    Text("Estoy bien")
                 }
             },
         )
@@ -160,7 +266,7 @@ fun RehabSessionContent(
     precision: JointPrecision,
     exercise: Exercise?,
     reps: Int,
-    onSurfaceReady: (androidx.lifecycle.LifecycleOwner, androidx.camera.core.Preview.SurfaceProvider) -> Unit,
+    onSurfaceReady: (LifecycleOwner, SurfaceProvider) -> Unit,
     onBackClick: () -> Unit,
     onNextClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -237,11 +343,33 @@ fun RehabSessionContent(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(
-                        text = stringResource(R.string.rehab_session_reps, reps, exercise?.repetitions ?: 0),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.White.copy(alpha = 0.9f),
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.rehab_session_reps, reps, exercise?.repetitions ?: 0),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.White.copy(alpha = 0.9f),
+                        )
+
+                        // Exercise Illustration Square
+                        Box(
+                            modifier =
+                                Modifier
+                                    .size(60.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color.White.copy(alpha = 0.1f))
+                                    .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(8.dp)),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = "💪",
+                                fontSize = 24.sp,
+                            )
+                        }
+                    }
                 }
 
                 // Precision Feedback
